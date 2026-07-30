@@ -5,24 +5,46 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏪</text></svg>">
 <style>
-:root{--bg:#eef2f1;--panel:#fff;--soft:#f6f9f7;--ink:#17262c;--line:#d6ddd9;--muted:#64727a;--brand:#15706a;
---good:#1f875a;--good-s:#e5f1ea;--warm:#c98a1f;--warm-s:#f6edd9;--bad:#c0402e;--bad-s:#f4e2de;}
+:root{--bg:#faedd2;--panel:#fffdf7;--soft:#fbf2df;--ink:#241a10;--line:#e6d3a3;--muted:#8a7350;
+  --brand:#1c5c86;--brand-s:#dfe9f0;--brand2:#d9932c;
+  --good:#227a4e;--good-s:#e2efdf;--good-b:#bcdcc4;
+  --warm:#c1801a;--warm-s:#f8edd2;--warm-b:#eecc7e;
+  --bad:#c23b2e;--bad-s:#f6e1dc;--bad-b:#eec1b6;
+  --shadow:0 1px 2px rgba(36,26,16,.06);color-scheme:light;}
+:root[data-theme="dark"]{--bg:#181209;--panel:#241c11;--soft:#2b2214;--ink:#f4e9d4;--line:#4a3c24;--muted:#c2ab80;
+  --brand:#7cbde6;--brand-s:#22384a;--brand2:#eab84e;
+  --good:#63c092;--good-s:#1e3327;--good-b:#2f5240;
+  --warm:#e3ac52;--warm-s:#3a2d15;--warm-b:#5c4726;
+  --bad:#ea8574;--bad-s:#3c231d;--bad-b:#5c352b;
+  --shadow:0 1px 3px rgba(0,0,0,.4);color-scheme:dark;}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#181209;--panel:#241c11;--soft:#2b2214;--ink:#f4e9d4;--line:#4a3c24;--muted:#c2ab80;
+  --brand:#7cbde6;--brand-s:#22384a;--brand2:#eab84e;
+  --good:#63c092;--good-s:#1e3327;--good-b:#2f5240;
+  --warm:#e3ac52;--warm-s:#3a2d15;--warm-b:#5c4726;
+  --bad:#ea8574;--bad-s:#3c231d;--bad-b:#5c352b;
+  --shadow:0 1px 3px rgba(0,0,0,.4);color-scheme:dark;}}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font-family:"Inter",system-ui,sans-serif;padding:clamp(14px,3.5vw,34px)}
+html{background:var(--bg)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Inter",system-ui,sans-serif;padding:clamp(14px,3.5vw,34px);transition:background .2s,color .2s}
+.awning{height:9px;max-width:960px;margin:0 auto;border-radius:5px;background:repeating-linear-gradient(90deg,var(--bad) 0 26px,var(--brand2) 26px 52px,var(--brand) 52px 78px)}
 .wrap{max-width:960px;margin:0 auto}
+.theme-toggle{position:fixed;top:16px;right:16px;width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:var(--panel);color:var(--ink);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow);z-index:10}
+.theme-toggle:hover{border-color:var(--brand)}
+.theme-toggle:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
 h1{font-family:"Archivo";font-weight:800;font-size:clamp(26px,5vw,40px);letter-spacing:-.02em;margin:0;line-height:1}
-.eyebrow{font-family:"IBM Plex Mono";font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--brand);margin:0 0 8px}
+.eyebrow{display:inline-flex;align-items:center;gap:6px;font-family:"IBM Plex Mono";font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--brand);margin:0 0 10px;background:var(--brand-s);border:1px dashed var(--brand);border-radius:20px;padding:4px 12px 4px 10px}
 .lead{color:var(--muted);margin:10px 0 0;font-size:14.5px;max-width:66ch}
-header{border-bottom:1px solid var(--line);padding-bottom:20px;margin-bottom:20px}
+header{border-bottom:1px solid var(--line);padding-bottom:20px;margin:14px 0 20px}
 .tabs{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:22px}
 .tabs button{font-family:"Archivo";font-weight:600;font-size:13.5px;cursor:pointer;background:transparent;border:1px solid transparent;border-radius:9px;padding:9px 14px;color:var(--muted)}
 .tabs button:hover{color:var(--ink);background:var(--soft)}
-.tabs button.on{background:var(--ink);color:#fff}
+.tabs button.on{background:var(--brand);color:#fff;box-shadow:var(--shadow)}
 .tabs button:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
 .tab{display:none}.tab.on{display:block;animation:fade .25s ease}
 @keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
-.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px;box-shadow:var(--shadow)}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
 @media(max-width:720px){.grid2{grid-template-columns:1fr}}
 h2{font-family:"Archivo";font-weight:700;font-size:15px;letter-spacing:.02em;margin:0 0 4px}
@@ -32,7 +54,7 @@ h2{font-family:"Archivo";font-weight:700;font-size:15px;letter-spacing:.02em;mar
 .field label{font-weight:600;font-size:13.5px}
 .field .hint{font-size:11.5px;color:var(--muted)}
 .field .val{font-family:"Archivo";font-weight:700;font-size:20px}
-input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:6px;border-radius:4px;background:#cfd8d4;margin-top:10px;cursor:pointer}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:6px;border-radius:4px;background:var(--line);margin-top:10px;cursor:pointer}
 input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--ink);border:3px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.25)}
 input[type=number],input[type=text]{font-family:"Inter";font-size:14px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--soft)}
 .temp-wrap{display:flex;gap:22px;align-items:center}
@@ -67,29 +89,32 @@ select{font-family:"Inter";font-size:14px;padding:9px 11px;border:1px solid var(
 .pair{display:flex;align-items:center;gap:12px;padding:12px 0;border-top:1px solid var(--line)}
 .pair:first-child{border-top:none}
 .pair .pn{font-family:"Archivo";font-weight:700;font-size:15px;min-width:150px}
-.pair .track{flex:1;background:#eef2f0;border-radius:5px;height:14px;overflow:hidden}
+.pair .track{flex:1;background:var(--soft);border-radius:5px;height:14px;overflow:hidden;border:1px solid var(--line)}
 .pair .track i{display:block;height:100%;background:var(--brand)}
 .pair .pv{font-family:"IBM Plex Mono";font-size:12px;color:var(--muted);min-width:120px;text-align:right}
-.rec{margin-top:16px;background:var(--good-s);border:1px solid #bfe0cf;border-radius:12px;padding:14px 16px;font-size:14px}
+.rec{margin-top:16px;background:var(--good-s);border:1px solid var(--good-b);border-radius:12px;padding:14px 16px;font-size:14px}
 .rec b{color:var(--good)}
 .note{margin-top:14px;font-size:12px;color:var(--muted)}
 .rp{border-radius:12px;padding:16px 18px;border:1px solid var(--line)}
 .rp-h{font-family:"Archivo";font-weight:800;font-size:18px;margin-bottom:6px}
-.rp.discount,.rp.bundle{background:var(--good-s);border-color:#bfe0cf}
+.rp.discount,.rp.bundle{background:var(--good-s);border-color:var(--good-b)}
 .rp.discount .rp-h,.rp.bundle .rp-h{color:var(--good)}
 .rp.keep{background:var(--soft)}
-.rp.retire{background:var(--bad-s);border-color:#e8c3ba}.rp.retire .rp-h{color:var(--bad)}
+.rp.retire{background:var(--bad-s);border-color:var(--bad-b)}.rp.retire .rp-h{color:var(--bad)}
 .rp p{margin:0;font-size:14px}
 .rp2{background:var(--soft);border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin-top:8px;font-size:13.5px}
-.warn{margin-top:14px;background:var(--warm-s);border:1px solid #e6d2a0;border-radius:10px;padding:12px 14px;font-size:13.5px}
+.warn{margin-top:14px;background:var(--warm-s);border:1px solid var(--warm-b);border-radius:10px;padding:12px 14px;font-size:13.5px}
 footer{margin-top:24px;padding-top:16px;border-top:1px solid var(--line);font-size:12px;color:var(--muted);max-width:72ch}
 footer b{color:var(--ink)}
 @media(prefers-reduced-motion:reduce){*{animation:none!important}}
 </style>
 </head>
-<body><div class="wrap">
+<body>
+<div class="awning" aria-hidden="true"></div>
+<button class="theme-toggle" id="themeToggle" type="button" aria-label="Switch between light and dark theme" title="Switch theme">🌙</button>
+<div class="wrap">
 <header>
-  <p class="eyebrow">For store owners · slow-mover triage</p>
+  <p class="eyebrow">🏮 For store owners · slow-mover triage</p>
   <h1>Shelf Temperature Check</h1>
   <p class="lead">Check whether a slow product is worth keeping — and if it is, get the one move most likely to save
     it. Everything runs on your own numbers.</p>
@@ -130,12 +155,12 @@ footer b{color:var(--ink)}
     <div class="card">
       <div class="temp-wrap">
         <svg width="70" height="200" viewBox="0 0 70 200" aria-hidden="true">
-          <rect x="27" y="10" width="16" height="150" rx="8" fill="#eef2f0" stroke="#cfd8d4"/>
+          <rect x="27" y="10" width="16" height="150" rx="8" fill="var(--soft)" stroke="var(--line)"/>
           <rect id="merc" x="29" y="80" width="12" height="80" rx="6" fill="var(--good)"/>
           <circle cx="35" cy="172" r="17" id="bulb" fill="var(--good)"/>
-          <text x="52" y="16" font-size="9" fill="#64727a" font-family="IBM Plex Mono">100</text>
-          <text x="52" y="90" font-size="9" fill="#64727a" font-family="IBM Plex Mono">50</text>
-          <text x="52" y="162" font-size="9" fill="#64727a" font-family="IBM Plex Mono">0</text>
+          <text x="52" y="16" font-size="9" fill="var(--muted)" font-family="IBM Plex Mono">100</text>
+          <text x="52" y="90" font-size="9" fill="var(--muted)" font-family="IBM Plex Mono">50</text>
+          <text x="52" y="162" font-size="9" fill="var(--muted)" font-family="IBM Plex Mono">0</text>
         </svg>
         <div><p class="verdict" id="verdict"><small>Reading</small>STABLE</p>
           <p class="pbig" id="pbig">— chance it keeps selling</p></div>
@@ -299,5 +324,24 @@ _('addrow').addEventListener('click',()=>makeRow("","",4,8,15));
 seed.forEach(s=>makeRow(...s));
 
 renderCheck();
+</script>
+<script>
+(function(){
+  var root=document.documentElement, btn=document.getElementById('themeToggle');
+  var saved=localStorage.getItem('theme');
+  var prefersDark=window.matchMedia('(prefers-color-scheme: dark)').matches;
+  function apply(mode){
+    if(mode){root.setAttribute('data-theme',mode);}else{root.removeAttribute('data-theme');}
+    var isDark = mode ? mode==='dark' : prefersDark;
+    btn.textContent = isDark ? '☀️' : '🌙';
+  }
+  apply(saved);
+  btn.addEventListener('click',function(){
+    var isDark=(root.getAttribute('data-theme')||(prefersDark?'dark':'light'))==='dark';
+    var next=isDark?'light':'dark';
+    localStorage.setItem('theme',next);
+    apply(next);
+  });
+})();
 </script>
 </body></html>
