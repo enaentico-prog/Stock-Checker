@@ -1,1692 +1,336 @@
 <!doctype html>
 <html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Shelf Temp Check — itulak o bitawan?</title>
-<meta name="description" content="Slow-mover triage for sari-sari stores and small groceries. One clear call per product: push it (bundle or discount) or cut it loose.">
+<title>Shelf Temp Check — ang problema sa hindi nabebenta</title>
+<meta name="description" content="Slow-mover triage for sari-sari stores and small groceries. Start with the problem: what dead stock costs you, and why you're not the only one carrying it.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<style>
-/* ============================================================
-   MANILA PALETTE — sari-sari shelf triage
-   ============================================================ */
-:root{
-  /* palette, straight off the Manila swatch */
-  --red:#DD0B00;        --red-soft:#F7DCD8;   --red-deep:#A80800;
-  --orange:#FF8C00;     --orange-soft:#FFE9CE; --orange-deep:#C46A00;
-  --taupe:#B0A794;      --taupe-soft:#E0DACF;
-  --blue:#5B7F97;       --blue-soft:#DDE6EB;  --blue-deep:#3E5F75;
-  --forest:#23332B;     --forest-2:#3E5C4B;   --forest-soft:#DDE4DD;
-  --paper:#E5E1DC;      --paper-2:#EEEAE4;    --card:#FAF8F4;
-
-  --ink:var(--forest);  --ink-soft:#5E6E64;   --muted:#7A8A80;
-  --line:#D3CCC1;       --line-2:#C0B7A8;
-
-  --f-display:"Archivo Black","Bricolage Grotesque",sans-serif;
-  --f-head:"Bricolage Grotesque",system-ui,sans-serif;
-  --f-body:"DM Sans",system-ui,sans-serif;
-  --f-mono:"IBM Plex Mono",ui-monospace,monospace;
-}
-*{box-sizing:border-box}
-html{scroll-behavior:smooth}
-body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:17px;line-height:1.55;-webkit-font-smoothing:antialiased}
-img,svg{max-width:100%}
-a{color:inherit}
-h1,h2,h3{font-family:var(--f-head);font-weight:800;letter-spacing:-.02em;line-height:1.05;margin:0}
-.wrap{max-width:1120px;margin:0 auto;padding:0 22px}
-.grain{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;opacity:.05;mix-blend-mode:multiply;z-index:60}
-:focus-visible{outline:3px solid var(--orange);outline-offset:3px}
-::selection{background:var(--orange);color:var(--forest)}
-
-/* --- textures & motifs ------------------------------------- */
-.capiz{background-image:linear-gradient(rgba(176,167,148,.30) 1px,transparent 1px),linear-gradient(90deg,rgba(176,167,148,.30) 1px,transparent 1px);background-size:44px 44px}
-.banig{background-image:repeating-linear-gradient(45deg,rgba(176,167,148,.16) 0 6px,transparent 6px 12px),repeating-linear-gradient(-45deg,rgba(176,167,148,.16) 0 6px,transparent 6px 12px)}
-/* tingi sachet strip — the hanging strings in every sari-sari window */
-.sachets{position:relative;height:30px;margin:0;overflow:hidden}
-.sachets::before{content:"";position:absolute;inset:0 0 auto 0;height:2px;background:var(--forest);opacity:.3}
-.sachets::after{content:"";position:absolute;left:0;right:0;top:3px;height:22px;
-  background:repeating-linear-gradient(90deg,
-    var(--red) 0 17px,transparent 17px 26px,
-    var(--orange) 26px 43px,transparent 43px 52px,
-    var(--taupe) 52px 69px,transparent 69px 78px,
-    var(--blue) 78px 95px,transparent 95px 104px,
-    var(--forest) 104px 121px,transparent 121px 130px)}
-.sachets.tight::after{opacity:.85}
-
-/* --- buttons ------------------------------------------------ */
-.btn{display:inline-block;font-family:var(--f-head);font-weight:700;font-size:16px;text-decoration:none;
-  padding:14px 26px;border-radius:6px;transition:transform .14s,box-shadow .14s;cursor:pointer;border:none}
-.btn-red{background:var(--red);color:#fff;box-shadow:0 5px 0 var(--red-deep)}
-.btn-red:hover{transform:translateY(-2px);box-shadow:0 7px 0 var(--red-deep)}
-.btn-red:active{transform:translateY(2px);box-shadow:0 3px 0 var(--red-deep)}
-.btn-orange{background:var(--orange);color:var(--forest);box-shadow:0 5px 0 var(--orange-deep)}
-.btn-orange:hover{transform:translateY(-2px);box-shadow:0 7px 0 var(--orange-deep)}
-.btn-ghost{border:2px solid var(--ink);color:var(--ink);padding:12px 24px;background:transparent}
-.btn-ghost:hover{background:var(--ink);color:var(--paper)}
-
-.eyebrow{font-family:var(--f-mono);font-size:11.5px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--red);margin:0 0 14px}
-.tl{font-family:var(--f-mono);font-size:12px;letter-spacing:.06em;color:var(--muted)}
-.fil{font-style:normal;color:var(--muted);font-family:var(--f-body);font-weight:500}
-
-/* --- navbar ------------------------------------------------- */
-.navbar{background:var(--forest);position:sticky;top:0;z-index:50;box-shadow:0 1px 0 rgba(0,0,0,.2)}
-.navbar nav{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:13px 0}
-.brand{display:flex;align-items:center;gap:11px;font-family:var(--f-head);font-weight:800;font-size:18px;color:#fff;text-decoration:none;letter-spacing:-.01em}
-.brand .mark{width:34px;height:34px;border-radius:7px;background:var(--red);display:grid;place-items:center;flex:none;box-shadow:inset 0 -3px 0 rgba(0,0,0,.22)}
-.brand .mark svg{width:20px;height:20px;display:block}
-.brand small{display:block;font-family:var(--f-mono);font-weight:400;font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--taupe);margin-top:1px}
-.navlinks{display:flex;gap:24px;align-items:center;font-size:14.5px;font-weight:500}
-.navlinks a{text-decoration:none;color:#CFD6CE}
-.navlinks a:hover{color:#fff}
-@media(max-width:880px){.navlinks a:not(.btn){display:none}}
-.navlinks .btn{white-space:nowrap}
-.cta-short{display:none}
-@media(max-width:560px){.brand{font-size:16px;gap:9px}.brand small{display:none}
-  .brand .mark{width:30px;height:30px}
-  .navlinks .btn{padding:10px 15px!important;font-size:13.5px!important}}
-@media(max-width:430px){.brand{font-size:15px}.cta-long{display:none}.cta-short{display:inline}}
-
-/* --- hero --------------------------------------------------- */
-.hero{display:grid;grid-template-columns:1.02fr .98fr;gap:44px;align-items:center;padding:52px 0 20px}
-@media(max-width:900px){.hero{grid-template-columns:1fr;gap:28px;padding-top:36px}}
-.hero h1{font-size:clamp(38px,6.2vw,66px);letter-spacing:-.03em}
-.hero h1 .u{background:linear-gradient(transparent 62%,var(--orange) 62%);padding:0 2px}
-.hero h1 .r{color:var(--red)}
-.hero .lead{font-size:18.5px;color:var(--ink-soft);max-width:46ch;margin:20px 0 26px}
-.hero .cta{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
-.hero .trust{margin-top:20px;font-family:var(--f-mono);font-size:12.5px;color:var(--muted);line-height:1.7}
-.hero-art{position:relative}
-.hero-art svg{display:block;width:100%;height:auto}
-/* floating triage card over the storefront */
-.floatcard{position:absolute;right:-6px;bottom:-14px;width:min(268px,74%);background:var(--card);
-  border:1.5px solid var(--line-2);border-radius:12px;padding:15px 16px;box-shadow:0 18px 40px -20px rgba(35,51,43,.55);}
-.floatcard .hd{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
-.floatcard .nm{font-family:var(--f-head);font-weight:800;font-size:16px}
-.floatcard .st{font-family:var(--f-mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
-.floatcard .bar{height:9px;border-radius:5px;margin:11px 0 5px;background:linear-gradient(90deg,var(--red),var(--orange),var(--blue),var(--forest-2));position:relative}
-.floatcard .bar i{position:absolute;top:-4px;left:32%;width:17px;height:17px;border-radius:50%;background:var(--card);border:3.5px solid var(--forest);transform:translateX(-50%)}
-.floatcard .sc{display:flex;justify-content:space-between;font-family:var(--f-mono);font-size:9px;color:var(--muted);letter-spacing:.04em}
-.floatcard .verd{margin-top:12px;padding-top:11px;border-top:1px dashed var(--line);display:flex;gap:9px;align-items:center}
-.floatcard .verd .tag{font-family:var(--f-display);font-size:12px;letter-spacing:.04em;color:#fff;background:var(--orange);color:var(--forest);padding:4px 9px;border-radius:4px}
-.floatcard .verd p{margin:0;font-size:12.5px;color:var(--ink-soft);line-height:1.35}
-@media(max-width:900px){.floatcard{position:static;width:100%;margin-top:14px}}
-
-/* --- ticker ------------------------------------------------- */
-.ticker{background:var(--forest);color:var(--taupe-soft);overflow:hidden;border-top:3px solid var(--red)}
-.ticker .in{display:flex;gap:38px;white-space:nowrap;padding:11px 0;font-family:var(--f-mono);font-size:12.5px;letter-spacing:.05em;animation:slide 42s linear infinite}
-.ticker b{color:var(--orange);font-weight:600}
-@keyframes slide{from{transform:translateX(0)}to{transform:translateX(-50%)}}
-@media(prefers-reduced-motion:reduce){.ticker .in{animation:none;flex-wrap:wrap;white-space:normal}}
-
-section{padding:74px 0;position:relative}
-.sec-head{max-width:64ch;margin-bottom:40px}
-.sec-head.center{margin:0 auto 44px;text-align:center}
-.sec-head h2{font-size:clamp(29px,4.4vw,45px)}
-.sec-head p{color:var(--ink-soft);font-size:17.5px;margin:15px 0 0}
-.rule{height:3px;background:var(--forest);opacity:.12;margin:0}
-
-/* --- PH statistics ------------------------------------------ */
-#numbers{background-color:var(--paper-2);border-top:3px solid var(--forest);border-bottom:3px solid var(--forest)}
-.statgroup{margin-bottom:40px}
-.grouphd{display:flex;align-items:center;gap:14px;margin-bottom:18px;flex-wrap:wrap}
-.grouphd .kicker{font-family:var(--f-display);font-size:13px;letter-spacing:.09em;color:#fff;padding:6px 12px;border-radius:4px}
-.grouphd .kicker.waste{background:var(--red)}
-.grouphd .kicker.loss{background:var(--orange);color:var(--forest)}
-.grouphd .kicker.opp{background:var(--forest)}
-.grouphd h3{font-size:22px}
-.grouphd .sub{color:var(--muted);font-size:14.5px;margin:0}
-.statgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
-@media(max-width:960px){.statgrid{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:520px){.statgrid{grid-template-columns:1fr}}
-.stat{background:var(--card);border:1.5px solid var(--line);border-radius:10px;padding:20px 18px 16px;position:relative;overflow:hidden;display:flex;flex-direction:column}
-.stat::before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px}
-.stat.waste::before{background:var(--red)}
-.stat.loss::before{background:var(--orange)}
-.stat.opp::before{background:var(--forest-2)}
-.stat .n{font-family:var(--f-display);font-size:clamp(30px,4.2vw,40px);line-height:1;letter-spacing:-.02em}
-.stat .n.long{font-size:clamp(24px,3.1vw,30px)}
-.stat.waste .n{color:var(--red)}
-.stat.loss .n{color:var(--orange-deep)}
-.stat.opp .n{color:var(--forest-2)}
-.stat .u{font-family:var(--f-mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:8px 0 7px}
-.stat p{font-size:14px;color:var(--ink-soft);margin:0}
-.stat .src{margin-top:auto;padding-top:11px;padding-top:9px;border-top:1px solid var(--line);font-family:var(--f-mono);font-size:10.5px;color:var(--muted)}
-.stat .src a{color:var(--blue-deep);text-decoration:underline;text-underline-offset:2px}
-.stat .src a:hover{color:var(--red)}
-.readnote{background:var(--blue-soft);border:1.5px solid #C3D2DA;border-left:5px solid var(--blue);border-radius:8px;padding:16px 18px;font-size:14.5px;color:var(--blue-deep);margin-top:6px}
-.readnote b{color:#2C4B5E}
-.sources{margin-top:30px;background:var(--card);border:1.5px solid var(--line);border-radius:10px;padding:22px 24px}
-.sources h4{font-family:var(--f-mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin:0 0 12px}
-.sources ol{margin:0;padding-left:20px;columns:2;column-gap:34px}
-@media(max-width:760px){.sources ol{columns:1}}
-.sources li{font-size:13px;color:var(--ink-soft);margin-bottom:8px;break-inside:avoid}
-.sources a{color:var(--blue-deep)}
-.sources a:hover{color:var(--red)}
-
-/* --- cost cards --------------------------------------------- */
-.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
-@media(max-width:860px){.grid3{grid-template-columns:1fr}}
-.cost{background:var(--card);border:1.5px solid var(--line);border-radius:12px;padding:26px;position:relative}
-.cost .ic-cost{width:46px;height:46px;margin-bottom:12px}
-.cost .ic-cost svg{width:46px;height:46px;display:block}
-.cost h3{font-size:20px;margin:0 0 4px}
-.cost .tag-fil{font-family:var(--f-mono);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--red);margin:0 0 9px}
-.cost p{color:var(--ink-soft);font-size:14.5px;margin:0}
-
-/* --- triage (dark) ------------------------------------------ */
-.dark{background:var(--forest);border-radius:16px;padding:58px 0 62px;overflow:hidden;position:relative}
-.dark::after{content:"";position:absolute;inset:0;pointer-events:none;
-  background-image:repeating-linear-gradient(45deg,rgba(255,255,255,.03) 0 7px,transparent 7px 14px)}
-.dark .wrap{position:relative;z-index:1}
-.dark .eyebrow{color:var(--orange)}
-.dark h2{color:#F4F2ED;font-size:clamp(29px,4.4vw,45px)}
-.dark .sub{color:#B6C0B7;max-width:58ch;margin:15px 0 40px;font-size:17.5px}
-
-.triage{display:grid;grid-template-columns:1fr;gap:16px}
-.tnode{background:#2E4238;border:1.5px solid #435849;border-radius:12px;padding:22px 24px}
-.tnode .q{font-family:var(--f-mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--taupe);margin:0 0 8px}
-.tnode h3{color:#F4F2ED;font-size:21px;margin:0 0 6px}
-.tnode p{color:#B6C0B7;font-size:14.5px;margin:0}
-.tsplit{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-@media(max-width:760px){.tsplit{grid-template-columns:1fr}}
-.tcard{border-radius:12px;padding:22px 24px;border:1.5px solid transparent}
-.tcard .k{font-family:var(--f-display);font-size:12.5px;letter-spacing:.09em;padding:4px 10px;border-radius:4px;display:inline-block;margin-bottom:11px}
-.tcard h3{font-size:21px;margin:0 0 6px}
-.tcard .fil-sub{font-family:var(--f-mono);font-size:12px;letter-spacing:.06em;margin:0 0 8px}
-.tcard p{font-size:14.5px;margin:0}
-.tcard.push{background:#2E4238;border-color:#4C6B57}
-.tcard.push .k{background:var(--orange);color:var(--forest)}
-.tcard.push h3{color:#F4F2ED} .tcard.push p{color:#B6C0B7} .tcard.push .fil-sub{color:var(--orange)}
-.tcard.cut{background:#3A2320;border-color:#5E332C}
-.tcard.cut .k{background:var(--red);color:#fff}
-.tcard.cut h3{color:#F6EBE8} .tcard.cut p{color:#D3B9B3} .tcard.cut .fil-sub{color:#E9897C}
-.tsub{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}
-@media(max-width:560px){.tsub{grid-template-columns:1fr}}
-.tsub .b{background:rgba(255,255,255,.06);border:1px dashed #5B7A66;border-radius:9px;padding:15px 17px}
-.tsub .b b{display:block;font-family:var(--f-head);font-weight:800;color:#F4F2ED;font-size:15.5px;margin-bottom:3px}
-.tsub .b span{color:#A9B5AB;font-size:13.5px}
-.arrowdown{text-align:center;color:var(--taupe);font-size:20px;line-height:1;margin:-2px 0}
-
-/* --- steps -------------------------------------------------- */
-.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
-@media(max-width:860px){.steps{grid-template-columns:1fr}}
-.step{position:relative;padding-top:8px}
-.step .b{width:46px;height:46px;border-radius:8px;background:var(--orange);color:var(--forest);display:grid;place-items:center;
-  font-family:var(--f-display);font-size:20px;margin-bottom:15px;box-shadow:0 4px 0 var(--orange-deep)}
-.step h3{font-size:19.5px;margin:0 0 4px}
-.step .tag-fil{font-family:var(--f-mono);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 8px}
-.step p{color:var(--ink-soft);font-size:14.5px;margin:0}
-
-/* --- UVP ---------------------------------------------------- */
-.uvp{background:var(--orange-soft);border:1.5px solid #EFD3AC;border-radius:16px;padding:46px;display:grid;grid-template-columns:1fr 1fr;gap:36px;align-items:center}
-@media(max-width:860px){.uvp{grid-template-columns:1fr;padding:30px}}
-.uvp .eyebrow{color:var(--red)}
-.uvp h2{font-size:clamp(27px,3.8vw,40px)}
-.uvp p{color:#6D5636;margin:15px 0 0;font-size:16.5px}
-.uvp .demo{background:#fff;border:1.5px solid #EFD3AC;border-radius:12px;padding:20px}
-.uvp .demo .warnbox{background:var(--red-soft);border:1.5px solid #E7BDB5;border-left:5px solid var(--red);border-radius:8px;padding:13px 15px;font-size:14px;color:#7C2A20}
-.uvp .demo .warnbox b{color:var(--red)}
-
-/* --- method ------------------------------------------------- */
-.story{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
-@media(max-width:980px){.story{grid-template-columns:1fr 1fr}}
-@media(max-width:560px){.story{grid-template-columns:1fr}}
-.stepcard{background:var(--card);border:1.5px solid var(--line);border-radius:10px;padding:20px}
-.stepcard .num{font-family:var(--f-display);font-size:15px;color:var(--red)}
-.stepcard h3{font-size:16.5px;margin:9px 0 7px}
-.stepcard p{color:var(--ink-soft);font-size:13.5px;margin:0}
-.discovered{margin-top:22px;background:var(--forest-soft);border:1.5px dashed var(--line-2);border-radius:12px;padding:20px 24px;font-size:15px;color:var(--ink-soft)}
-.discovered b{color:var(--ink)}
-
-/* --- model stats band --------------------------------------- */
-.stats{background:var(--blue);border-radius:16px;padding:38px 0;color:#fff}
-.stats .row{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;text-align:center}
-@media(max-width:720px){.stats .row{grid-template-columns:1fr 1fr;gap:26px}}
-.stats .big{font-family:var(--f-display);font-size:38px;line-height:1;color:#fff}
-.stats .lbl{font-size:13px;color:#DCE6EB;margin-top:6px}
-
-/* ============================================================
-   THE APP
-   ============================================================ */
-section[id],#top{scroll-margin-top:76px}
-#try{scroll-margin-top:76px}
-#app{background:var(--card);border:2px solid var(--forest);border-radius:14px;padding:0;overflow:hidden;
-  box-shadow:0 26px 60px -38px rgba(35,51,43,.6);
-  --panel:#fff; --soft:var(--paper-2); --a-line:var(--line);
-  --good:var(--forest-2); --good-s:var(--forest-soft);
-  --calm:var(--blue); --calm-s:var(--blue-soft);
-  --warm:var(--orange-deep); --warm-s:var(--orange-soft);
-  --bad:var(--red); --bad-s:var(--red-soft);}
-#app .appbar{background:var(--forest);padding:12px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
-#app .appbar .ttl{font-family:var(--f-head);font-weight:800;color:#fff;font-size:15.5px;display:flex;align-items:center;gap:9px}
-#app .appbar .ttl span{width:9px;height:9px;border-radius:50%;background:var(--orange);flex:none}
-#app .appbar .note{font-family:var(--f-mono);font-size:11px;color:var(--taupe);letter-spacing:.05em}
-#app .appbody{padding:22px}
-@media(max-width:600px){#app .appbody{padding:15px}}
-#app .tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:20px;background:var(--soft);padding:5px;border-radius:8px;border:1px solid var(--a-line)}
-#app .tabs button{font-family:var(--f-head);font-weight:700;font-size:14px;cursor:pointer;background:transparent;border:none;border-radius:6px;padding:10px 17px;color:var(--muted)}
-#app .tabs button:hover{color:var(--ink)}
-#app .tabs button.on{background:var(--forest);color:#fff}
-#app .tab{display:none}#app .tab.on{display:block}
-#app .card{background:var(--panel);border:1.5px solid var(--a-line);border-radius:12px;padding:20px}
-#app .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-@media(max-width:820px){#app .grid2{grid-template-columns:1fr}}
-#app h2{font-family:var(--f-head);font-weight:800;font-size:17.5px;margin:0 0 3px;color:var(--ink)}
-#app .sub{color:var(--muted);font-size:13px;margin:0 0 15px}
-#app .field{margin:14px 0}
-#app .field .top{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
-#app label{font-weight:600;font-size:13.5px;color:var(--ink);font-family:var(--f-body)}
-#app .hint{font-size:11.5px;color:var(--muted)}
-#app .val{font-family:var(--f-display);font-size:19px;color:var(--ink)}
-#app input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:7px;border-radius:4px;background:var(--taupe-soft);margin-top:10px;cursor:pointer;border:1px solid var(--a-line)}
-#app input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:5px;background:var(--red);border:3px solid #fff;box-shadow:0 1px 5px rgba(0,0,0,.3);cursor:pointer}
-#app input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:5px;background:var(--red);border:3px solid #fff;cursor:pointer}
-#app input[type=number],#app select,#app input[type=text]{font-family:var(--f-body);font-size:14px;padding:9px 11px;border:1.5px solid var(--a-line);border-radius:7px;background:var(--soft);color:var(--ink)}
-#app input[type=number]:focus,#app select:focus,#app input[type=text]:focus{border-color:var(--forest);background:#fff}
-#app .temp-wrap{display:flex;gap:18px;align-items:center}
-#app .verdict{font-family:var(--f-display);font-size:clamp(24px,5.4vw,36px);line-height:1;margin:0;color:var(--ink);letter-spacing:-.01em}
-#app .verdict small{display:block;font-family:var(--f-mono);font-size:10.5px;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
-#app .verdict em{display:block;font-style:normal;font-family:var(--f-body);font-weight:500;font-size:14px;color:var(--ink-soft);margin-top:7px;letter-spacing:0}
-#app .pbig{font-family:var(--f-head);font-weight:700;font-size:18px;margin:12px 0 0;color:var(--ink)}
-#app .chips{display:flex;gap:7px;flex-wrap:wrap;margin-top:14px}
-#app .chip{font-size:12px;background:var(--soft);border:1.5px solid var(--a-line);border-radius:6px;padding:5px 11px;color:var(--ink)}
-#app .chip b{font-family:var(--f-head);font-weight:700}
-#app .why{margin-top:15px;border-top:1.5px solid var(--a-line);padding-top:13px}
-#app .why h3{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:0 0 8px}
-#app .why li{font-size:13px;color:var(--ink);margin:5px 0;list-style:none;padding-left:17px;position:relative}
-#app .why li::before{content:"▸";position:absolute;left:0;color:var(--red)}
-#app .why ul{margin:0;padding:0}
-#app .badge{display:inline-block;font-family:var(--f-mono);font-size:11px;font-weight:600;padding:2px 8px;border-radius:4px;white-space:nowrap}
-#app .b-good{background:var(--good-s);color:var(--forest)}
-#app .b-calm{background:var(--calm-s);color:var(--blue-deep)}
-#app .b-warm{background:var(--warm-s);color:var(--warm)}
-#app .b-bad{background:var(--bad-s);color:var(--bad)}
-
-/* triage ribbon inside the app */
-#app .triage-bar{display:flex;align-items:stretch;gap:0;border-radius:10px;overflow:hidden;border:1.5px solid var(--a-line);margin-bottom:12px;background:var(--panel)}
-#app .triage-bar .tb{flex:1;padding:11px 14px;text-align:center;font-family:var(--f-head);font-weight:700;font-size:13.5px;color:var(--muted);background:var(--soft);border-right:1.5px solid var(--a-line)}
-#app .triage-bar .tb:last-child{border-right:none}
-#app .triage-bar .tb small{display:block;font-family:var(--f-mono);font-weight:400;font-size:10px;letter-spacing:.06em;text-transform:uppercase;margin-top:2px;opacity:.75}
-#app .triage-bar .tb.on-keep{background:var(--good-s);color:var(--forest)}
-#app .triage-bar .tb.on-push{background:var(--orange);color:var(--forest)}
-#app .triage-bar .tb.on-cut{background:var(--red);color:#fff}
-#app .rp{border-radius:10px;padding:16px 18px;border:1.5px solid var(--a-line);border-left-width:5px;margin-top:2px}
-#app .rp-h{font-family:var(--f-head);font-weight:800;font-size:18px;margin-bottom:5px}
-#app .rp-h .gloss{font-family:var(--f-mono);font-weight:400;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;opacity:.72;margin-left:8px;white-space:nowrap}
-#app .rp p{margin:0;font-size:14px;color:var(--ink)}
-#app .rp.discount{background:var(--warm-s);border-color:#EAD2AE;border-left-color:var(--orange)}
-#app .rp.discount .rp-h{color:var(--orange-deep)}
-#app .rp.bundle{background:var(--calm-s);border-color:#C6D5DC;border-left-color:var(--blue)}
-#app .rp.bundle .rp-h{color:var(--blue-deep)}
-#app .rp.keep{background:var(--good-s);border-color:#C3D2C6;border-left-color:var(--forest-2)}
-#app .rp.keep .rp-h{color:var(--forest)}
-#app .rp.retire{background:var(--bad-s);border-color:#E7C2BB;border-left-color:var(--red)}
-#app .rp.retire .rp-h{color:var(--bad)}
-#app .rp2{background:var(--soft);border:1.5px solid var(--a-line);border-radius:8px;padding:10px 14px;margin-top:8px;font-size:13.5px;color:var(--ink)}
-#app .warn{margin-top:13px;background:var(--warm-s);border:1.5px solid #EAD2AE;border-left:5px solid var(--red);border-radius:8px;padding:12px 14px;font-size:13.5px;color:#6D5636}
-#app .warn b{color:var(--red)}
-#app .note{margin-top:12px;font-size:12.5px;color:var(--muted)}
-#app .playlabel{font-family:var(--f-mono);font-size:10.5px;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
-#app .hscroll{overflow-x:auto}
-#app .srow-head,#app .srow{display:grid;grid-template-columns:1.4fr 1.2fr .8fr .8fr .8fr 1.15fr 30px;gap:8px;align-items:center;min-width:740px}
-#app .srow-head{font-family:var(--f-mono);font-size:10px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin-bottom:7px}
-#app .srow{margin:6px 0}
-#app .srow input,#app .srow .rowcat{width:100%}
-#app .srow .rowcat{font-size:12.5px;padding:7px 6px}
-#app .srow .res{font-size:12px;text-align:center}
-#app .xbtn{background:transparent;border:none;color:var(--muted);cursor:pointer;font-size:17px;line-height:1}
-#app .xbtn:hover{color:var(--bad)}
-#app .addbtn{margin-top:12px;font-family:var(--f-head);font-weight:700;font-size:13px;cursor:pointer;background:var(--soft);border:1.5px solid var(--a-line);border-radius:7px;padding:9px 16px;color:var(--ink)}
-#app .addbtn:hover{background:var(--forest);color:#fff;border-color:var(--forest)}
-#app .summary{margin-top:15px;padding:13px 16px;border-radius:9px;background:var(--soft);border:1.5px solid var(--a-line);border-left:5px solid var(--forest);font-size:14px;color:var(--ink)}
-#app .mode-toggle{display:inline-flex;background:var(--soft);border:1.5px solid var(--a-line);border-radius:8px;padding:4px;margin-bottom:15px;gap:4px}
-#app .mode-toggle button{border:none;background:transparent;font-family:var(--f-head);font-weight:700;font-size:13px;padding:8px 15px;border-radius:5px;cursor:pointer;color:var(--muted)}
-#app .mode-toggle button.on{background:#fff;color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.14)}
-#app #upload-panel{margin-bottom:16px;background:var(--soft);border:1.5px solid var(--a-line);border-radius:10px;padding:17px}
-#app #upload-panel p{font-size:13.5px;color:var(--muted);margin:0 0 12px}
-#app .dropzone{display:block;border:2px dashed var(--line-2);border-radius:10px;padding:22px;text-align:center;color:var(--muted);cursor:pointer;margin-top:12px;font-size:14px;background:var(--panel)}
-#app .dropzone.drag{border-color:var(--red);background:var(--bad-s);color:var(--bad)}
-#app #upload-msg{margin-top:12px;font-size:13px}
-#app .upl-ok{color:var(--forest)}
-#app .upl-warn{color:#7C2A20;background:var(--warm-s);border:1.5px solid #EAD2AE;border-radius:8px;padding:10px 12px}
-#app footer{display:none}
-
-/* --- contribute + feedback ---------------------------------- */
-#contribute{background-color:var(--paper-2);border-top:3px solid var(--forest);border-bottom:3px solid var(--forest)}
-.formwrap{display:grid;grid-template-columns:1.06fr .94fr;gap:20px;align-items:start}
-@media(max-width:900px){.formwrap{grid-template-columns:1fr}}
-.panel{background:var(--card);border:1.5px solid var(--line);border-radius:12px;padding:24px}
-@media(max-width:600px){.panel{padding:18px}}
-.panel h3{font-size:20px;margin:0 0 3px}
-.panel .fil-sub{font-family:var(--f-mono);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--red);margin:0 0 12px}
-.panel .lede{color:var(--ink-soft);font-size:14.5px;margin:0 0 16px}
-.whereto{border-radius:8px;padding:12px 14px;font-size:13px;margin:0 0 18px;border:1.5px solid;display:flex;gap:9px;align-items:flex-start}
-.whereto .dot{width:9px;height:9px;border-radius:50%;flex:none;margin-top:5px}
-.whereto.local{background:var(--blue-soft);border-color:#C3D2DA;color:var(--blue-deep)}
-.whereto.local .dot{background:var(--blue)}
-.whereto.live{background:var(--forest-soft);border-color:#C3D2C6;color:var(--forest)}
-.whereto.live .dot{background:var(--forest-2)}
-.whereto b{font-weight:700}
-
-.f{margin:14px 0}
-.frow{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.frow3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
-@media(max-width:520px){.frow,.frow3{grid-template-columns:1fr}}
-.f>label,.flabel{display:block;font-family:var(--f-body);font-weight:600;font-size:13.5px;color:var(--ink);margin-bottom:6px}
-.f .hint{font-weight:400;font-size:11.5px;color:var(--muted)}
-.f input[type=text],.f input[type=number],.f input[type=email],.f select,.f textarea{
-  width:100%;font-family:var(--f-body);font-size:14px;padding:10px 12px;border:1.5px solid var(--line);
-  border-radius:7px;background:var(--paper-2);color:var(--ink)}
-.f textarea{min-height:118px;resize:vertical;line-height:1.5}
-.f input:focus,.f select:focus,.f textarea:focus{border-color:var(--forest);background:#fff;outline:none}
-.f input.bad,.f textarea.bad{border-color:var(--red);background:var(--red-soft)}
-
-.chipset{display:flex;flex-wrap:wrap;gap:7px}
-.chipset label{cursor:pointer}
-.chipset input{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap;border:0}
-.chipset span{display:inline-block;font-size:13px;padding:7px 13px;border-radius:100px;border:1.5px solid var(--line);
-  background:var(--paper-2);color:var(--ink-soft);transition:background .12s,color .12s,border-color .12s}
-.chipset label:hover span{border-color:var(--line-2)}
-.chipset input:checked+span{background:var(--forest);border-color:var(--forest);color:#fff;font-weight:600}
-.chipset input:focus-visible+span{outline:3px solid var(--orange);outline-offset:2px}
-.chipset.warmset input:checked+span{background:var(--orange);border-color:var(--orange-deep);color:var(--forest)}
-.chipset span em{font-style:normal;font-family:var(--f-mono);font-size:10.5px;letter-spacing:.05em;opacity:.7;margin-left:5px}
-
-.consent{display:flex;gap:10px;align-items:flex-start;background:var(--paper-2);border:1.5px solid var(--line);
-  border-radius:8px;padding:12px 14px;margin:18px 0 6px;font-size:13px;color:var(--ink-soft)}
-.consent input{margin-top:3px;width:17px;height:17px;accent-color:var(--forest);flex:none}
-.formactions{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:16px}
-.btn-sm{font-family:var(--f-head);font-weight:700;font-size:13.5px;cursor:pointer;border-radius:7px;padding:10px 16px;border:1.5px solid var(--line);background:var(--paper-2);color:var(--ink)}
-.btn-sm:hover{background:var(--forest);color:#fff;border-color:var(--forest)}
-.btn-sm.danger:hover{background:var(--red);border-color:var(--red);color:#fff}
-.status{font-size:13.5px;margin-top:14px;border-radius:8px;padding:11px 14px;border:1.5px solid;display:none}
-.status.show{display:block}
-.status.ok{background:var(--forest-soft);border-color:#C3D2C6;color:var(--forest)}
-.status.err{background:var(--red-soft);border-color:#E7C2BB;color:#7C2A20}
-.status.info{background:var(--orange-soft);border-color:#EAD2AE;color:#6D5636}
-
-/* the local ledger */
-.ledger .cnt{display:flex;align-items:baseline;gap:10px;margin-bottom:4px}
-.ledger .cnt b{font-family:var(--f-display);font-size:38px;line-height:1;color:var(--forest-2)}
-.ledger .cnt span{font-family:var(--f-mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
-.agree{background:var(--paper-2);border:1.5px solid var(--line);border-left:5px solid var(--blue);border-radius:8px;
-  padding:12px 14px;font-size:13.5px;color:var(--ink-soft);margin:14px 0}
-.agree b{color:var(--ink)}
-.entries{margin:14px 0 0;max-height:330px;overflow-y:auto;border:1.5px solid var(--line);border-radius:8px}
-.entries:empty{display:none}
-.entry{display:flex;gap:10px;align-items:flex-start;padding:11px 13px;border-bottom:1px solid var(--line);font-size:13px}
-.entry:last-child{border-bottom:none}
-.entry .meta{flex:1;min-width:0}
-.entry .nm{font-family:var(--f-head);font-weight:700;font-size:14px;color:var(--ink);word-break:break-word}
-.entry .dt{font-family:var(--f-mono);font-size:10.5px;color:var(--muted);margin-top:2px}
-.entry .tags{display:flex;gap:5px;flex-wrap:wrap;margin-top:6px}
-.entry .t{font-family:var(--f-mono);font-size:10px;letter-spacing:.04em;padding:2px 7px;border-radius:4px;background:var(--taupe-soft);color:var(--ink-soft)}
-.entry .t.did{background:var(--orange-soft);color:var(--orange-deep)}
-.entry .t.out-good{background:var(--forest-soft);color:var(--forest)}
-.entry .t.out-bad{background:var(--red-soft);color:var(--red)}
-.entry .del{background:transparent;border:none;color:var(--muted);cursor:pointer;font-size:17px;line-height:1;padding:0 2px}
-.entry .del:hover{color:var(--red)}
-.emptyledger{font-size:13.5px;color:var(--muted);background:var(--paper-2);border:1.5px dashed var(--line-2);
-  border-radius:8px;padding:16px;text-align:center;margin-top:14px}
-
-/* feedback */
-#feedback .formwrap{grid-template-columns:1fr .78fr}
-@media(max-width:900px){#feedback .formwrap{grid-template-columns:1fr}}
-.faq{list-style:none;padding:0;margin:0}
-.faq li{border-bottom:1px solid var(--line);padding:13px 0}
-.faq li:last-child{border-bottom:none}
-.faq b{display:block;font-family:var(--f-head);font-weight:700;font-size:14.5px;margin-bottom:3px}
-.faq span{font-size:13.5px;color:var(--ink-soft)}
-
-/* --- CTA + footer ------------------------------------------- */
-.cta-band{text-align:center;padding:78px 0}
-.cta-band h2{font-size:clamp(30px,4.8vw,52px);max-width:17ch;margin:0 auto 8px}
-.cta-band .fil-lead{font-family:var(--f-mono);font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--red);margin:0 0 18px}
-.cta-band p{color:var(--ink-soft);margin:0 auto 26px;max-width:48ch}
-.sitefoot{background:var(--forest);color:#B6C0B7;padding:42px 0 34px}
-.sitefoot .cols{display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:28px;font-size:13.5px}
-@media(max-width:800px){.sitefoot .cols{grid-template-columns:1fr}}
-.sitefoot .brand{color:#fff;margin-bottom:10px}
-.sitefoot h5{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--taupe);margin:0 0 10px}
-.sitefoot a{color:#CFD6CE}
-.sitefoot a:hover{color:var(--orange)}
-.sitefoot ul{list-style:none;padding:0;margin:0}
-.sitefoot li{margin-bottom:7px}
-.sitefoot .fine{margin-top:26px;padding-top:18px;border-top:1px solid #3A4C42;font-size:12px;color:#8C998F;display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
-
-@media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto;animation:none!important}}
-</style></head>
+<link rel="stylesheet" href="assets/site.css">
+</head>
 <body>
 <svg class="grain" aria-hidden="true"><filter id="grainf"><feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter><rect width="100%" height="100%" filter="url(#grainf)"/></svg>
 
 <div class="navbar"><div class="wrap"><nav>
-  <a class="brand" href="#top">
-    <span class="mark" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="2.5" y="8" width="19" height="12.5" rx="1.6" fill="#fff"/><path d="M2.5 8 5 3.5h14L21.5 8Z" fill="#fff" opacity=".78"/><rect x="5.5" y="12" width="5" height="8.5" rx=".8" fill="#DD0B00"/><rect x="13" y="11.5" width="5.5" height="4" rx=".8" fill="#DD0B00"/></svg></span>
+  <a class="brand" href="index.html">
+    <span class="mark" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="2.5" y="8" width="19" height="12.5" rx="1.8" fill="#fff"/><path d="M2.5 8 5 3.5h14L21.5 8Z" fill="#fff" opacity=".78"/><rect x="5.5" y="12" width="5" height="8.5" rx=".9" fill="#C4553F"/><rect x="13" y="11.5" width="5.5" height="4" rx=".9" fill="#C4553F"/></svg></span>
     <span>Shelf Temp Check<small>Tindahan triage</small></span>
   </a>
   <div class="navlinks">
-    <a href="#numbers">The numbers</a>
-    <a href="#problem">The problem</a>
-    <a href="#triage">The triage</a>
-    <a href="#contribute">Contribute</a>
-    <a href="#try" class="btn btn-red navcta" style="padding:11px 19px;font-size:14.5px"><span class="cta-long">Check a product</span><span class="cta-short">Try it →</span></a>
+    <a href="index.html">Ang problema</a>
+    <a href="solution.html">Ang solusyon</a>
+    <a href="method.html">Paano ito natuto</a>
+    <a href="solution.html#try" class="btn btn-primary" style="padding:11px 19px;font-size:14.5px"><span class="cta-long">Check a product</span><span class="cta-short">Try it →</span></a>
   </div>
 </nav></div></div>
 
+<!-- ============================================================
+     1 · WHAT THIS IS
+     ============================================================ -->
 <div id="top" class="wrap">
   <header class="hero">
     <div>
       <p class="eyebrow">Slow-mover triage · para sa tindahan</p>
-      <h1>Alin ang <span class="r">itutulak</span>, alin ang <span class="u">bibitawan</span>?</h1>
-      <p class="lead">Every shelf has one: the item that's been sitting there since forever. Shelf Temp Check reads
-        each slow mover the way you'd read a suki — and gives you one honest call. <b>Push it</b> (bundle it or
-        cut the price) or <b>let it go</b> and free the cash for something that actually sells.</p>
+      <h1>Alin ang <span class="tint">itutulak</span>, alin ang <span class="hl">bibitawan</span>?</h1>
+      <p class="lead">Shelf Temp Check reads one fading product at a time and gives you a single honest call:
+        <b>push it</b> — by bundling or cutting the price — or <b>let it go</b> and free the cash for something
+        that actually sells. Three numbers you already know. No POS, no sign-up.</p>
       <div class="cta">
-        <a href="#try" class="btn btn-red">Check a product →</a>
-        <a href="#numbers" class="btn btn-ghost">See the numbers</a>
+        <a href="solution.html#try" class="btn btn-primary">Try the checker →</a>
+        <a href="#problema" class="btn btn-ghost">Start with the problem</a>
       </div>
-      <p class="trust">No sign-up · Walang app na ida-download · Runs on your own numbers<br>Built on two years of real store sales</p>
+      <p class="trust">Walang app na ida-download · Runs on your own numbers<br>Built on two years of real store sales</p>
     </div>
 
     <div class="hero-art">
-      <svg viewBox="0 0 520 470" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Illustration of a sari-sari store front with shelves of goods, one slow-moving item tagged for review">
-        <defs>
-          <linearGradient id="glow" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0" stop-color="#FFF4E0"/><stop offset="1" stop-color="#F0E7D6"/>
-          </linearGradient>
-          <linearGradient id="tempgrad" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0" stop-color="#DD0B00"/><stop offset=".45" stop-color="#FF8C00"/>
-            <stop offset=".75" stop-color="#5B7F97"/><stop offset="1" stop-color="#23332B"/>
-          </linearGradient>
-        </defs>
+      <svg viewBox="0 0 520 470" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="A sari-sari storefront with three shelves of goods; one dusty item on the middle shelf is circled and tagged for review">
+        <defs><linearGradient id="glow" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#FBF3E4"/><stop offset="1" stop-color="#F0E8D8"/></linearGradient></defs>
+        <rect x="0" y="0" width="520" height="470" rx="16" fill="#E7E0D4"/>
+        <g opacity=".45" stroke="#C6BBA6" stroke-width="1"><path d="M0 60h520M0 120h520M0 180h520M0 240h520M0 300h520M0 360h520M0 420h520"/></g>
 
-        <!-- back wall -->
-        <rect x="0" y="0" width="520" height="470" rx="14" fill="#DFD9CE"/>
-        <g opacity=".5" stroke="#B0A794" stroke-width="1">
-          <path d="M0 60h520M0 120h520M0 180h520M0 240h520M0 300h520M0 360h520M0 420h520"/>
-        </g>
+        <rect x="18" y="26" width="484" height="62" rx="7" fill="#C4553F"/>
+        <rect x="18" y="80" width="484" height="8" rx="3" fill="#9E4231"/>
+        <text x="260" y="68" text-anchor="middle" font-family="Archivo Black, sans-serif" font-size="30" letter-spacing="7" fill="#FBF9F5">SARI-SARI</text>
+        <circle cx="44" cy="57" r="4" fill="#FAEEDA" opacity=".85"/><circle cx="476" cy="57" r="4" fill="#FAEEDA" opacity=".85"/>
 
-        <!-- awning / signage board -->
-        <rect x="18" y="26" width="484" height="62" rx="5" fill="#DD0B00"/>
-        <rect x="18" y="80" width="484" height="8" rx="3" fill="#A80800"/>
-        <text x="260" y="68" text-anchor="middle" font-family="Archivo Black, sans-serif" font-size="30" letter-spacing="7" fill="#FFFFFF">SARI-SARI</text>
-        <circle cx="44" cy="57" r="4" fill="#FFE9CE" opacity=".8"/>
-        <circle cx="476" cy="57" r="4" fill="#FFE9CE" opacity=".8"/>
+        <rect x="30" y="96" width="460" height="288" rx="8" fill="url(#glow)" stroke="#2E4034" stroke-width="3.5"/>
 
-        <!-- storefront opening -->
-        <rect x="30" y="96" width="460" height="288" rx="6" fill="url(#glow)" stroke="#23332B" stroke-width="3.5"/>
+        <g><line x1="72" y1="100" x2="72" y2="196" stroke="#2E4034" stroke-width="1.6"/>
+          <rect x="63" y="108" width="18" height="21" rx="3" fill="#E0A052"/><rect x="63" y="132" width="18" height="21" rx="3" fill="#6F91A6"/>
+          <rect x="63" y="156" width="18" height="21" rx="3" fill="#C4553F"/><rect x="63" y="180" width="18" height="21" rx="3" fill="#7C9A6B"/></g>
+        <g><line x1="448" y1="100" x2="448" y2="196" stroke="#2E4034" stroke-width="1.6"/>
+          <rect x="439" y="108" width="18" height="21" rx="3" fill="#6F91A6"/><rect x="439" y="132" width="18" height="21" rx="3" fill="#C4553F"/>
+          <rect x="439" y="156" width="18" height="21" rx="3" fill="#E0A052"/><rect x="439" y="180" width="18" height="21" rx="3" fill="#C6BBA6"/></g>
 
-        <!-- hanging tingi sachet strings -->
-        <g>
-          <line x1="72" y1="100" x2="72" y2="196" stroke="#23332B" stroke-width="1.6"/>
-          <rect x="63" y="108" width="18" height="21" rx="2" fill="#FF8C00"/>
-          <rect x="63" y="132" width="18" height="21" rx="2" fill="#5B7F97"/>
-          <rect x="63" y="156" width="18" height="21" rx="2" fill="#DD0B00"/>
-          <rect x="63" y="180" width="18" height="21" rx="2" fill="#B0A794"/>
-        </g>
-        <g>
-          <line x1="448" y1="100" x2="448" y2="196" stroke="#23332B" stroke-width="1.6"/>
-          <rect x="439" y="108" width="18" height="21" rx="2" fill="#5B7F97"/>
-          <rect x="439" y="132" width="18" height="21" rx="2" fill="#DD0B00"/>
-          <rect x="439" y="156" width="18" height="21" rx="2" fill="#FF8C00"/>
-          <rect x="439" y="180" width="18" height="21" rx="2" fill="#23332B"/>
-        </g>
+        <rect x="96" y="150" width="316" height="7" rx="3" fill="#2E4034"/>
+        <g><rect x="106" y="116" width="26" height="34" rx="4" fill="#6F91A6"/><rect x="106" y="126" width="26" height="11" fill="#FBF9F5" opacity=".9"/>
+          <rect x="138" y="112" width="22" height="38" rx="4" fill="#C4553F"/><rect x="138" y="124" width="22" height="11" fill="#FBF9F5" opacity=".9"/>
+          <rect x="166" y="120" width="30" height="30" rx="4" fill="#E0A052"/><rect x="166" y="130" width="30" height="10" fill="#FBF9F5" opacity=".9"/>
+          <rect x="202" y="110" width="20" height="40" rx="9" fill="#C6BBA6"/>
+          <rect x="228" y="118" width="28" height="32" rx="4" fill="#7C9A6B"/><rect x="228" y="128" width="28" height="10" fill="#FBF9F5" opacity=".9"/>
+          <rect x="262" y="114" width="24" height="36" rx="4" fill="#C4553F"/><rect x="262" y="126" width="24" height="10" fill="#FBF9F5" opacity=".9"/>
+          <rect x="292" y="122" width="32" height="28" rx="4" fill="#6F91A6"/><rect x="292" y="131" width="32" height="9" fill="#FBF9F5" opacity=".9"/>
+          <rect x="330" y="112" width="22" height="38" rx="4" fill="#E0A052"/><rect x="330" y="124" width="22" height="11" fill="#FBF9F5" opacity=".9"/>
+          <rect x="358" y="118" width="26" height="32" rx="4" fill="#7C9A6B"/><rect x="358" y="128" width="26" height="10" fill="#FBF9F5" opacity=".9"/></g>
 
-        <!-- shelf 1 -->
-        <rect x="96" y="150" width="316" height="7" rx="2" fill="#23332B"/>
-        <g>
-          <rect x="106" y="116" width="26" height="34" rx="3" fill="#5B7F97"/><rect x="106" y="126" width="26" height="11" fill="#FAF8F4" opacity=".9"/>
-          <rect x="138" y="112" width="22" height="38" rx="3" fill="#DD0B00"/><rect x="138" y="124" width="22" height="11" fill="#FAF8F4" opacity=".9"/>
-          <rect x="166" y="120" width="30" height="30" rx="3" fill="#FF8C00"/><rect x="166" y="130" width="30" height="10" fill="#FAF8F4" opacity=".9"/>
-          <rect x="202" y="110" width="20" height="40" rx="9" fill="#B0A794"/>
-          <rect x="228" y="118" width="28" height="32" rx="3" fill="#3E5C4B"/><rect x="228" y="128" width="28" height="10" fill="#FAF8F4" opacity=".9"/>
-          <rect x="262" y="114" width="24" height="36" rx="3" fill="#DD0B00"/><rect x="262" y="126" width="24" height="10" fill="#FAF8F4" opacity=".9"/>
-          <rect x="292" y="122" width="32" height="28" rx="3" fill="#5B7F97"/><rect x="292" y="131" width="32" height="9" fill="#FAF8F4" opacity=".9"/>
-          <rect x="330" y="112" width="22" height="38" rx="3" fill="#FF8C00"/><rect x="330" y="124" width="22" height="11" fill="#FAF8F4" opacity=".9"/>
-          <rect x="358" y="118" width="26" height="32" rx="3" fill="#B0A794"/><rect x="358" y="128" width="26" height="10" fill="#FAF8F4" opacity=".9"/>
-        </g>
+        <rect x="96" y="228" width="316" height="7" rx="3" fill="#2E4034"/>
+        <g><rect x="106" y="192" width="28" height="36" rx="4" fill="#E0A052"/><rect x="106" y="203" width="28" height="11" fill="#FBF9F5" opacity=".9"/>
+          <rect x="140" y="196" width="24" height="32" rx="4" fill="#7C9A6B"/><rect x="140" y="206" width="24" height="10" fill="#FBF9F5" opacity=".9"/>
+          <g><rect x="176" y="184" width="42" height="44" rx="5" fill="#C6BBA6"/>
+            <rect x="176" y="198" width="42" height="14" fill="#F0EDE5" opacity=".85"/>
+            <rect x="184" y="203" width="18" height="3.5" rx="1.5" fill="#C6BBA6"/>
+            <rect x="172" y="180" width="50" height="52" rx="7" fill="none" stroke="#C4553F" stroke-width="2.6" stroke-dasharray="6 5"/></g>
+          <rect x="234" y="190" width="26" height="38" rx="4" fill="#6F91A6"/><rect x="234" y="202" width="26" height="11" fill="#FBF9F5" opacity=".9"/>
+          <rect x="266" y="196" width="30" height="32" rx="4" fill="#C4553F"/><rect x="266" y="206" width="30" height="10" fill="#FBF9F5" opacity=".9"/>
+          <rect x="302" y="188" width="22" height="40" rx="9" fill="#E0A052"/>
+          <rect x="330" y="194" width="28" height="34" rx="4" fill="#C6BBA6"/><rect x="330" y="205" width="28" height="10" fill="#FBF9F5" opacity=".9"/>
+          <rect x="364" y="198" width="20" height="30" rx="4" fill="#7C9A6B"/></g>
 
-        <!-- shelf 2 — holds the flagged item -->
-        <rect x="96" y="228" width="316" height="7" rx="2" fill="#23332B"/>
-        <g>
-          <rect x="106" y="192" width="28" height="36" rx="3" fill="#FF8C00"/><rect x="106" y="203" width="28" height="11" fill="#FAF8F4" opacity=".9"/>
-          <rect x="140" y="196" width="24" height="32" rx="3" fill="#3E5C4B"/><rect x="140" y="206" width="24" height="10" fill="#FAF8F4" opacity=".9"/>
-          <!-- the slow mover: desaturated, dusty, dashed outline -->
-          <g>
-            <rect x="176" y="184" width="42" height="44" rx="4" fill="#B0A794"/>
-            <rect x="176" y="198" width="42" height="14" fill="#EEEAE4" opacity=".85"/>
-            <rect x="184" y="203" width="18" height="3.5" rx="1.5" fill="#B0A794"/>
-            <rect x="172" y="180" width="50" height="52" rx="6" fill="none" stroke="#DD0B00" stroke-width="2.6" stroke-dasharray="6 5"/>
-          </g>
-          <rect x="234" y="190" width="26" height="38" rx="3" fill="#5B7F97"/><rect x="234" y="202" width="26" height="11" fill="#FAF8F4" opacity=".9"/>
-          <rect x="266" y="196" width="30" height="32" rx="3" fill="#DD0B00"/><rect x="266" y="206" width="30" height="10" fill="#FAF8F4" opacity=".9"/>
-          <rect x="302" y="188" width="22" height="40" rx="9" fill="#FF8C00"/>
-          <rect x="330" y="194" width="28" height="34" rx="3" fill="#B0A794"/><rect x="330" y="205" width="28" height="10" fill="#FAF8F4" opacity=".9"/>
-          <rect x="364" y="198" width="20" height="30" rx="3" fill="#3E5C4B"/>
-        </g>
+        <rect x="96" y="306" width="316" height="7" rx="3" fill="#2E4034"/>
+        <g><rect x="104" y="268" width="34" height="38" rx="4" fill="#C4553F"/><rect x="104" y="280" width="34" height="12" fill="#FBF9F5" opacity=".9"/>
+          <rect x="144" y="274" width="26" height="32" rx="4" fill="#6F91A6"/><rect x="144" y="284" width="26" height="10" fill="#FBF9F5" opacity=".9"/>
+          <rect x="178" y="286" width="58" height="20" rx="4" fill="#F0EDE5" stroke="#C6BBA6" stroke-width="1.4"/>
+          <circle cx="190" cy="284" r="7" fill="#F5EDDD"/><circle cx="207" cy="284" r="7" fill="#F5EDDD"/><circle cx="224" cy="284" r="7" fill="#F5EDDD"/>
+          <rect x="244" y="270" width="28" height="36" rx="4" fill="#E0A052"/><rect x="244" y="281" width="28" height="11" fill="#FBF9F5" opacity=".9"/>
+          <rect x="278" y="276" width="24" height="30" rx="4" fill="#7C9A6B"/>
+          <rect x="308" y="266" width="22" height="40" rx="9" fill="#6F91A6"/>
+          <rect x="336" y="272" width="32" height="34" rx="4" fill="#C6BBA6"/><rect x="336" y="283" width="32" height="10" fill="#FBF9F5" opacity=".9"/>
+          <rect x="374" y="278" width="20" height="28" rx="4" fill="#C4553F"/></g>
 
-        <!-- shelf 3 -->
-        <rect x="96" y="306" width="316" height="7" rx="2" fill="#23332B"/>
-        <g>
-          <rect x="104" y="268" width="34" height="38" rx="3" fill="#DD0B00"/><rect x="104" y="280" width="34" height="12" fill="#FAF8F4" opacity=".9"/>
-          <rect x="144" y="274" width="26" height="32" rx="3" fill="#5B7F97"/><rect x="144" y="284" width="26" height="10" fill="#FAF8F4" opacity=".9"/>
-          <!-- egg tray, the sari-sari staple -->
-          <rect x="178" y="286" width="58" height="20" rx="3" fill="#EEEAE4" stroke="#B0A794" stroke-width="1.4"/>
-          <circle cx="190" cy="284" r="7" fill="#F3EADA"/><circle cx="207" cy="284" r="7" fill="#F3EADA"/><circle cx="224" cy="284" r="7" fill="#F3EADA"/>
-          <rect x="244" y="270" width="28" height="36" rx="3" fill="#FF8C00"/><rect x="244" y="281" width="28" height="11" fill="#FAF8F4" opacity=".9"/>
-          <rect x="278" y="276" width="24" height="30" rx="3" fill="#3E5C4B"/>
-          <rect x="308" y="266" width="22" height="40" rx="9" fill="#5B7F97"/>
-          <rect x="336" y="272" width="32" height="34" rx="3" fill="#B0A794"/><rect x="336" y="283" width="32" height="10" fill="#FAF8F4" opacity=".9"/>
-          <rect x="374" y="278" width="20" height="28" rx="3" fill="#DD0B00"/>
-        </g>
-
-        <!-- counter -->
-        <rect x="30" y="384" width="460" height="46" rx="5" fill="#23332B"/>
-        <rect x="30" y="384" width="460" height="7" rx="3" fill="#3E5C4B"/>
-        <!-- kendi jar on the counter -->
-        <rect x="392" y="352" width="44" height="34" rx="5" fill="#FAF8F4" opacity=".92" stroke="#B0A794" stroke-width="1.5"/>
-        <circle cx="403" cy="374" r="4" fill="#DD0B00"/><circle cx="414" cy="371" r="4" fill="#FF8C00"/>
-        <circle cx="425" cy="375" r="4" fill="#5B7F97"/><circle cx="409" cy="381" r="4" fill="#3E5C4B"/>
-        <rect x="396" y="346" width="36" height="7" rx="2.5" fill="#DD0B00"/>
-        <!-- ground shadow -->
-        <ellipse cx="260" cy="440" rx="228" ry="11" fill="#23332B" opacity=".14"/>
-
-        <!-- tag pinned to the slow mover -->
-        <line x1="197" y1="180" x2="197" y2="150" stroke="#DD0B00" stroke-width="2"/>
-        <circle cx="197" cy="180" r="4" fill="#DD0B00"/>
+        <rect x="30" y="384" width="460" height="46" rx="7" fill="#2E4034"/>
+        <rect x="30" y="384" width="460" height="7" rx="3" fill="#456B52"/>
+        <rect x="392" y="352" width="44" height="34" rx="6" fill="#FBF9F5" opacity=".93" stroke="#C6BBA6" stroke-width="1.5"/>
+        <circle cx="403" cy="374" r="4" fill="#C4553F"/><circle cx="414" cy="371" r="4" fill="#E0A052"/>
+        <circle cx="425" cy="375" r="4" fill="#6F91A6"/><circle cx="409" cy="381" r="4" fill="#7C9A6B"/>
+        <rect x="396" y="346" width="36" height="7" rx="3" fill="#C4553F"/>
+        <ellipse cx="260" cy="440" rx="228" ry="11" fill="#2E4034" opacity=".12"/>
+        <line x1="197" y1="180" x2="197" y2="150" stroke="#C4553F" stroke-width="2"/>
+        <circle cx="197" cy="180" r="4" fill="#C4553F"/>
       </svg>
 
       <div class="floatcard">
-        <div class="hd">
-          <div>
-            <div class="st">Shelf reading</div>
-            <div class="nm">Canned mushrooms</div>
-          </div>
-        </div>
+        <div class="st">Shelf reading</div>
+        <div class="nm">Canned mushrooms</div>
         <div class="bar"><i></i></div>
         <div class="sc"><span>NATIGIL</span><span>MABENTA</span></div>
-        <div class="verd">
-          <span class="tag">ITULAK</span>
-          <p>22 weeks quiet — but it pairs. <b>Bundle it</b>, don't discount.</p>
-        </div>
+        <div class="verd"><span class="tag">ITULAK</span>
+          <p>22 weeks quiet — but it pairs. <b>Bundle it</b>, don't discount.</p></div>
       </div>
     </div>
   </header>
 </div>
 
 <div class="ticker" aria-hidden="true"><div class="in">
-  <span>1.3M sari-sari stores nationwide<b>·</b>94% of Filipinos buy from them<b>·</b>₱1.12–1.46T contributed each year<b>·</b>2.95M tonnes of food wasted by PH households annually<b>·</b>$562B lost to overstock worldwide<b>·</b>+46% sales when stores acted on slow-mover advice<b>·</b></span>
-  <span>1.3M sari-sari stores nationwide<b>·</b>94% of Filipinos buy from them<b>·</b>₱1.12–1.46T contributed each year<b>·</b>2.95M tonnes of food wasted by PH households annually<b>·</b>$562B lost to overstock worldwide<b>·</b>+46% sales when stores acted on slow-mover advice<b>·</b></span>
+  <span>1.3M sari-sari stores nationwide<b>·</b>94% of Filipinos buy from them<b>·</b>~70% of packaged food sales pass through them<b>·</b>131M tonnes of food wasted by retail worldwide<b>·</b>$562B lost to overstock<b>·</b>+46% sales when stores acted on slow-mover advice<b>·</b></span>
+  <span>1.3M sari-sari stores nationwide<b>·</b>94% of Filipinos buy from them<b>·</b>~70% of packaged food sales pass through them<b>·</b>131M tonnes of food wasted by retail worldwide<b>·</b>$562B lost to overstock<b>·</b>+46% sales when stores acted on slow-mover advice<b>·</b></span>
 </div></div>
 
 <!-- ============================================================
-     PH NUMBERS
+     2 · THE PROBLEM — numbers live inside it
      ============================================================ -->
-<section id="numbers" class="capiz"><div class="wrap">
+<section id="problema" class="capiz"><div class="wrap">
   <div class="sec-head">
-    <p class="eyebrow">Ang totoong bilang · The receipts</p>
-    <h2>What unsold stock actually costs the Philippines.</h2>
-    <p>Dead stock doesn't announce itself. It shows up as food in the bin, capital that never came back, and a
-      shelf slot a better product could have used. Here's the scale of it — and the size of the prize for
-      the stores that get it right. Every number is sourced and dated.</p>
+    <p class="eyebrow">Ang tahimik na lugi · the quiet loss</p>
+    <h2>You already know which one it is.</h2>
+    <p>The can at the back. The sachet strip nobody touches. It sold twice in March and it has been sitting there
+      since. You keep it because throwing it out feels like admitting the money is gone — but it already is, and
+      it is charging you rent three ways at the same time.</p>
   </div>
 
-  <div class="statgroup">
-    <div class="grouphd">
-      <span class="kicker waste">01 · NASASAYANG</span>
-      <h3>What gets thrown away</h3>
-      <p class="sub">Waste is dead stock that ran out of time.</p>
-    </div>
-    <div class="statgrid">
-      <div class="stat waste">
-        <div class="n">2.95M</div><div class="u">tonnes / year</div>
-        <p>Food thrown out by Filipino households every year — about <b>26 kg per person</b>, and that's only what happens after it leaves the store.</p>
-        <div class="src">UNEP, <a href="https://www.unep.org/resources/publication/food-waste-index-report-2024" target="_blank" rel="noopener">Food Waste Index Report 2024</a> <sup>[1]</sup></div>
-      </div>
-      <div class="stat waste">
-        <div class="n">2,175</div><div class="u">tons every single day</div>
-        <p>Food waste generated nationwide per day. Rice alone is <b>58%</b> of household plate waste.</p>
-        <div class="src">PIDS <a href="https://www.pids.gov.ph/details/news/in-the-news/food-wasted-by-the-tons-while-millions-of-filipinos-go-hungry" target="_blank" rel="noopener">estimate</a> <sup>[2]</sup></div>
-      </div>
-      <div class="stat waste">
-        <div class="n">131M</div><div class="u">tonnes wasted by retail</div>
-        <p>Food wasted by shops worldwide each year — <b>12% of all food waste</b>. This isn't only a kitchen problem. It starts on the shelf.</p>
-        <div class="src">UNEP, <a href="https://www.unep.org/resources/publication/food-waste-index-report-2024" target="_blank" rel="noopener">Food Waste Index Report 2024</a> <sup>[1]</sup></div>
-      </div>
-      <div class="stat waste">
-        <div class="n">₱8.4B</div><div class="u">of rice, wasted yearly</div>
-        <p>The value of rice Filipinos throw away in a year — one commodity, in a country where millions go hungry.</p>
-        <div class="src">IRRI, via <a href="https://newsinfo.inquirer.net/179509/p8-4b-worth-of-rice-goes-to-waste-in-philippines-yearly%E2%80%94irri" target="_blank" rel="noopener">Inquirer</a> <sup>[3]</sup></div>
-      </div>
-    </div>
-  </div>
-
-  <div class="statgroup">
-    <div class="grouphd">
-      <span class="kicker loss">02 · NALULUGI</span>
-      <h3>What it costs the business</h3>
-      <p class="sub">Stock in the wrong place is a loan you made to your own shelf.</p>
-    </div>
-    <div class="statgrid">
-      <div class="stat loss">
-        <div class="n">$1.77T</div><div class="u">inventory distortion, 2023</div>
-        <p>The global cost of having the wrong stock in the wrong place — bigger than the entire retail GDP of Latin America.</p>
-        <div class="src">IHL Group, <a href="https://www.ihlservices.com/product/fixing-inventory-distortion-are-we-there-yet/" target="_blank" rel="noopener">Fixing Inventory Distortion</a> <sup>[4]</sup></div>
-      </div>
-      <div class="stat loss">
-        <div class="n">$562B</div><div class="u">of that is pure overstock</div>
-        <p>Goods that were bought in but never bought out. Every peso of it started as somebody's working capital.</p>
-        <div class="src">IHL Group, 2023 <sup>[4]</sup></div>
-      </div>
-      <div class="stat loss">
-        <div class="n">7.2%</div><div class="u">of retail sales, gone</div>
-        <p>What inventory distortion costs as a share of sales. On a store turning over <b>₱1,000,000</b> a year, that's about <b>₱72,000</b> — close to a full month of revenue.</p>
-        <div class="src">IHL Group, 2023 <sup>[4]</sup></div>
-      </div>
-      <div class="stat loss">
-        <div class="n">99.6%</div><div class="u">of PH businesses are MSMEs</div>
-        <p>1,236,908 of the country's 1,241,476 establishments — and they carry <b>65.1%</b> of all employment. These are the owners who feel every peso of dead stock personally.</p>
-        <div class="src">DTI, <a href="https://www.dti.gov.ph/dti-knowledge-hub/dti-statistics/dti-msme-statistics" target="_blank" rel="noopener">2024 Philippine MSME Statistics</a> <sup>[5]</sup></div>
-      </div>
-    </div>
-  </div>
-
-  <div class="statgroup">
-    <div class="grouphd">
-      <span class="kicker opp">03 · PAGKAKATAON</span>
-      <h3>What's there to win</h3>
-      <p class="sub">The upside isn't theoretical. It's already been measured.</p>
-    </div>
-    <div class="statgrid">
-      <div class="stat opp">
-        <div class="n">1.3M</div><div class="u">sari-sari stores</div>
-        <p>Stores nationwide, with <b>94%</b> of Filipino consumers relying on them for everyday needs.</p>
-        <div class="src">Reported by <a href="https://www.philstar.com/the-freeman/cebu-business/2024/03/05/2338187/sari-fund-benefit-13m-sari-sari-stores-nationwide" target="_blank" rel="noopener">Philstar</a>, 2024 <sup>[6]</sup></div>
-      </div>
-      <div class="stat opp">
-        <div class="n long">₱1.4T → ₱2.4T</div><div class="u">today, and the 2030 target</div>
-        <p>The channel already adds <b>₱1.12–1.46T</b> a year — <b>15–20%</b> of the whole retail market. Doubling that by 2030 means stores keeping more of what they already stock working, instead of dying on a shelf.</p>
-        <div class="src">Sector estimates via <a href="https://bworldonline.com/economy/2025/06/16/679536/sari-sari-store-segment-targeted-for-growth-to-p2-4-trillion-by-2030/" target="_blank" rel="noopener">BusinessWorld</a>, 2025 <sup>[7]</sup></div>
-      </div>
-      <div class="stat opp">
-        <div class="n">+46%</div><div class="u">daily sales, in two weeks</div>
-        <p>The lift 300+ sari-sari stores saw after acting on data-driven advice about their <b>underperforming products</b> — with total sales up 17%, on 20% <i>fewer</i> selling days.</p>
-        <div class="src">Packworks <a href="https://packworks.io/sari-sari-stores-using-ai-see-double-digit-performance-gains-packworks-report/" target="_blank" rel="noopener">Store Insighting Project</a>, 2025 <sup>[8]</sup></div>
-      </div>
-      <div class="stat opp">
-        <div class="n">~70%</div><div class="u">of packaged food sales</div>
-        <p>The share of manufactured consumer-food sales that moves through sari-sari stores — which is why what sits unsold on those shelves matters nationally.</p>
-        <div class="src">Magna Kultura Foundation <sup>[9]</sup></div>
-      </div>
-    </div>
-  </div>
-
-  <p class="readnote"><b>How to read these:</b> they come from different studies with different scopes and years —
-    national food-waste totals aren't retail-only, and the inventory-distortion figures are global, not Philippine.
-    We show them together because they point the same way: unsold stock is expensive, and small stores carry the
-    cost. Shelf Temp Check doesn't estimate any of these numbers. It works only on the numbers <i>you</i> type in.</p>
-
-  <div class="sources">
-    <h4>Sources</h4>
-    <ol>
-      <li>UNEP, <a href="https://www.unep.org/resources/publication/food-waste-index-report-2024" target="_blank" rel="noopener">Food Waste Index Report 2024: Think Eat Save</a> (2022 reference data). Philippine household food waste: 2.95M tonnes/yr, 26 kg per capita. Global retail: 131M tonnes, 12% of food waste.</li>
-      <li>Philippine Institute for Development Studies, <a href="https://www.pids.gov.ph/details/news/in-the-news/food-wasted-by-the-tons-while-millions-of-filipinos-go-hungry" target="_blank" rel="noopener">"Food wasted by the tons while millions of Filipinos go hungry"</a> — ~2,175 tons/day; rice 58% of household plate waste.</li>
-      <li>International Rice Research Institute, reported in the <a href="https://newsinfo.inquirer.net/179509/p8-4b-worth-of-rice-goes-to-waste-in-philippines-yearly%E2%80%94irri" target="_blank" rel="noopener">Philippine Daily Inquirer</a> — ₱8.4B of rice wasted per year.</li>
-      <li>IHL Group, <a href="https://www.ihlservices.com/product/fixing-inventory-distortion-are-we-there-yet/" target="_blank" rel="noopener">Fixing Inventory Distortion</a> (2023) — $1.77T global cost; $1.2T out-of-stocks, $562B overstocks; equal to 7.2% of retail sales. Summary via <a href="https://www.retailtouchpoints.com/features/industry-insights/ihl-study-inventory-distortion-will-cost-retailers-1-77-trillion-in-2023" target="_blank" rel="noopener">Retail TouchPoints</a>.</li>
-      <li>Department of Trade and Industry, <a href="https://www.dti.gov.ph/dti-knowledge-hub/dti-statistics/dti-msme-statistics" target="_blank" rel="noopener">2024 Philippine MSME Statistics</a> (from the PSA List of Establishments) — 1,236,908 MSMEs of 1,241,476 establishments (99.63%); 65.1% of total employment; wholesale &amp; retail trade is the largest MSME sector.</li>
-      <li><a href="https://www.philstar.com/the-freeman/cebu-business/2024/03/05/2338187/sari-fund-benefit-13m-sari-sari-stores-nationwide" target="_blank" rel="noopener">Philstar / The Freeman</a> (2024) — 1.3M sari-sari stores; 94% of consumers depend on them.</li>
-      <li><a href="https://bworldonline.com/economy/2025/06/16/679536/sari-sari-store-segment-targeted-for-growth-to-p2-4-trillion-by-2030/" target="_blank" rel="noopener">BusinessWorld</a> (2025) — ₱1.12–1.46T annual contribution; 15–20% of retail; ₱861k–₱1.123M average annual sales per store; ₱2.4T target by 2030.</li>
-      <li>Packworks, <a href="https://packworks.io/sari-sari-stores-using-ai-see-double-digit-performance-gains-packworks-report/" target="_blank" rel="noopener">Store Insighting Project report</a> (2025) — 300+ stores; +46% daily GMV and +17% total sales in two weeks, driven by recommendations on underperforming products.</li>
-      <li>Magna Kultura Foundation, <a href="https://dickieaguado.wordpress.com/2011/09/29/empowering-sari-sari-stores-in-the-philippines/" target="_blank" rel="noopener">"Empowering Sari-Sari Stores in the Philippines"</a> — sari-sari stores account for almost 70% of sales of manufactured consumer food products. Foundation estimate, quoted widely in retail coverage; treat as indicative rather than official statistics.</li>
-    </ol>
-  </div>
-</div></section>
-
-<div class="sachets" aria-hidden="true"></div>
-
-<!-- ============================================================
-     THE PROBLEM
-     ============================================================ -->
-<section id="problem"><div class="wrap">
-  <div class="sec-head">
-    <p class="eyebrow">Ang tahimik na lugi</p>
-    <h2>Every product that just sits there is money that's stuck.</h2>
-    <p>Owners celebrate the fast movers and quietly tolerate the rest. But a slow mover isn't neutral — it charges
-      you rent three different ways at the same time.</p>
-  </div>
   <div class="grid3">
     <div class="cost">
-      <div class="ic-cost"><svg viewBox="0 0 48 48" fill="none"><circle cx="24" cy="24" r="16.5" stroke="#DD0B00" stroke-width="2.6"/><path d="M19 16h6.5a4 4 0 0 1 0 8H19m0-4h11M19 16v16" stroke="#DD0B00" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M37 11l3.4 3.4M40.4 11L37 14.4" stroke="#23332B" stroke-width="2.4" stroke-linecap="round"/></svg></div>
+      <div class="ic-cost"><svg viewBox="0 0 52 52" fill="none">
+        <rect x="6" y="14" width="40" height="27" rx="5" fill="#F4E2DC" stroke="#C4553F" stroke-width="2.4"/>
+        <circle cx="26" cy="27.5" r="7.5" stroke="#C4553F" stroke-width="2.4"/>
+        <path d="M23.5 23.5h4a2.6 2.6 0 0 1 0 5.2h-4m0-2.6h6.5m-6.5-2.6v8.4" stroke="#C4553F" stroke-width="2" stroke-linecap="round"/>
+        <path d="M13 20v-4a3 3 0 0 1 3-3h20a3 3 0 0 1 3 3v4" stroke="#C6BBA6" stroke-width="2.4"/>
+        <path d="M15 44l3-3m16 3l-3-3" stroke="#6F91A6" stroke-width="2.2" stroke-linecap="round"/></svg></div>
       <h3>Frozen cash</h3><p class="tag-fil">Nakatengga ang puhunan</p>
-      <p>Money tied up in stock that won't move is money you can't spend on stock that will. The app shows the exact pesos frozen in each slow item.</p>
+      <p>Money tied up in stock that will not move is money you cannot spend on stock that will. The checker shows
+        the exact pesos frozen in each slow item.</p>
     </div>
     <div class="cost">
-      <div class="ic-cost"><svg viewBox="0 0 48 48" fill="none"><rect x="7" y="30" width="34" height="4" rx="2" fill="#DD0B00"/><rect x="12" y="16" width="9" height="14" rx="2" stroke="#DD0B00" stroke-width="2.6"/><rect x="27" y="21" width="9" height="9" rx="2" stroke="#B0A794" stroke-width="2.6"/><path d="M11 34v5m26-5v5" stroke="#DD0B00" stroke-width="2.6" stroke-linecap="round"/></svg></div>
+      <div class="ic-cost"><svg viewBox="0 0 52 52" fill="none">
+        <rect x="5" y="33" width="42" height="4.5" rx="2.2" fill="#2E4034"/>
+        <rect x="9" y="17" width="10" height="16" rx="2.5" fill="#E0A052"/>
+        <rect x="21" y="21" width="9" height="12" rx="2.5" fill="#7C9A6B"/>
+        <rect x="33" y="15" width="10" height="18" rx="2.5" fill="#C6BBA6" stroke="#C4553F" stroke-width="2.2" stroke-dasharray="4 3"/>
+        <path d="M10 37.5v5m32-5v5" stroke="#2E4034" stroke-width="2.2" stroke-linecap="round"/>
+        <path d="M38 9v4M35 11h6" stroke="#C4553F" stroke-width="2" stroke-linecap="round"/></svg></div>
       <h3>Dead shelf space</h3><p class="tag-fil">Sayang ang espasyo</p>
-      <p>Every slot a loser occupies is a slot a winner can't have. In a tindahan, space is the scarcest thing you own — and slow movers hoard it.</p>
+      <p>Every slot a loser occupies is a slot a winner cannot have. In a tindahan, space is the scarcest thing you
+        own — and slow movers hoard it.</p>
     </div>
     <div class="cost">
-      <div class="ic-cost"><svg viewBox="0 0 48 48" fill="none"><path d="M24 9c6 8 10 12 10 18a10 10 0 0 1-20 0c0-6 4-10 10-18Z" stroke="#DD0B00" stroke-width="2.6" stroke-linejoin="round"/><path d="M24 21v10m0 0l-3.6-3.6M24 31l3.6-3.6" stroke="#FF8C00" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="ic-cost"><svg viewBox="0 0 52 52" fill="none">
+        <path d="M17 15h18l-2 26a3 3 0 0 1-3 2.8H22a3 3 0 0 1-3-2.8L17 15Z" fill="#FAEEDA" stroke="#E0A052" stroke-width="2.4"/>
+        <path d="M14 15h24" stroke="#E0A052" stroke-width="2.4" stroke-linecap="round"/>
+        <path d="M21 10h10v5H21z" fill="#C6BBA6"/>
+        <path d="M26 22v10m0 0l-3.5-3.5M26 32l3.5-3.5" stroke="#C4553F" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="38" cy="36" r="6" fill="#C4553F" opacity=".18"/></svg></div>
       <h3>Spoiling value</h3><p class="tag-fil">Malapit nang mag-expire</p>
-      <p>Food, sachets, and seasonal items lose value by the week. The longer they sit, the closer their worth slides to zero — then to the bin.</p>
+      <p>Food, sachets and seasonal items lose value by the week. The longer they sit, the closer their worth
+        slides to zero — then to the bin.</p>
     </div>
   </div>
-</div></section>
 
-<!-- ============================================================
-     THE TRIAGE
-     ============================================================ -->
-<section id="triage" style="padding-top:0"><div class="wrap"><div class="dark"><div class="wrap">
-  <p class="eyebrow">Isang produkto, isang desisyon</p>
-  <h2>Not a dashboard. A decision.</h2>
-  <p class="sub">Enter what you already know about a fading product. You get one call, in the order a store owner
-    actually thinks: is it still fine? If not — do I push it, or do I let it go? And if I push it, how?</p>
+  <!-- ---------- the numbers, as a subsection of the problem ---------- -->
+  <div class="numbers-sub" id="bilang">
+    <div class="sub-head">
+      <p class="eyebrow">Hindi ka nag-iisa · you're not the only one</p>
+      <h3>It isn't just your shelf. It's the whole ecosystem.</h3>
+      <p>Slow stock feels like a personal failure when you are the one staring at it. It is not. Nearly every
+        business in this country is a micro-enterprise — <b>99.6%</b> of the Philippines' 1.24 million
+        establishments <sup>[8]</sup> — and unsold goods are the tax they all quietly pay. Here is the size of it,
+        in three parts.</p>
+    </div>
 
-  <div class="triage">
-    <div class="tnode">
-      <p class="q">Question 1 · Malusog pa ba?</p>
-      <h3>Is it still healthy?</h3>
-      <p>If it's selling recently and steadily, you're done. <b>Panatilihin</b> — keep stocking it, no rescue needed. The app only escalates products that are actually fading.</p>
-    </div>
-    <div class="arrowdown" aria-hidden="true">↓</div>
-    <div class="tnode">
-      <p class="q">Question 2 · Itulak o bitawan?</p>
-      <h3>Push it, or cut it?</h3>
-      <p>This is the fork everything hangs on. A slow mover is worth saving only if it has a lever you can actually pull — a discount it responds to, or a partner product it rides along with. No lever, no rescue.</p>
-    </div>
-    <div class="arrowdown" aria-hidden="true">↓</div>
-    <div class="tsplit">
-      <div class="tcard push">
-        <span class="k">ITULAK</span>
-        <h3>Push it</h3>
-        <p class="fil-sub">May pag-asa pa ito</p>
-        <p>It has a lever. Now the app picks which one — and this is question 3.</p>
-        <div class="tsub">
-          <div class="b"><b>Ibaba ang presyo</b><span>Discount — only when the category genuinely responds to price cuts <i>and</i> your margin survives it.</span></div>
-          <div class="b"><b>Ipares / ibundle</b><span>Bundle — pair it with what your shoppers already buy alongside it, and let that habit pull it out.</span></div>
+    <p class="notalone"><b>Read this as context, not as your numbers.</b> These figures come from national and
+      global studies. They are here to show the shape of the problem you are standing in — the checker itself
+      never uses them. It works only on the numbers you type in.</p>
+
+    <div class="statgroup">
+      <div class="grouphd">
+        <span class="gic" aria-hidden="true"><svg viewBox="0 0 38 38" fill="none">
+          <path d="M9 12h20l-1.6 19.5a2.6 2.6 0 0 1-2.6 2.4H13.2a2.6 2.6 0 0 1-2.6-2.4L9 12Z" fill="#F4E2DC" stroke="#C4553F" stroke-width="2.2"/>
+          <path d="M6.5 12h25" stroke="#C4553F" stroke-width="2.2" stroke-linecap="round"/>
+          <path d="M15 7.5h8v4.5h-8z" fill="#C4553F"/>
+          <path d="M16 19v9m6-9v9" stroke="#C4553F" stroke-width="1.9" stroke-linecap="round"/></svg></span>
+        <div><h4>1 · Ang natatapon</h4><p class="sub">Retail food waste — stock that ran out of time</p></div>
+      </div>
+      <div class="statgrid">
+        <div class="stat waste">
+          <div class="n">131M</div><div class="u">tonnes, retail worldwide</div>
+          <p>Food thrown out by <b>shops</b> every year — <b>12%</b> of all food waste. This starts on the shelf, not in the kitchen.</p>
+          <div class="src">UNEP, <a href="https://www.unep.org/resources/publication/food-waste-index-report-2024" target="_blank" rel="noopener">Food Waste Index 2024</a> <sup>[1]</sup></div>
+        </div>
+        <div class="stat waste">
+          <div class="n">2.95M</div><div class="u">tonnes / year, PH households</div>
+          <p>What Filipino homes throw away annually — about <b>26 kg per person</b>. Most of it crossed a store counter first.</p>
+          <div class="src">UNEP, <a href="https://www.unep.org/resources/publication/food-waste-index-report-2024" target="_blank" rel="noopener">Food Waste Index 2024</a> <sup>[1]</sup></div>
+        </div>
+        <div class="stat waste">
+          <div class="n">2,175</div><div class="u">tons every single day</div>
+          <p>Food waste generated nationwide, per day. Rice alone is <b>58%</b> of household plate waste.</p>
+          <div class="src">PIDS <a href="https://www.pids.gov.ph/details/news/in-the-news/food-wasted-by-the-tons-while-millions-of-filipinos-go-hungry" target="_blank" rel="noopener">estimate</a> <sup>[2]</sup></div>
         </div>
       </div>
-      <div class="tcard cut">
-        <span class="k">BITAWAN</span>
-        <h3>Cut it loose</h3>
-        <p class="fil-sub">Hayaan mo na</p>
-        <p>No discount response, no pairing partner, barely any margin per week. The honest move is to stop reordering.</p>
-        <div class="tsub" style="grid-template-columns:1fr">
-          <div class="b" style="border-color:#7A4038"><b>Free the cash</b><span>The app tells you exactly how much capital is frozen in the unsold units — so you know what you're releasing, and what it could buy instead.</span></div>
+    </div>
+
+    <div class="statgroup">
+      <div class="grouphd">
+        <span class="gic" aria-hidden="true"><svg viewBox="0 0 38 38" fill="none">
+          <circle cx="19" cy="19" r="12" fill="#FAEEDA" stroke="#E0A052" stroke-width="2.2"/>
+          <path d="M15 14h5.2a3.1 3.1 0 0 1 0 6.2H15m0-3.1h8.5M15 14v11.5" stroke="#96622A" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M30 8.5l3 3m0-3l-3 3" stroke="#C4553F" stroke-width="2.1" stroke-linecap="round"/></svg></span>
+        <div><h4>2 · Ang nalulugi</h4><p class="sub">What wrong stock costs the business</p></div>
+      </div>
+      <div class="statgrid">
+        <div class="stat cost">
+          <div class="n">$1.77T</div><div class="u">inventory distortion, 2023</div>
+          <p>The global cost of the wrong stock in the wrong place — larger than the entire retail GDP of Latin America.</p>
+          <div class="src">IHL Group, <a href="https://www.ihlservices.com/product/fixing-inventory-distortion-are-we-there-yet/" target="_blank" rel="noopener">Fixing Inventory Distortion</a> <sup>[3]</sup></div>
+        </div>
+        <div class="stat cost">
+          <div class="n">$562B</div><div class="u">of that is pure overstock</div>
+          <p>Goods bought in that were never bought out. Every peso of it started as somebody's working capital.</p>
+          <div class="src">IHL Group, 2023 <sup>[3]</sup></div>
+        </div>
+        <div class="stat cost">
+          <div class="n">7.2%</div><div class="u">of retail sales, gone</div>
+          <p>What distortion costs as a share of sales. On a store turning over <b>₱1,000,000</b> a year that is about <b>₱72,000</b> — close to a full month of revenue.</p>
+          <div class="src">IHL Group, 2023 <sup>[3]</sup></div>
         </div>
       </div>
     </div>
-  </div>
-</div></div></div></section>
 
-<!-- ============================================================
-     HOW IT WORKS
-     ============================================================ -->
-<section id="how"><div class="wrap">
-  <div class="sec-head center"><p class="eyebrow">Sobrang simple</p><h2>Three numbers you already know.</h2>
-    <p>No POS, no integration, no inventory system. Kung alam mo ang paninda mo, kaya mo 'to.</p></div>
-  <div class="steps">
-    <div class="step"><div class="b">1</div>
-      <h3>Tell it about the product</h3><p class="tag-fil">Ilagay ang alam mo</p>
-      <p>Weeks since it last sold, how long you've stocked it, units sold. Add your cost and price and it unlocks the money advice.</p></div>
-    <div class="step"><div class="b">2</div>
-      <h3>Read the temperature</h3><p class="tag-fil">Tingnan ang lagay</p>
-      <p>A plain health reading — mabenta, okay lang, bumabagal, or natigil — plus the cash tied up in it and how fast it's turning.</p></div>
-    <div class="step"><div class="b">3</div>
-      <h3>Get the move</h3><p class="tag-fil">Ano'ng gagawin</p>
-      <p>For anything fading: push or cut. If push — bundle or discount, with a warning when a price cut would lose you money.</p></div>
-  </div>
-</div></section>
-
-<!-- ============================================================
-     UVP
-     ============================================================ -->
-<section style="padding-top:0"><div class="wrap">
-  <div class="uvp">
-    <div>
-      <p class="eyebrow">Ang hindi ginagawa ng iba</p>
-      <h2>It tells you when <em>not</em> to discount.</h2>
-      <p>Every owner's reflex is to slash the price on a slow item. But plenty of products barely sell more when
-        discounted — and on a thin sari-sari margin, a price cut can lose you money for nothing. Shelf Temp Check
-        runs the math on <i>your</i> cost and price first, then stops you.</p>
-    </div>
-    <div class="demo">
-      <div class="tl" style="text-transform:uppercase;letter-spacing:.12em;font-size:10.5px">Rescue play · bacon</div>
-      <div style="font-family:var(--f-head);font-weight:800;font-size:19px;margin:6px 0 13px">Bundle it — don't discount</div>
-      <div class="warnbox"><b>⚠ Huwag mong i-discount 'to.</b> Bacon does respond to price cuts, but at your ₱3 margin a 15% cut would sell you <b>below cost</b>. Pair it instead.</div>
-    </div>
-  </div>
-</div></section>
-
-<!-- ============================================================
-     METHOD
-     ============================================================ -->
-<section id="method"><div class="wrap">
-  <div class="sec-head"><p class="eyebrow">Under the hood</p>
-    <h2>How the app learned to read a shelf.</h2>
-    <p>It's not magic and it's not a crystal ball. Here's exactly how it was built — in plain terms.</p></div>
-  <div class="story">
-    <div class="stepcard"><div class="num">01</div><h3>Fed it real history</h3>
-      <p>Two full years of actual store sales — millions of purchases across thousands of products.</p></div>
-    <div class="stepcard"><div class="num">02</div><h3>Boiled each product down</h3>
-      <p>Turned every product into a few honest signals: how recently it sold, how steadily, and how many people bought it.</p></div>
-    <div class="stepcard"><div class="num">03</div><h3>Taught it with known endings</h3>
-      <p>Showed it thousands of products whose ending was already known — which kept selling, which faded — so it could learn the difference.</p></div>
-    <div class="stepcard"><div class="num">04</div><h3>Built a wall against cheating</h3>
-      <p>It only ever sees a product's first year to call its second. It can't peek at the future, so it has to learn real patterns.</p></div>
-    <div class="stepcard"><div class="num">05</div><h3>Tested on the unseen</h3>
-      <p>Checked it against products it had never met, to be sure it learned genuine signals — not lucky flukes.</p></div>
-  </div>
-  <p class="discovered"><b>What it discovered:</b> a product's fate is written mostly in <b>how recently and how widely it sold</b> — not in its category or its brand. On top of that, the app learned which products get bought <b>together</b> (from 230,000 real baskets) and which ones actually <b>respond to a discount</b> — the two things that decide whether a slow item is worth saving, and how.</p>
-</div></section>
-
-<section style="padding-top:0"><div class="wrap"><div class="stats"><div class="wrap"><div class="row">
-  <div><div class="big">2 yrs</div><div class="lbl">of real sales learned from</div></div>
-  <div><div class="big">230k</div><div class="lbl">baskets mined for pairings</div></div>
-  <div><div class="big">3</div><div class="lbl">simple signals that matter</div></div>
-  <div><div class="big">1</div><div class="lbl">clear verdict per product</div></div>
-</div></div></div></div></section>
-
-<!-- ============================================================
-     THE APP
-     ============================================================ -->
-<section id="try"><div class="wrap">
-  <div class="sec-head center"><p class="eyebrow">Subukan mo na</p>
-    <h2>Check one of your slow movers.</h2>
-    <p>Enter what you know. Get a reading and the one move to make.</p></div>
-
-  <div id="app">
-    <div class="appbar">
-      <div class="ttl"><span></span> Shelf Temp Check</div>
-      <div class="note">Walang sign-up · nothing leaves your phone</div>
-    </div>
-    <div class="appbody">
-      <nav class="tabs" id="tabs">
-        <button class="on" data-t="check">Check a product</button>
-        <button data-t="batch">Check my slow-movers</button>
-      </nav>
-
-      <section class="tab on" id="check">
-        <div class="grid2">
-          <div class="card">
-            <h2>Tell me about the product</h2>
-            <p class="sub">Ang alam mo lang — just what you already know.</p>
-            <div class="field"><div class="top"><div><label for="stale">Weeks since it last sold</label>
-              <span class="hint">— 0 = sold this week</span></div><span class="val" id="stale-v">20</span></div>
-              <input type="range" id="stale" min="0" max="52" value="20"></div>
-            <div class="field"><div class="top"><div><label for="weeks">Weeks you've been selling it</label></div>
-              <span class="val" id="weeks-v">3</span></div><input type="range" id="weeks" min="1" max="52" value="3"></div>
-            <div class="field"><label for="units">Total units sold so far</label>
-              <span class="hint">— type the number</span><br>
-              <input type="number" id="units" min="0" step="1" value="5" style="width:150px;margin-top:6px"></div>
-            <div class="field"><label for="cat">Category</label>
-              <span class="hint">— used for rescue advice if it's slipping</span><br>
-              <select id="cat" style="width:100%;margin-top:6px"></select></div>
-            <div class="field"><label for="stock">Units you originally stocked</label>
-              <span class="hint">— optional, for sell-through &amp; reorder</span><br>
-              <input type="number" id="stock" min="0" step="1" value="12" style="width:150px;margin-top:6px"></div>
-            <div class="field"><label for="price">Your selling price (₱)</label>
-              <span class="hint">— optional, unlocks profit advice</span><br>
-              <input type="number" id="price" min="0" step="0.01" value="25" style="width:150px;margin-top:6px"></div>
-            <div class="field"><label for="cost">What you pay for it (₱)</label>
-              <span class="hint">— your cost per unit</span><br>
-              <input type="number" id="cost" min="0" step="0.01" value="22" style="width:150px;margin-top:6px"></div>
-          </div>
-          <div class="card">
-            <div class="temp-wrap">
-              <svg width="66" height="196" viewBox="0 0 66 196" aria-hidden="true" style="flex:none">
-                <rect x="24" y="10" width="17" height="150" rx="8.5" fill="#EEEAE4" stroke="#D3CCC1" stroke-width="1.5"/>
-                <rect id="merc" x="26.5" y="80" width="12" height="80" rx="6" fill="#3E5C4B"/>
-                <circle cx="32.5" cy="172" r="17" id="bulb" fill="#3E5C4B"/>
-                <text x="47" y="16" font-size="9" fill="#7A8A80" font-family="IBM Plex Mono, monospace">100</text>
-                <text x="47" y="90" font-size="9" fill="#7A8A80" font-family="IBM Plex Mono, monospace">50</text>
-                <text x="47" y="163" font-size="9" fill="#7A8A80" font-family="IBM Plex Mono, monospace">0</text>
-              </svg>
-              <div><p class="verdict" id="verdict"><small>Lagay ng paninda · Reading</small>OKAY LANG</p>
-                <p class="pbig" id="pbig">— chance it keeps selling</p></div>
-            </div>
-            <div class="chips">
-              <span class="chip" id="margin-chip">Margin <b id="margin">–</b></span>
-              <span class="chip" id="str-chip">Sell-through <b id="str">–</b></span>
-              <span class="chip" id="reorder-chip">Stock left lasts <b id="reorder">–</b></span>
-              <span class="chip" id="frozen-chip">Cash tied up <b id="frozen">–</b></span>
-            </div>
-            <div class="why"><h3>How it read the shelf</h3><ul id="why"></ul></div>
-          </div>
-        </div>
-        <div id="check-rescue" style="margin-top:16px"></div>
-      </section>
-
-      <section class="tab" id="batch">
-        <div class="card">
-          <h2>Check your slow-movers in one go</h2>
-          <p class="sub">Type them in or upload a filled list. Tag each with a category and enter the three numbers —
-            it reads whether each is worth keeping. The category is for your reference; the reading runs on the sales numbers.</p>
-          <div class="mode-toggle"><button id="mode-type" class="on" type="button">Type it in</button><button id="mode-upload" type="button">Upload a list</button></div>
-          <div id="upload-panel" style="display:none">
-            <p>Download the template, fill it in (it opens in Excel), save it as CSV, then drop it back here. It just reads the numbers you type — it doesn't connect to your till.</p>
-            <button class="addbtn" id="dl-template" type="button">↓ Download CSV template</button>
-            <label class="dropzone" id="dropzone"><input type="file" id="csv-file" accept=".csv" style="display:none"><span>Drop your filled CSV here — or click to choose</span></label>
-            <div id="upload-msg"></div>
-          </div>
-          <div class="hscroll">
-            <div class="srow-head"><span>Product</span><span>Category</span><span>Wks since sold</span><span>Wks selling</span>
-              <span>Units sold</span><span>Reading</span><span></span></div>
-            <div id="rows"></div>
-          </div>
-          <button class="addbtn" id="addrow">+ Add product</button>
-          <div class="summary" id="batch-summary"></div>
-        </div>
-      </section>
-    </div>
-  </div>
-</div></section>
-
-<!-- ============================================================
-     CONTRIBUTE TO THE DATASET
-     ============================================================ -->
-<section id="contribute"><div class="wrap">
-  <div class="sec-head">
-    <p class="eyebrow">Ambag mo · add to the dataset</p>
-    <h2>Tell it what actually happened.</h2>
-    <p>The app learned from someone else's shelf. It gets sharper when it learns from yours. Log a slow mover, what
-      you decided to do about it, and how it turned out — that last part is the piece no dataset ever has. Every
-      entry is stamped with what the app <i>predicted</i>, so the gap between the call and the reality is the thing
-      that gets measured.</p>
-  </div>
-
-  <div class="formwrap">
-    <div class="panel">
-      <h3>Log a shelf outcome</h3>
-      <p class="fil-sub">Isang produkto, isang resulta</p>
-      <div class="whereto local" id="contrib-where">
-        <span class="dot"></span>
-        <span id="contrib-where-txt">Checking where this goes…</span>
+    <div class="statgroup">
+      <div class="grouphd">
+        <span class="gic" aria-hidden="true"><svg viewBox="0 0 38 38" fill="none">
+          <path d="M19 33V17" stroke="#54704A" stroke-width="2.4" stroke-linecap="round"/>
+          <path d="M19 21c-1-6-6-8-11.5-7 .6 6 5.4 9 11.5 7Z" fill="#7C9A6B"/>
+          <path d="M19 18c1-6.5 6-9 11.5-8-.6 6.5-5.4 9.6-11.5 8Z" fill="#A8C094"/>
+          <path d="M11 33h16" stroke="#54704A" stroke-width="2.4" stroke-linecap="round"/></svg></span>
+        <div><h4>3 · Ang pagkakataon</h4><p class="sub">What there is to win — already measured, on Filipino shelves</p></div>
       </div>
-
-      <form id="contrib-form" novalidate>
-        <div class="f">
-          <label for="c-name">Product <span class="hint">— whatever you call it on the shelf</span></label>
-          <input type="text" id="c-name" placeholder="e.g. Canned mushrooms" maxlength="80">
+      <div class="statgrid">
+        <div class="stat opp">
+          <div class="n">1.3M</div><div class="u">sari-sari stores</div>
+          <p>Stores nationwide, with <b>94%</b> of Filipino consumers relying on them. The channel already turns over <b>₱1.12–1.46T</b> a year, with a ₱2.4T target by 2030.</p>
+          <div class="src"><a href="https://www.philstar.com/the-freeman/cebu-business/2024/03/05/2338187/sari-fund-benefit-13m-sari-sari-stores-nationwide" target="_blank" rel="noopener">Philstar</a> 2024 · <a href="https://bworldonline.com/economy/2025/06/16/679536/sari-sari-store-segment-targeted-for-growth-to-p2-4-trillion-by-2030/" target="_blank" rel="noopener">BusinessWorld</a> 2025 <sup>[4][5]</sup></div>
         </div>
-        <div class="f">
-          <label for="c-cat">Category <span class="hint">— optional, helps group the data</span></label>
-          <select id="c-cat"></select>
+        <div class="stat opp">
+          <div class="n">~70%</div><div class="u">of packaged food sales</div>
+          <p>The share of manufactured consumer-food sales that moves through sari-sari stores — which is why what sits unsold on those shelves matters nationally.</p>
+          <div class="src">Magna Kultura Foundation <sup>[6]</sup></div>
         </div>
-        <div class="frow3">
-          <div class="f"><label for="c-stale">Weeks since last sold</label>
-            <input type="number" id="c-stale" min="0" max="520" step="1" placeholder="0"></div>
-          <div class="f"><label for="c-weeks">Weeks selling it</label>
-            <input type="number" id="c-weeks" min="1" max="520" step="1" placeholder="1"></div>
-          <div class="f"><label for="c-units">Units sold</label>
-            <input type="number" id="c-units" min="0" step="1" placeholder="0"></div>
+        <div class="stat opp">
+          <div class="n">+46%</div><div class="u">daily sales, in two weeks</div>
+          <p>The lift 300+ sari-sari stores saw after acting on data-driven advice about their <b>underperforming products</b> — total sales up 17%, on 20% <i>fewer</i> selling days.</p>
+          <div class="src">Packworks <a href="https://packworks.io/sari-sari-stores-using-ai-see-double-digit-performance-gains-packworks-report/" target="_blank" rel="noopener">Store Insighting Project</a>, 2025 <sup>[7]</sup></div>
         </div>
-        <div class="frow3">
-          <div class="f"><label for="c-stock">Units stocked <span class="hint">— opt.</span></label>
-            <input type="number" id="c-stock" min="0" step="1" placeholder="—"></div>
-          <div class="f"><label for="c-price">Price ₱ <span class="hint">— opt.</span></label>
-            <input type="number" id="c-price" min="0" step="0.01" placeholder="—"></div>
-          <div class="f"><label for="c-cost">Cost ₱ <span class="hint">— opt.</span></label>
-            <input type="number" id="c-cost" min="0" step="0.01" placeholder="—"></div>
-        </div>
-
-        <div class="f">
-          <span class="flabel">Ano'ng ginawa mo? <span class="hint">— what you decided</span></span>
-          <div class="chipset warmset" id="c-did" role="radiogroup" aria-label="What you decided to do">
-            <label><input type="radio" name="c-did" value="kept"><span>Itinuloy <em>kept it</em></span></label>
-            <label><input type="radio" name="c-did" value="discounted"><span>Binawasan ang presyo <em>discounted</em></span></label>
-            <label><input type="radio" name="c-did" value="bundled"><span>Ipinares <em>bundled</em></span></label>
-            <label><input type="radio" name="c-did" value="stopped"><span>Hindi na inorder <em>stopped reordering</em></span></label>
-            <label><input type="radio" name="c-did" value="nothing"><span>Wala pa <em>nothing yet</em></span></label>
-          </div>
-        </div>
-
-        <div class="f">
-          <span class="flabel">Ano'ng nangyari? <span class="hint">— how it turned out</span></span>
-          <div class="chipset" id="c-out" role="radiogroup" aria-label="How it turned out">
-            <label><input type="radio" name="c-out" value="soldout"><span>Naubos <em>sold out</em></span></label>
-            <label><input type="radio" name="c-out" value="faster"><span>Bumilis <em>moved faster</em></span></label>
-            <label><input type="radio" name="c-out" value="same"><span>Ganoon pa rin <em>no change</em></span></label>
-            <label><input type="radio" name="c-out" value="wasted"><span>Nasayang <em>spoiled / written off</em></span></label>
-            <label><input type="radio" name="c-out" value="early"><span>Maaga pa <em>too early to tell</em></span></label>
-          </div>
-        </div>
-
-        <div class="frow">
-          <div class="f"><label for="c-region">Where's your store? <span class="hint">— optional</span></label>
-            <select id="c-region">
-              <option value="">— skip —</option>
-              <option>NCR / Metro Manila</option><option>Luzon (outside NCR)</option>
-              <option>Visayas</option><option>Mindanao</option><option>Outside PH</option>
-            </select></div>
-          <div class="f"><label for="c-type">Kind of store <span class="hint">— optional</span></label>
-            <select id="c-type">
-              <option value="">— skip —</option>
-              <option>Sari-sari store</option><option>Mini-grocery</option>
-              <option>Palengke / market stall</option><option>Convenience store</option><option>Iba pa / other</option>
-            </select></div>
-        </div>
-
-        <label class="consent"><input type="checkbox" id="c-consent">
-          <span>I'm happy for this entry to be used to improve the model. No store name, no address, no customer
-            details — only the numbers and the outcome above.</span></label>
-
-        <div class="formactions">
-          <button type="submit" class="btn btn-red" style="padding:12px 22px;font-size:15px">Log this outcome</button>
-          <button type="button" class="btn-sm" id="c-prefill">↑ Prefill from the checker</button>
-        </div>
-        <div class="status" id="c-status" role="status" aria-live="polite"></div>
-      </form>
+      </div>
     </div>
 
-    <div class="panel ledger">
-      <h3>Your entries</h3>
-      <p class="fil-sub">Nasa telepono mo lang · kept on this device</p>
-      <div class="cnt"><b id="led-count">0</b><span id="led-count-lbl">outcomes logged</span></div>
-      <p class="lede" id="led-blurb">Nothing logged yet. Anything you add stays in this browser until you send it —
-        so you can build the list over weeks and export it in one go.</p>
-      <div class="agree" id="led-agree" style="display:none"></div>
-      <div class="entries" id="led-entries"></div>
-      <div class="emptyledger" id="led-empty">No entries yet. Log your first slow mover using the form.</div>
-      <div class="formactions">
-        <button type="button" class="btn-sm" id="led-csv">↓ Export CSV</button>
-        <button type="button" class="btn-sm" id="led-json">Copy as JSON</button>
-        <button type="button" class="btn-sm" id="led-send" style="display:none">Send all</button>
-        <button type="button" class="btn-sm danger" id="led-clear">Clear all</button>
-      </div>
-      <div class="status" id="led-status" role="status" aria-live="polite"></div>
+    <div class="sources">
+      <h5>Sources</h5>
+      <ol>
+        <li>UNEP, <a href="https://www.unep.org/resources/publication/food-waste-index-report-2024" target="_blank" rel="noopener">Food Waste Index Report 2024</a> (2022 reference data) — global retail 131M tonnes / 12% of food waste; PH households 2.95M tonnes/yr, 26 kg per capita.</li>
+        <li>Philippine Institute for Development Studies, <a href="https://www.pids.gov.ph/details/news/in-the-news/food-wasted-by-the-tons-while-millions-of-filipinos-go-hungry" target="_blank" rel="noopener">"Food wasted by the tons while millions of Filipinos go hungry"</a> — ~2,175 tons/day; rice 58% of household plate waste.</li>
+        <li>IHL Group, <a href="https://www.ihlservices.com/product/fixing-inventory-distortion-are-we-there-yet/" target="_blank" rel="noopener">Fixing Inventory Distortion</a> (2023) — $1.77T global cost; $1.2T out-of-stocks, $562B overstocks; 7.2% of retail sales. Summary via <a href="https://www.retailtouchpoints.com/features/industry-insights/ihl-study-inventory-distortion-will-cost-retailers-1-77-trillion-in-2023" target="_blank" rel="noopener">Retail TouchPoints</a>.</li>
+        <li><a href="https://www.philstar.com/the-freeman/cebu-business/2024/03/05/2338187/sari-fund-benefit-13m-sari-sari-stores-nationwide" target="_blank" rel="noopener">Philstar / The Freeman</a> (2024) — 1.3M sari-sari stores; 94% of consumers depend on them.</li>
+        <li><a href="https://bworldonline.com/economy/2025/06/16/679536/sari-sari-store-segment-targeted-for-growth-to-p2-4-trillion-by-2030/" target="_blank" rel="noopener">BusinessWorld</a> (2025) — ₱1.12–1.46T annual contribution, 15–20% of retail; ₱2.4T target by 2030.</li>
+        <li>Magna Kultura Foundation, <a href="https://dickieaguado.wordpress.com/2011/09/29/empowering-sari-sari-stores-in-the-philippines/" target="_blank" rel="noopener">"Empowering Sari-Sari Stores in the Philippines"</a> — almost 70% of manufactured consumer-food sales. Foundation estimate, not official statistics.</li>
+        <li>Packworks, <a href="https://packworks.io/sari-sari-stores-using-ai-see-double-digit-performance-gains-packworks-report/" target="_blank" rel="noopener">Store Insighting Project report</a> (2025) — 300+ stores; +46% daily GMV, +17% total sales in two weeks, driven by recommendations on underperforming products.</li>
+        <li>Department of Trade and Industry, <a href="https://www.dti.gov.ph/dti-knowledge-hub/dti-statistics/dti-msme-statistics" target="_blank" rel="noopener">2024 Philippine MSME Statistics</a> — 1,236,908 MSMEs of 1,241,476 establishments (99.63%); 65.1% of total employment.</li>
+      </ol>
     </div>
   </div>
 </div></section>
 
-<!-- ============================================================
-     FEEDBACK
-     ============================================================ -->
-<section id="feedback"><div class="wrap">
-  <div class="sec-head">
-    <p class="eyebrow">Sabihin mo sa amin · reach out</p>
-    <h2>Tell us where it gets it wrong.</h2>
-    <p>The verdicts are only as good as the shelves they've seen. If a call felt off, a word didn't translate, or
-      there's something a tindera needs that isn't here — that's the most useful thing you can send.</p>
-  </div>
+<div class="shelfrule" aria-hidden="true"></div>
 
-  <div class="formwrap">
-    <div class="panel">
-      <h3>Leave a message</h3>
-      <p class="fil-sub">Mag-iwan ng mensahe</p>
-      <div class="whereto local" id="fb-where">
-        <span class="dot"></span>
-        <span id="fb-where-txt">Checking where this goes…</span>
-      </div>
+<section style="padding-top:56px"><div class="wrap"><div class="bridge">
+  <p class="eyebrow">May paraan · there's a way through</p>
+  <h2>Knowing it's expensive doesn't tell you what to do about it.</h2>
+  <p>That's the next page. One product, one decision — itulak o bitawan, and if you push it, how.</p>
+  <a href="solution.html" class="btn btn-mango">See the solution →</a>
+</div></div></section>
 
-      <form id="fb-form" novalidate>
-        <div class="f">
-          <span class="flabel">Anong klase? <span class="hint">— what's this about</span></span>
-          <div class="chipset" id="fb-topic" role="radiogroup" aria-label="Topic">
-            <label><input type="radio" name="fb-topic" value="wrong-call" checked><span>Mali ang hatol <em>a verdict felt wrong</em></span></label>
-            <label><input type="radio" name="fb-topic" value="bug"><span>May sira <em>something's broken</em></span></label>
-            <label><input type="radio" name="fb-topic" value="idea"><span>May ideya ako <em>feature idea</em></span></label>
-            <label><input type="radio" name="fb-topic" value="data"><span>Mali ang datos <em>data correction</em></span></label>
-            <label><input type="radio" name="fb-topic" value="other"><span>Iba pa <em>something else</em></span></label>
-          </div>
-        </div>
-        <div class="frow">
-          <div class="f"><label for="fb-name">Name <span class="hint">— optional</span></label>
-            <input type="text" id="fb-name" maxlength="80" placeholder="Aling Nena"></div>
-          <div class="f"><label for="fb-email">Email <span class="hint">— only if you want a reply</span></label>
-            <input type="email" id="fb-email" maxlength="120" placeholder="you@email.com"></div>
-        </div>
-        <div class="f">
-          <label for="fb-msg">Your message</label>
-          <textarea id="fb-msg" maxlength="4000" placeholder="Sabihin mo lang — Taglish is fine. If a verdict felt wrong, tell us the product and the three numbers you put in."></textarea>
-        </div>
-        <div class="formactions">
-          <button type="submit" class="btn btn-red" style="padding:12px 22px;font-size:15px">Send it</button>
-          <button type="button" class="btn-sm" id="fb-copy">Copy my message</button>
-        </div>
-        <div class="status" id="fb-status" role="status" aria-live="polite"></div>
-      </form>
-    </div>
-
-    <div class="panel">
-      <h3>Before you write</h3>
-      <p class="fil-sub">Baka nasagot na dito</p>
-      <ul class="faq">
-        <li><b>Does anything I type get uploaded?</b><span>No. The checker runs entirely in your browser — the
-          numbers you enter never leave the page. Contributions and messages are stored on this device until you
-          choose to send or export them.</span></li>
-        <li><b>Why did it say "don't discount"?</b><span>Because the category's measured response to a price cut
-          wasn't enough to cover the margin you'd give up, at <i>your</i> price and cost. Change either and it
-          recalculates.</span></li>
-        <li><b>My category isn't in the list.</b><span>Pick the closest one — the health reading doesn't use
-          category at all, only the bundle and discount advice does. Then tell us what's missing, above.</span></li>
-        <li><b>Can I get my data back out?</b><span>Yes. Export CSV in the section above gives you everything you
-          logged, in a file you can open in Excel.</span></li>
-      </ul>
-    </div>
-  </div>
-</div></section>
-
-<div class="sachets" aria-hidden="true"></div>
-
-<div class="cta-band banig"><div class="wrap">
-  <p class="fil-lead">Huwag mong hayaang matulog ang puhunan mo</p>
-  <h2>Stop letting cash sit on the shelf.</h2>
-  <p>Three numbers you already know. One clear answer, in seconds.</p>
-  <a href="#try" class="btn btn-red">Check a product →</a>
-  <a href="#contribute" class="btn btn-ghost" style="margin-left:10px">Contribute an outcome</a>
+<div class="disclaimer"><div class="wrap">
+  <h4>Mga paalala · notes on these figures</h4>
+  <ul>
+    <li><b>Different studies, different scopes.</b> The food-waste totals are national and household-level, not retail-only. The inventory-distortion figures are global, not Philippine. They are shown together because they point the same way — not because they measure the same thing.</li>
+    <li><b>Different years.</b> Each figure carries the year of its source. The most recent is 2025; the UNEP data references 2022. Nothing has been adjusted for inflation or restated.</li>
+    <li><b>One source is weaker than the rest.</b> The ~70% packaged-food share is a foundation estimate that circulates widely in retail coverage. It is not official statistics, and it is labelled as such rather than dropped.</li>
+    <li><b>None of these numbers touch the tool.</b> The checker's verdicts come only from the sales figures you enter. Nothing on this page feeds the model.</li>
+  </ul>
 </div></div>
 
 <footer class="sitefoot"><div class="wrap">
   <div class="cols">
     <div>
-      <div class="brand"><span class="mark" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="2.5" y="8" width="19" height="12.5" rx="1.6" fill="#fff"/><path d="M2.5 8 5 3.5h14L21.5 8Z" fill="#fff" opacity=".78"/><rect x="5.5" y="12" width="5" height="8.5" rx=".8" fill="#DD0B00"/><rect x="13" y="11.5" width="5.5" height="4" rx=".8" fill="#DD0B00"/></svg></span> <span>Shelf Temp Check</span></div>
+      <div class="brand"><span class="mark" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="2.5" y="8" width="19" height="12.5" rx="1.8" fill="#fff"/><path d="M2.5 8 5 3.5h14L21.5 8Z" fill="#fff" opacity=".78"/><rect x="5.5" y="12" width="5" height="8.5" rx=".9" fill="#C4553F"/><rect x="13" y="11.5" width="5.5" height="4" rx=".9" fill="#C4553F"/></svg></span> <span>Shelf Temp Check</span></div>
       <p style="margin:0;max-width:36ch">Slow-mover triage for sari-sari stores, mini-groceries, and anyone who has ever stared at a shelf and wondered kung itutuloy pa.</p>
     </div>
-    <div>
-      <h5>On this page</h5>
-      <ul>
-        <li><a href="#numbers">The numbers</a></li>
-        <li><a href="#problem">The problem</a></li>
-        <li><a href="#triage">The triage</a></li>
-        <li><a href="#method">The method</a></li>
-        <li><a href="#try">Try it</a></li>
-        <li><a href="#contribute">Contribute data</a></li>
-        <li><a href="#feedback">Leave feedback</a></li>
-      </ul>
-    </div>
-    <div>
-      <h5>Where the data comes from</h5>
-      <ul>
-        <li><a href="https://www.unep.org/resources/publication/food-waste-index-report-2024" target="_blank" rel="noopener">UNEP Food Waste Index 2024</a></li>
-        <li><a href="https://www.dti.gov.ph/dti-knowledge-hub/dti-statistics/dti-msme-statistics" target="_blank" rel="noopener">DTI MSME Statistics</a></li>
-        <li><a href="https://www.ihlservices.com/product/fixing-inventory-distortion-are-we-there-yet/" target="_blank" rel="noopener">IHL Inventory Distortion</a></li>
-        <li><a href="https://packworks.io/sari-sari-stores-using-ai-see-double-digit-performance-gains-packworks-report/" target="_blank" rel="noopener">Packworks SIP report</a></li>
-        <li><a href="#numbers">Full source list ↑</a></li>
-      </ul>
-    </div>
+    <div><h5>The three pages</h5><ul>
+      <li><a href="index.html">1 · Ang problema</a></li>
+      <li><a href="solution.html">2 · Ang solusyon</a></li>
+      <li><a href="method.html">3 · Paano ito natuto</a></li>
+    </ul></div>
+    <div><h5>On this page</h5><ul>
+      <li><a href="#problema">The three costs</a></li>
+      <li><a href="#bilang">The numbers</a></li>
+      <li><a href="method.html#contribute">Contribute data</a></li>
+      <li><a href="method.html#feedback">Leave feedback</a></li>
+    </ul></div>
   </div>
   <div class="fine">
-    <span>Built on real grocery transaction data. It's a guide, not a guarantee — the method transfers to Philippine shops even where the specific numbers don't. ₱ figures illustrative.</span>
+    <span>Built on real grocery transaction data. A guide, not a guarantee. ₱ figures illustrative.</span>
     <span>Ginawa para sa mga tindera at tindero.</span>
   </div>
 </div></footer>
 
-<script>
-const DATA = {"tree": {"leaf": false, "f": "weeks", "thr": 2.5, "l": {"leaf": false, "f": "weeks", "thr": 1.5, "l": {"leaf": false, "f": "weeks_since_last", "thr": 6.5, "l": {"leaf": false, "f": "weeks_since_last", "thr": 1.5, "l": {"leaf": false, "f": "weeks_since_last", "thr": 0.5, "l": {"leaf": true, "prob": 0.56}, "r": {"leaf": true, "prob": 0.504}}, "r": {"leaf": false, "f": "weeks_since_last", "thr": 5.5, "l": {"leaf": true, "prob": 0.372}, "r": {"leaf": true, "prob": 0.336}}}, "r": {"leaf": false, "f": "weeks_since_last", "thr": 33.5, "l": {"leaf": false, "f": "weeks_since_last", "thr": 17.5, "l": {"leaf": true, "prob": 0.297}, "r": {"leaf": true, "prob": 0.254}}, "r": {"leaf": false, "f": "weeks_since_last", "thr": 43.5, "l": {"leaf": true, "prob": 0.204}, "r": {"leaf": true, "prob": 0.141}}}}, "r": {"leaf": false, "f": "weeks_since_last", "thr": 31.5, "l": {"leaf": false, "f": "weeks_since_last", "thr": 9.5, "l": {"leaf": false, "f": "weeks_since_last", "thr": 1.5, "l": {"leaf": true, "prob": 0.757}, "r": {"leaf": true, "prob": 0.615}}, "r": {"leaf": false, "f": "weeks_since_last", "thr": 16.5, "l": {"leaf": true, "prob": 0.546}, "r": {"leaf": true, "prob": 0.468}}}, "r": {"leaf": false, "f": "weeks_since_last", "thr": 34.5, "l": {"leaf": true, "prob": 0.325}, "r": {"leaf": false, "f": "weeks_since_last", "thr": 37.5, "l": {"leaf": true, "prob": 0.217}, "r": {"leaf": true, "prob": 0.174}}}}}, "r": {"leaf": false, "f": "weeks_since_last", "thr": 9.5, "l": {"leaf": false, "f": "weeks_since_last", "thr": 2.5, "l": {"leaf": false, "f": "weeks", "thr": 4.5, "l": {"leaf": false, "f": "weeks_since_last", "thr": 1.5, "l": {"leaf": true, "prob": 0.879}, "r": {"leaf": true, "prob": 0.813}}, "r": {"leaf": false, "f": "units", "thr": 13.5, "l": {"leaf": true, "prob": 0.952}, "r": {"leaf": true, "prob": 0.989}}}, "r": {"leaf": false, "f": "weeks_since_last", "thr": 6.5, "l": {"leaf": false, "f": "weeks", "thr": 4.5, "l": {"leaf": true, "prob": 0.81}, "r": {"leaf": true, "prob": 0.899}}, "r": {"leaf": false, "f": "weeks", "thr": 12.5, "l": {"leaf": true, "prob": 0.795}, "r": {"leaf": true, "prob": 0.673}}}}, "r": {"leaf": false, "f": "weeks_since_last", "thr": 18.5, "l": {"leaf": false, "f": "weeks", "thr": 11.5, "l": {"leaf": false, "f": "weeks_since_last", "thr": 13.5, "l": {"leaf": true, "prob": 0.742}, "r": {"leaf": true, "prob": 0.63}}, "r": {"leaf": true, "prob": 0.368}}, "r": {"leaf": false, "f": "weeks_since_last", "thr": 30.5, "l": {"leaf": false, "f": "weeks", "thr": 6.5, "l": {"leaf": true, "prob": 0.469}, "r": {"leaf": true, "prob": 0.254}}, "r": {"leaf": false, "f": "weeks", "thr": 3.5, "l": {"leaf": true, "prob": 0.278}, "r": {"leaf": true, "prob": 0.132}}}}}}, "affinity": {"Onions": [{"cat": "Herbs", "pct": 10, "lift": 6.8}, {"cat": "Peppers-all", "pct": 21, "lift": 6.2}, {"cat": "Mushrooms", "pct": 11, "lift": 5.3}, {"cat": "Squash", "pct": 4, "lift": 5.1}], "Organics Fruit & Vegetables": [{"cat": "Baking", "pct": 2, "lift": 12.9}, {"cat": "Condiments", "pct": 2, "lift": 12.6}, {"cat": "Prepared/pkgd Foods", "pct": 3, "lift": 11.5}, {"cat": "Cereal/breakfast", "pct": 6, "lift": 8.9}], "Potatoes": [{"cat": "Onions", "pct": 27, "lift": 4.1}, {"cat": "Squash", "pct": 3, "lift": 4.0}, {"cat": "Carrots", "pct": 14, "lift": 3.8}, {"cat": "Broccoli/cauliflower", "pct": 7, "lift": 3.5}], "Tropical Fruit": [{"cat": "Pears", "pct": 3, "lift": 3.9}, {"cat": "Stone Fruit", "pct": 7, "lift": 3.3}, {"cat": "Apples", "pct": 18, "lift": 3.2}, {"cat": "Berries", "pct": 12, "lift": 3.1}], "Vegetables - All Others": [{"cat": "Squash", "pct": 5, "lift": 6.4}, {"cat": "Broccoli/cauliflower", "pct": 11, "lift": 5.6}, {"cat": "Peppers-all", "pct": 18, "lift": 5.3}, {"cat": "Carrots", "pct": 19, "lift": 5.2}], "Baked Bread/buns/rolls": [{"cat": "Hot Dogs", "pct": 13, "lift": 2.7}, {"cat": "Deli Meats", "pct": 18, "lift": 2.4}, {"cat": "Meat - Shelf Stable", "pct": 14, "lift": 2.4}, {"cat": "Dinner Mxs Dry", "pct": 14, "lift": 2.3}], "Cookies/cones": [{"cat": "Dry Mix Desserts", "pct": 8, "lift": 3.4}, {"cat": "Convenient Brkfst/whlsm Snacks", "pct": 20, "lift": 3.2}, {"cat": "Crackers/misc Bkd Fd", "pct": 30, "lift": 3.1}, {"cat": "Fruit - Shelf Stable", "pct": 18, "lift": 3.1}], "Pnt Btr/jelly/jams": [{"cat": "Molasses/syrup/pancake Mixs", "pct": 8, "lift": 4.2}, {"cat": "Non-dairy Beverages", "pct": 1, "lift": 3.9}, {"cat": "Hot Cereal", "pct": 9, "lift": 3.6}, {"cat": "Rice Cakes", "pct": 2, "lift": 3.3}], "Beef": [{"cat": "Dry Sauces/gravy", "pct": 10, "lift": 3.4}, {"cat": "Pork", "pct": 17, "lift": 3.2}, {"cat": "Beans - Canned Glass & Mw", "pct": 13, "lift": 3.1}, {"cat": "Pasta Sauce", "pct": 15, "lift": 3.1}], "Breakfast Sausage/sandwiches": [{"cat": "Bacon", "pct": 24, "lift": 5.1}, {"cat": "Refrgratd Dough Products", "pct": 23, "lift": 4.0}, {"cat": "Molasses/syrup/pancake Mixs", "pct": 7, "lift": 3.9}, {"cat": "Frozen Meat", "pct": 13, "lift": 3.7}], "Convenient Brkfst/whlsm Snacks": [{"cat": "Frzn Breakfast Foods", "pct": 13, "lift": 4.1}, {"cat": "Hot Cereal", "pct": 10, "lift": 4.0}, {"cat": "Cold Cereal", "pct": 42, "lift": 3.8}, {"cat": "Cocoa Mixes", "pct": 6, "lift": 3.7}], "Crackers/misc Bkd Fd": [{"cat": "Beans - Canned Glass & Mw", "pct": 14, "lift": 3.3}, {"cat": "Dinner Mxs Dry", "pct": 19, "lift": 3.2}, {"cat": "Convenient Brkfst/whlsm Snacks", "pct": 19, "lift": 3.2}, {"cat": "Fruit - Shelf Stable", "pct": 18, "lift": 3.1}], "Eggs": [{"cat": "Bacon", "pct": 17, "lift": 3.7}, {"cat": "Breakfast Sausage/sandwiches", "pct": 16, "lift": 3.4}, {"cat": "Flour & Meals", "pct": 4, "lift": 3.1}, {"cat": "Butter", "pct": 7, "lift": 3.1}], "Soup": [{"cat": "Seafood - Shelf Stable", "pct": 11, "lift": 3.4}, {"cat": "Meat - Shelf Stable", "pct": 18, "lift": 3.1}, {"cat": "Vegetables - Shelf Stable", "pct": 26, "lift": 3.1}, {"cat": "Dinner Mxs Dry", "pct": 18, "lift": 3.1}], "Bag Snacks": [{"cat": "Hispanic", "pct": 15, "lift": 2.4}, {"cat": "Popcorn", "pct": 4, "lift": 2.3}, {"cat": "Miscellaneous", "pct": 2, "lift": 2.3}, {"cat": "Meat - Shelf Stable", "pct": 13, "lift": 2.3}], "Baked Sweet Goods": [{"cat": "Convenient Brkfst/whlsm Snacks", "pct": 19, "lift": 3.0}, {"cat": "Frzn Breakfast Foods", "pct": 10, "lift": 3.0}, {"cat": "Frozen Meat", "pct": 10, "lift": 2.9}, {"cat": "Cocoa Mixes", "pct": 5, "lift": 2.9}], "Bath Tissues": [{"cat": "Paper Towels", "pct": 26, "lift": 6.1}, {"cat": "Facial Tiss/dnr Napkin", "pct": 14, "lift": 4.7}, {"cat": "Laundry Detergents", "pct": 14, "lift": 3.9}, {"cat": "Dishwash Detergents", "pct": 10, "lift": 3.8}], "Cat Food": [{"cat": "Cat Litter", "pct": 20, "lift": 15.4}, {"cat": "Pet Care Supplies", "pct": 6, "lift": 6.0}, {"cat": "Dog Foods", "pct": 14, "lift": 4.5}, {"cat": "Air Care", "pct": 5, "lift": 3.2}], "Fluid Milk Products": [{"cat": "Cold Cereal", "pct": 24, "lift": 2.2}, {"cat": "Eggs", "pct": 25, "lift": 2.1}, {"cat": "Cocoa Mixes", "pct": 3, "lift": 2.0}, {"cat": "Dinner Mxs Dry", "pct": 11, "lift": 2.0}], "Meat - Shelf Stable": [{"cat": "Dinner Mxs Dry", "pct": 29, "lift": 5.0}, {"cat": "Hot Dogs", "pct": 20, "lift": 4.3}, {"cat": "Seafood - Shelf Stable", "pct": 13, "lift": 4.2}, {"cat": "Frozen Meat", "pct": 14, "lift": 3.9}], "Prepared Food": [{"cat": "Chicken/poultry", "pct": 12, "lift": 4.8}, {"cat": "Salads/dips", "pct": 9, "lift": 3.7}, {"cat": "Rolls", "pct": 6, "lift": 2.7}, {"cat": "Deli Meats", "pct": 14, "lift": 1.9}], "Soft Drinks": [{"cat": "Warehouse Snacks", "pct": 4, "lift": 1.5}, {"cat": "Bag Snacks", "pct": 27, "lift": 1.5}, {"cat": "Frzn Ice", "pct": 2, "lift": 1.5}, {"cat": "Popcorn", "pct": 2, "lift": 1.5}], "Sugars/sweetners": [{"cat": "Flour & Meals", "pct": 10, "lift": 7.1}, {"cat": "Canned Milk", "pct": 4, "lift": 5.4}, {"cat": "Pwdr/crystl Drnk Mx", "pct": 11, "lift": 5.2}, {"cat": "Shortening/oil", "pct": 15, "lift": 4.5}], "Bacon": [{"cat": "Breakfast Sausage/sandwiches", "pct": 24, "lift": 5.1}, {"cat": "Molasses/syrup/pancake Mixs", "pct": 7, "lift": 3.9}, {"cat": "Dinner Sausage", "pct": 16, "lift": 3.7}, {"cat": "Eggs", "pct": 45, "lift": 3.7}], "Cheeses": [{"cat": "Deli Meats", "pct": 63, "lift": 8.5}, {"cat": "Snacks", "pct": 3, "lift": 6.2}, {"cat": "Deli Specialties (retail Pk)", "pct": 1, "lift": 4.5}, {"cat": "Salads/dips", "pct": 9, "lift": 3.7}], "Chicken": [{"cat": "Pork", "pct": 20, "lift": 3.9}, {"cat": "Dry Bn/veg/potato/rice", "pct": 20, "lift": 3.5}, {"cat": "Squash", "pct": 3, "lift": 3.3}, {"cat": "Broccoli/cauliflower", "pct": 6, "lift": 3.3}], "Cold Cereal": [{"cat": "Convenient Brkfst/whlsm Snacks", "pct": 23, "lift": 3.8}, {"cat": "Hot Cereal", "pct": 9, "lift": 3.7}, {"cat": "Molasses/syrup/pancake Mixs", "pct": 6, "lift": 3.2}, {"cat": "Cocoa Mixes", "pct": 5, "lift": 3.2}], "Deli Meats": [{"cat": "Cheeses", "pct": 42, "lift": 8.5}, {"cat": "Deli Specialties (retail Pk)", "pct": 1, "lift": 3.8}, {"cat": "Salads/dips", "pct": 9, "lift": 3.5}, {"cat": "Snacks", "pct": 1, "lift": 2.9}], "Dinner Mxs Dry": [{"cat": "Meat - Shelf Stable", "pct": 29, "lift": 5.0}, {"cat": "Dry Sauces/gravy", "pct": 14, "lift": 4.9}, {"cat": "Dry Bn/veg/potato/rice", "pct": 28, "lift": 4.9}, {"cat": "Seafood - Shelf Stable", "pct": 13, "lift": 4.3}], "Dry Bn/veg/potato/rice": [{"cat": "Dinner Mxs Dry", "pct": 28, "lift": 4.9}, {"cat": "Dry Sauces/gravy", "pct": 14, "lift": 4.8}, {"cat": "Beans - Canned Glass & Mw", "pct": 17, "lift": 4.2}, {"cat": "Fruit - Shelf Stable", "pct": 23, "lift": 4.0}], "Dry Noodles/pasta": [{"cat": "Pasta Sauce", "pct": 43, "lift": 8.8}, {"cat": "Frozen Bread/dough", "pct": 16, "lift": 5.1}, {"cat": "Dry Sauces/gravy", "pct": 12, "lift": 4.2}, {"cat": "Beans - Canned Glass & Mw", "pct": 16, "lift": 4.0}], "Frozen Pizza": [{"cat": "Frozen Chicken", "pct": 1, "lift": 4.1}, {"cat": "Frozen Meat", "pct": 13, "lift": 3.7}, {"cat": "Frzn Potatoes", "pct": 13, "lift": 3.6}, {"cat": "Frzn Breakfast Foods", "pct": 11, "lift": 3.5}], "Frzn Breakfast Foods": [{"cat": "Molasses/syrup/pancake Mixs", "pct": 12, "lift": 6.5}, {"cat": "Frozen Bread/dough", "pct": 14, "lift": 4.6}, {"cat": "Frozen Meat", "pct": 15, "lift": 4.3}, {"cat": "Convenient Brkfst/whlsm Snacks", "pct": 25, "lift": 4.1}], "Frzn Meat/meat Dinners": [{"cat": "Frzn Breakfast Foods", "pct": 11, "lift": 3.5}, {"cat": "Frozen Bread/dough", "pct": 10, "lift": 3.3}, {"cat": "Frzn Potatoes", "pct": 11, "lift": 3.2}, {"cat": "Frozen Meat", "pct": 11, "lift": 3.2}], "Frzn Novelties/wtr Ice": [{"cat": "Frzn Breakfast Foods", "pct": 11, "lift": 3.5}, {"cat": "Frozen Bread/dough", "pct": 8, "lift": 2.6}, {"cat": "Frozen Meat", "pct": 9, "lift": 2.5}, {"cat": "Frzn Jce Conc/drnks", "pct": 2, "lift": 2.5}], "Hispanic": [{"cat": "Misc. Dairy", "pct": 16, "lift": 5.1}, {"cat": "Olives", "pct": 5, "lift": 4.4}, {"cat": "Dry Bn/veg/potato/rice", "pct": 22, "lift": 3.9}, {"cat": "Herbs", "pct": 5, "lift": 3.8}], "Milk By-products": [{"cat": "Hispanic", "pct": 21, "lift": 3.5}, {"cat": "Olives", "pct": 4, "lift": 3.4}, {"cat": "Misc. Dairy", "pct": 10, "lift": 3.1}, {"cat": "Broccoli/cauliflower", "pct": 6, "lift": 3.0}], "Paper Housewares": [{"cat": "Facial Tiss/dnr Napkin", "pct": 16, "lift": 5.5}, {"cat": "Paper Towels", "pct": 18, "lift": 4.2}, {"cat": "Fd Wraps/bags/trsh Bg", "pct": 21, "lift": 4.2}, {"cat": "Olives", "pct": 3, "lift": 3.0}], "Refrgratd Juices/drnks": [{"cat": "Bacon", "pct": 11, "lift": 2.3}, {"cat": "Refrgratd Dough Products", "pct": 14, "lift": 2.3}, {"cat": "Breakfast Sausage/sandwiches", "pct": 11, "lift": 2.2}, {"cat": "Molasses/syrup/pancake Mixs", "pct": 4, "lift": 2.2}], "Seafood - Frozen": [{"cat": "Seafood - Misc", "pct": 7, "lift": 14.9}, {"cat": "Frozen - Boxed(grocery)", "pct": 3, "lift": 7.6}, {"cat": "Seafood-fresh", "pct": 9, "lift": 5.7}, {"cat": "Frozen Meat", "pct": 12, "lift": 3.3}], "Tomatoes": [{"cat": "Vegetables Salad", "pct": 25, "lift": 6.0}, {"cat": "Squash", "pct": 3, "lift": 4.5}, {"cat": "Peppers-all", "pct": 15, "lift": 4.3}, {"cat": "Vegetables - All Others", "pct": 27, "lift": 4.2}], "Vegetables - Shelf Stable": [{"cat": "Dry Sauces/gravy", "pct": 13, "lift": 4.7}, {"cat": "Beans - Canned Glass & Mw", "pct": 19, "lift": 4.6}, {"cat": "Dry Noodles/pasta", "pct": 21, "lift": 3.4}, {"cat": "Turkey", "pct": 4, "lift": 3.4}], "Bread": [{"cat": "Squash", "pct": 3, "lift": 4.5}, {"cat": "Herbs", "pct": 6, "lift": 4.3}, {"cat": "Mushrooms", "pct": 8, "lift": 4.0}, {"cat": "Organics Fruit & Vegetables", "pct": 9, "lift": 4.0}], "Cakes": [{"cat": "Sweet Goods & Snacks", "pct": 2, "lift": 2.9}, {"cat": "Pies", "pct": 3, "lift": 2.6}, {"cat": "Cookies", "pct": 4, "lift": 2.5}, {"cat": "Frozen Pie/desserts", "pct": 7, "lift": 2.5}], "Canned Juices": [{"cat": "Cocoa Mixes", "pct": 6, "lift": 3.5}, {"cat": "Convenient Brkfst/whlsm Snacks", "pct": 20, "lift": 3.3}, {"cat": "Fruit - Shelf Stable", "pct": 18, "lift": 3.1}, {"cat": "Pwdr/crystl Drnk Mx", "pct": 6, "lift": 3.0}], "Cheese": [{"cat": "Olives", "pct": 3, "lift": 2.8}, {"cat": "Dry Noodles/pasta", "pct": 17, "lift": 2.8}, {"cat": "Hispanic", "pct": 17, "lift": 2.7}, {"cat": "Milk By-products", "pct": 23, "lift": 2.7}], "Condiments/sauces": [{"cat": "Pickle/relish/pkld Veg", "pct": 11, "lift": 4.5}, {"cat": "Sald Drsng/sndwch Sprd", "pct": 24, "lift": 3.6}, {"cat": "Beans - Canned Glass & Mw", "pct": 14, "lift": 3.5}, {"cat": "Dinner Mxs Dry", "pct": 20, "lift": 3.4}], "Grapes": [{"cat": "Pears", "pct": 4, "lift": 4.7}, {"cat": "Berries", "pct": 18, "lift": 4.6}, {"cat": "Melons", "pct": 8, "lift": 4.4}, {"cat": "Stone Fruit", "pct": 9, "lift": 4.2}], "Misc. Dairy": [{"cat": "Hispanic", "pct": 31, "lift": 5.1}, {"cat": "Olives", "pct": 4, "lift": 3.9}, {"cat": "Molasses/syrup/pancake Mixs", "pct": 7, "lift": 3.5}, {"cat": "Cereal/breakfast", "pct": 2, "lift": 3.5}], "Pasta Sauce": [{"cat": "Dry Noodles/pasta", "pct": 54, "lift": 8.8}, {"cat": "Frozen Bread/dough", "pct": 20, "lift": 6.4}, {"cat": "Dinner Mxs Dry", "pct": 25, "lift": 4.2}, {"cat": "Frozen Meat", "pct": 14, "lift": 4.0}], "Vegetables Salad": [{"cat": "Tomatoes", "pct": 36, "lift": 6.0}, {"cat": "Vegetables - All Others", "pct": 27, "lift": 4.2}, {"cat": "Broccoli/cauliflower", "pct": 8, "lift": 4.0}, {"cat": "Peppers-all", "pct": 13, "lift": 3.7}], "Yogurt": [{"cat": "Cereal/breakfast", "pct": 3, "lift": 4.0}, {"cat": "Rice Cakes", "pct": 2, "lift": 3.6}, {"cat": "Pears", "pct": 3, "lift": 3.3}, {"cat": "Broccoli/cauliflower", "pct": 6, "lift": 3.1}], "Baking Mixes": [{"cat": "Dry Mix Desserts", "pct": 12, "lift": 5.1}, {"cat": "Baking Needs", "pct": 23, "lift": 5.1}, {"cat": "Canned Milk", "pct": 4, "lift": 4.6}, {"cat": "Flour & Meals", "pct": 6, "lift": 4.1}], "Beans - Canned Glass & Mw": [{"cat": "Dry Sauces/gravy", "pct": 19, "lift": 6.8}, {"cat": "Vegetables - Shelf Stable", "pct": 39, "lift": 4.6}, {"cat": "Dry Bn/veg/potato/rice", "pct": 24, "lift": 4.2}, {"cat": "Dry Noodles/pasta", "pct": 24, "lift": 4.0}], "Butter": [{"cat": "Canned Milk", "pct": 5, "lift": 6.0}, {"cat": "Flour & Meals", "pct": 8, "lift": 5.8}, {"cat": "Herbs", "pct": 7, "lift": 5.0}, {"cat": "Baking Needs", "pct": 22, "lift": 4.8}], "Chips&snacks": [{"cat": "Condiments", "pct": 7, "lift": 40.0}, {"cat": "Snks/ckys/crkr/cndy", "pct": 8, "lift": 21.3}, {"cat": "Prepared/pkgd Foods", "pct": 5, "lift": 19.8}, {"cat": "Frozen", "pct": 12, "lift": 17.8}], "Dishwash Detergents": [{"cat": "Bleach", "pct": 10, "lift": 6.4}, {"cat": "Laundry Additives", "pct": 12, "lift": 6.3}, {"cat": "Household Cleang Needs", "pct": 20, "lift": 6.1}, {"cat": "Laundry Detergents", "pct": 22, "lift": 6.0}], "Dry Mix Desserts": [{"cat": "Frozen Pie/desserts", "pct": 17, "lift": 6.2}, {"cat": "Baking Mixes", "pct": 25, "lift": 5.1}, {"cat": "Fruit - Shelf Stable", "pct": 27, "lift": 4.6}, {"cat": "Baking Needs", "pct": 20, "lift": 4.4}], "Dry Sauces/gravy": [{"cat": "Beans - Canned Glass & Mw", "pct": 28, "lift": 6.8}, {"cat": "Dinner Mxs Dry", "pct": 28, "lift": 4.9}, {"cat": "Dry Bn/veg/potato/rice", "pct": 28, "lift": 4.8}, {"cat": "Vegetables - Shelf Stable", "pct": 40, "lift": 4.7}], "Frozen Meat": [{"cat": "Frozen Chicken", "pct": 1, "lift": 6.6}, {"cat": "Frzn Potatoes", "pct": 18, "lift": 5.2}, {"cat": "Frozen - Boxed(grocery)", "pct": 2, "lift": 4.8}, {"cat": "Frozen Bread/dough", "pct": 14, "lift": 4.4}], "Frozen Pie/desserts": [{"cat": "Frzn Fruits", "pct": 4, "lift": 8.0}, {"cat": "Dry Mix Desserts", "pct": 15, "lift": 6.2}, {"cat": "Syrups/toppings", "pct": 2, "lift": 5.2}, {"cat": "Canned Milk", "pct": 4, "lift": 5.2}], "Fruit - Shelf Stable": [{"cat": "Dried Fruit", "pct": 7, "lift": 5.0}, {"cat": "Dry Mix Desserts", "pct": 11, "lift": 4.6}, {"cat": "Dinner Mxs Dry", "pct": 24, "lift": 4.2}, {"cat": "Dry Sauces/gravy", "pct": 11, "lift": 4.1}], "Frzn Fruits": [{"cat": "Frozen Pie/desserts", "pct": 22, "lift": 8.0}, {"cat": "Refrigerated", "pct": 11, "lift": 4.9}, {"cat": "Dry Mix Desserts", "pct": 10, "lift": 4.4}, {"cat": "Broccoli/cauliflower", "pct": 8, "lift": 3.9}], "Frzn Potatoes": [{"cat": "Frozen Chicken", "pct": 1, "lift": 5.8}, {"cat": "Frozen Meat", "pct": 18, "lift": 5.2}, {"cat": "Frozen Bread/dough", "pct": 13, "lift": 4.2}, {"cat": "Frozen - Boxed(grocery)", "pct": 1, "lift": 3.9}], "Frzn Vegetable/veg Dsh": [{"cat": "Frozen - Boxed(grocery)", "pct": 1, "lift": 3.8}, {"cat": "Frzn Potatoes", "pct": 13, "lift": 3.6}, {"cat": "Dry Bn/veg/potato/rice", "pct": 19, "lift": 3.4}, {"cat": "Frozen Bread/dough", "pct": 10, "lift": 3.4}], "Hot Dogs": [{"cat": "Dinner Sausage", "pct": 21, "lift": 4.8}, {"cat": "Meat - Shelf Stable", "pct": 25, "lift": 4.3}, {"cat": "Meat - Misc", "pct": 14, "lift": 3.8}, {"cat": "Frozen Meat", "pct": 13, "lift": 3.7}], "Ice Cream/milk/sherbts": [{"cat": "Syrups/toppings", "pct": 3, "lift": 7.1}, {"cat": "Frozen Pie/desserts", "pct": 7, "lift": 2.5}, {"cat": "Cocoa Mixes", "pct": 4, "lift": 2.4}, {"cat": "Frzn Breakfast Foods", "pct": 8, "lift": 2.4}], "Laundry Detergents": [{"cat": "Laundry Additives", "pct": 22, "lift": 11.6}, {"cat": "Bleach", "pct": 15, "lift": 9.6}, {"cat": "Dishwash Detergents", "pct": 16, "lift": 6.0}, {"cat": "Air Care", "pct": 9, "lift": 5.4}], "Lunchmeat": [{"cat": "Hot Dogs", "pct": 14, "lift": 3.1}, {"cat": "Frozen Meat", "pct": 10, "lift": 2.9}, {"cat": "Frozen Chicken", "pct": 1, "lift": 2.9}, {"cat": "Meat - Shelf Stable", "pct": 16, "lift": 2.8}], "Laundry Additives": [{"cat": "Laundry Detergents", "pct": 42, "lift": 11.6}, {"cat": "Bleach", "pct": 16, "lift": 10.2}, {"cat": "Air Care", "pct": 12, "lift": 7.5}, {"cat": "Household Cleang Needs", "pct": 23, "lift": 7.3}], "Baking Needs": [{"cat": "Canned Milk", "pct": 6, "lift": 7.9}, {"cat": "Flour & Meals", "pct": 9, "lift": 6.5}, {"cat": "Baking Mixes", "pct": 25, "lift": 5.1}, {"cat": "Butter", "pct": 10, "lift": 4.8}], "Canned Milk": [{"cat": "Baking Needs", "pct": 36, "lift": 7.9}, {"cat": "Flour & Meals", "pct": 9, "lift": 6.7}, {"cat": "Butter", "pct": 13, "lift": 6.0}, {"cat": "Sugars/sweetners", "pct": 22, "lift": 5.4}], "Chicken/poultry": [{"cat": "Prepared Food", "pct": 10, "lift": 4.8}, {"cat": "Salads/dips", "pct": 9, "lift": 3.6}, {"cat": "Rolls", "pct": 5, "lift": 2.5}, {"cat": "Bread", "pct": 7, "lift": 2.1}], "Hot Cereal": [{"cat": "Dried Fruit", "pct": 6, "lift": 4.2}, {"cat": "Rice Cakes", "pct": 2, "lift": 4.2}, {"cat": "Molasses/syrup/pancake Mixs", "pct": 8, "lift": 4.1}, {"cat": "Convenient Brkfst/whlsm Snacks", "pct": 25, "lift": 4.0}], "Melons": [{"cat": "Stone Fruit", "pct": 15, "lift": 6.7}, {"cat": "Corn", "pct": 8, "lift": 6.6}, {"cat": "Juice", "pct": 2, "lift": 5.7}, {"cat": "Berries", "pct": 21, "lift": 5.3}], "Refrigerated": [{"cat": "Frozen", "pct": 11, "lift": 17.0}, {"cat": "Condiments", "pct": 3, "lift": 15.5}, {"cat": "Prepared/pkgd Foods", "pct": 4, "lift": 15.1}, {"cat": "Snks/ckys/crkr/cndy", "pct": 5, "lift": 12.3}], "Salad Mix": [{"cat": "Processed", "pct": 8, "lift": 4.4}, {"cat": "Mushrooms", "pct": 9, "lift": 4.2}, {"cat": "Value Added Vegetables", "pct": 3, "lift": 4.2}, {"cat": "Sald Drsng/sndwch Sprd", "pct": 27, "lift": 3.9}], "Air Care": [{"cat": "Household Cleang Needs", "pct": 28, "lift": 8.8}, {"cat": "Laundry Additives", "pct": 14, "lift": 7.5}, {"cat": "Bleach", "pct": 10, "lift": 6.3}, {"cat": "Dishwash Detergents", "pct": 15, "lift": 5.6}], "Household Cleang Needs": [{"cat": "Air Care", "pct": 15, "lift": 8.8}, {"cat": "Laundry Additives", "pct": 14, "lift": 7.3}, {"cat": "Bleach", "pct": 10, "lift": 6.8}, {"cat": "Dishwash Detergents", "pct": 17, "lift": 6.1}], "Spices & Extracts": [{"cat": "Flour & Meals", "pct": 7, "lift": 5.5}, {"cat": "Shortening/oil", "pct": 16, "lift": 4.8}, {"cat": "Sugars/sweetners", "pct": 17, "lift": 4.2}, {"cat": "Canned Milk", "pct": 3, "lift": 4.1}], "Beers/ales": [{"cat": "Misc Wine", "pct": 2, "lift": 4.3}, {"cat": "Liquor", "pct": 3, "lift": 3.1}, {"cat": "Domestic Wine", "pct": 6, "lift": 3.0}, {"cat": "Imported Wine", "pct": 2, "lift": 2.6}], "Heat/serve": [{"cat": "Frozen - Boxed(grocery)", "pct": 2, "lift": 4.4}, {"cat": "Frozen Meat", "pct": 14, "lift": 3.8}, {"cat": "Miscellaneous", "pct": 3, "lift": 3.7}, {"cat": "Frozen Bread/dough", "pct": 11, "lift": 3.4}], "Misc Wine": [{"cat": "Beers/ales", "pct": 29, "lift": 4.3}, {"cat": "Domestic Wine", "pct": 8, "lift": 4.2}, {"cat": "Seafood - Frozen", "pct": 7, "lift": 2.2}, {"cat": "Bread", "pct": 7, "lift": 2.0}], "Pork": [{"cat": "Miscellaneous", "pct": 4, "lift": 4.5}, {"cat": "Chicken", "pct": 25, "lift": 3.9}, {"cat": "Meat - Misc", "pct": 13, "lift": 3.6}, {"cat": "Dinner Mxs Dry", "pct": 20, "lift": 3.4}], "Seafood-fresh": [{"cat": "Seafood - Misc", "pct": 9, "lift": 19.1}, {"cat": "Seafood - Frozen", "pct": 17, "lift": 5.7}, {"cat": "Squash", "pct": 4, "lift": 5.1}, {"cat": "Snacks", "pct": 2, "lift": 4.5}], "Frozen Bread/dough": [{"cat": "Pasta Sauce", "pct": 31, "lift": 6.4}, {"cat": "Dry Noodles/pasta", "pct": 31, "lift": 5.1}, {"cat": "Frzn Breakfast Foods", "pct": 14, "lift": 4.6}, {"cat": "Frozen Meat", "pct": 16, "lift": 4.4}], "Margarines": [{"cat": "Molasses/syrup/pancake Mixs", "pct": 6, "lift": 3.4}, {"cat": "Flour & Meals", "pct": 5, "lift": 3.4}, {"cat": "Dinner Mxs Dry", "pct": 19, "lift": 3.3}, {"cat": "Bacon", "pct": 14, "lift": 3.1}], "Water - Carbonated/flvrd Drink": [{"cat": "Rice Cakes", "pct": 1, "lift": 2.2}, {"cat": "Isotonic Drinks", "pct": 5, "lift": 2.0}, {"cat": "Paper Housewares", "pct": 6, "lift": 1.9}, {"cat": "Paper Towels", "pct": 8, "lift": 1.9}], "Cookies": [{"cat": "Sweet Goods & Snacks", "pct": 2, "lift": 3.3}, {"cat": "Cakes", "pct": 5, "lift": 2.5}, {"cat": "Paper Housewares", "pct": 7, "lift": 2.2}, {"cat": "Convenient Brkfst/whlsm Snacks", "pct": 13, "lift": 2.2}], "Mushrooms": [{"cat": "Squash", "pct": 8, "lift": 9.8}, {"cat": "Herbs", "pct": 11, "lift": 8.1}, {"cat": "Peppers-all", "pct": 24, "lift": 7.0}, {"cat": "Organics Fruit & Vegetables", "pct": 15, "lift": 6.6}], "Seafood - Misc": [{"cat": "Seafood-fresh", "pct": 29, "lift": 19.1}, {"cat": "Seafood - Frozen", "pct": 45, "lift": 14.9}, {"cat": "Shortening/oil", "pct": 14, "lift": 4.2}, {"cat": "Meat - Misc", "pct": 11, "lift": 3.2}], "Berries": [{"cat": "Melons", "pct": 10, "lift": 5.3}, {"cat": "Cereal/breakfast", "pct": 3, "lift": 5.1}, {"cat": "Stone Fruit", "pct": 10, "lift": 4.7}, {"cat": "Corn", "pct": 6, "lift": 4.7}], "Carrots": [{"cat": "Broccoli/cauliflower", "pct": 14, "lift": 7.4}, {"cat": "Squash", "pct": 4, "lift": 5.2}, {"cat": "Vegetables - All Others", "pct": 33, "lift": 5.2}, {"cat": "Peppers-all", "pct": 16, "lift": 4.6}], "Coffee": [{"cat": "Cocoa Mixes", "pct": 6, "lift": 3.5}, {"cat": "Teas", "pct": 5, "lift": 3.5}, {"cat": "Hot Cereal", "pct": 7, "lift": 3.0}, {"cat": "Facial Tiss/dnr Napkin", "pct": 9, "lift": 2.9}], "Dried Fruit": [{"cat": "Snks/ckys/crkr/cndy", "pct": 3, "lift": 9.0}, {"cat": "Nuts", "pct": 7, "lift": 8.5}, {"cat": "Cereal/breakfast", "pct": 5, "lift": 7.3}, {"cat": "Frozen", "pct": 4, "lift": 5.5}], "Pickle/relish/pkld Veg": [{"cat": "Olives", "pct": 8, "lift": 7.6}, {"cat": "Sald Drsng/sndwch Sprd", "pct": 32, "lift": 4.7}, {"cat": "Condiments/sauces", "pct": 35, "lift": 4.5}, {"cat": "Seafood - Shelf Stable", "pct": 12, "lift": 4.0}], "Salads/dips": [{"cat": "Snacks", "pct": 3, "lift": 6.2}, {"cat": "Prepared Food", "pct": 8, "lift": 3.7}, {"cat": "Cheeses", "pct": 18, "lift": 3.7}, {"cat": "Chicken/poultry", "pct": 9, "lift": 3.6}], "Sald Drsng/sndwch Sprd": [{"cat": "Pickle/relish/pkld Veg", "pct": 12, "lift": 4.7}, {"cat": "Salad Mix", "pct": 25, "lift": 3.9}, {"cat": "Olives", "pct": 4, "lift": 3.9}, {"cat": "Condiments/sauces", "pct": 28, "lift": 3.6}], "Smoked Meats": [{"cat": "Turkey", "pct": 4, "lift": 3.9}, {"cat": "Potatoes", "pct": 22, "lift": 3.4}, {"cat": "Pork", "pct": 17, "lift": 3.3}, {"cat": "Miscellaneous", "pct": 3, "lift": 3.3}], "Breakfast Sweets": [{"cat": "Sweet Goods & Snacks", "pct": 2, "lift": 2.9}, {"cat": "Rolls", "pct": 5, "lift": 2.6}, {"cat": "Pies", "pct": 3, "lift": 2.5}, {"cat": "Cookies", "pct": 3, "lift": 1.8}], "Molasses/syrup/pancake Mixs": [{"cat": "Frzn Breakfast Foods", "pct": 21, "lift": 6.5}, {"cat": "Flour & Meals", "pct": 6, "lift": 4.6}, {"cat": "Pnt Btr/jelly/jams", "pct": 18, "lift": 4.2}, {"cat": "Hot Cereal", "pct": 10, "lift": 4.1}], "Olives": [{"cat": "Pickle/relish/pkld Veg", "pct": 19, "lift": 7.6}, {"cat": "Mushrooms", "pct": 10, "lift": 5.1}, {"cat": "Herbs", "pct": 7, "lift": 5.0}, {"cat": "Miscellaneous", "pct": 5, "lift": 5.0}], "Refrgratd Dough Products": [{"cat": "Breakfast Sausage/sandwiches", "pct": 19, "lift": 4.0}, {"cat": "Bacon", "pct": 16, "lift": 3.4}, {"cat": "Margarines", "pct": 18, "lift": 3.0}, {"cat": "Dry Sauces/gravy", "pct": 8, "lift": 3.0}], "Shortening/oil": [{"cat": "Flour & Meals", "pct": 10, "lift": 7.4}, {"cat": "Spices & Extracts", "pct": 18, "lift": 4.8}, {"cat": "Sugars/sweetners", "pct": 18, "lift": 4.5}, {"cat": "Seafood - Misc", "pct": 2, "lift": 4.2}], "Isotonic Drinks": [{"cat": "Convenient Brkfst/whlsm Snacks", "pct": 20, "lift": 3.3}, {"cat": "Frzn Breakfast Foods", "pct": 9, "lift": 2.9}, {"cat": "Pwdr/crystl Drnk Mx", "pct": 6, "lift": 2.8}, {"cat": "Canned Juices", "pct": 25, "lift": 2.8}], "Citrus": [{"cat": "Herbs", "pct": 8, "lift": 5.5}, {"cat": "Pears", "pct": 4, "lift": 5.3}, {"cat": "Apples", "pct": 26, "lift": 4.8}, {"cat": "Cereal/breakfast", "pct": 3, "lift": 4.7}], "Peppers-all": [{"cat": "Squash", "pct": 6, "lift": 7.9}, {"cat": "Herbs", "pct": 10, "lift": 7.3}, {"cat": "Mushrooms", "pct": 14, "lift": 7.0}, {"cat": "Onions", "pct": 41, "lift": 6.2}], "Snack Nuts": [{"cat": "Juice", "pct": 2, "lift": 4.8}, {"cat": "Popcorn", "pct": 7, "lift": 4.4}, {"cat": "Dried Fruit", "pct": 5, "lift": 4.0}, {"cat": "Warehouse Snacks", "pct": 9, "lift": 3.6}], "Value Added Fruit": [{"cat": "Value Added Vegetables", "pct": 4, "lift": 5.2}, {"cat": "Juice", "pct": 2, "lift": 5.0}, {"cat": "Stone Fruit", "pct": 9, "lift": 4.2}, {"cat": "Berries", "pct": 16, "lift": 4.1}], "Popcorn": [{"cat": "Snack Nuts", "pct": 8, "lift": 4.4}, {"cat": "Nuts", "pct": 3, "lift": 3.3}, {"cat": "Pwdr/crystl Drnk Mx", "pct": 7, "lift": 3.1}, {"cat": "Convenient Brkfst/whlsm Snacks", "pct": 18, "lift": 3.0}], "Apples": [{"cat": "Pears", "pct": 6, "lift": 6.7}, {"cat": "Citrus", "pct": 21, "lift": 4.8}, {"cat": "Cereal/breakfast", "pct": 3, "lift": 4.8}, {"cat": "Dried Fruit", "pct": 6, "lift": 4.5}], "Rolls": [{"cat": "Cheeses", "pct": 15, "lift": 3.1}, {"cat": "Sweet Goods & Snacks", "pct": 2, "lift": 2.8}, {"cat": "Salads/dips", "pct": 7, "lift": 2.8}, {"cat": "Pies", "pct": 3, "lift": 2.7}], "Turkey": [{"cat": "Canned Milk", "pct": 3, "lift": 4.1}, {"cat": "Dry Sauces/gravy", "pct": 11, "lift": 4.0}, {"cat": "Smoked Meats", "pct": 6, "lift": 3.9}, {"cat": "Vegetables - All Others", "pct": 23, "lift": 3.6}], "Cat Litter": [{"cat": "Cat Food", "pct": 44, "lift": 15.4}, {"cat": "Pet Care Supplies", "pct": 8, "lift": 7.2}, {"cat": "Air Care", "pct": 7, "lift": 4.0}, {"cat": "Dog Foods", "pct": 11, "lift": 3.6}], "Broccoli/cauliflower": [{"cat": "Squash", "pct": 6, "lift": 8.1}, {"cat": "Carrots", "pct": 27, "lift": 7.4}, {"cat": "Mushrooms", "pct": 12, "lift": 6.0}, {"cat": "Herbs", "pct": 8, "lift": 5.7}], "Frzn Ice": [{"cat": "Paper Housewares", "pct": 9, "lift": 2.8}, {"cat": "Beers/ales", "pct": 15, "lift": 2.2}, {"cat": "Water - Carbonated/flvrd Drink", "pct": 12, "lift": 1.7}, {"cat": "Warehouse Snacks", "pct": 4, "lift": 1.6}], "Flour & Meals": [{"cat": "Shortening/oil", "pct": 24, "lift": 7.4}, {"cat": "Sugars/sweetners", "pct": 28, "lift": 7.1}, {"cat": "Canned Milk", "pct": 5, "lift": 6.7}, {"cat": "Baking Needs", "pct": 29, "lift": 6.5}], "Teas": [{"cat": "Cocoa Mixes", "pct": 7, "lift": 4.5}, {"cat": "Sugars/sweetners", "pct": 18, "lift": 4.4}, {"cat": "Pwdr/crystl Drnk Mx", "pct": 9, "lift": 4.0}, {"cat": "Coffee", "pct": 17, "lift": 3.5}], "Paper Towels": [{"cat": "Bath Tissues", "pct": 36, "lift": 6.1}, {"cat": "Facial Tiss/dnr Napkin", "pct": 16, "lift": 5.5}, {"cat": "Household Cleang Needs", "pct": 14, "lift": 4.3}, {"cat": "Paper Housewares", "pct": 14, "lift": 4.2}], "Pies": [{"cat": "Frozen Pie/desserts", "pct": 13, "lift": 4.7}, {"cat": "Smoked Meats", "pct": 4, "lift": 2.8}, {"cat": "Salads/dips", "pct": 7, "lift": 2.7}, {"cat": "Rolls", "pct": 6, "lift": 2.7}], "Seafood - Shelf Stable": [{"cat": "Dinner Mxs Dry", "pct": 25, "lift": 4.3}, {"cat": "Meat - Shelf Stable", "pct": 25, "lift": 4.2}, {"cat": "Pickle/relish/pkld Veg", "pct": 10, "lift": 4.0}, {"cat": "Dry Bn/veg/potato/rice", "pct": 21, "lift": 3.6}], "Frozen - Boxed(grocery)": [{"cat": "Seafood - Frozen", "pct": 23, "lift": 7.6}, {"cat": "Frozen Meat", "pct": 17, "lift": 4.8}, {"cat": "Heat/serve", "pct": 10, "lift": 4.4}, {"cat": "Frzn Potatoes", "pct": 14, "lift": 3.9}], "Meat - Misc": [{"cat": "Frozen Meat", "pct": 14, "lift": 3.9}, {"cat": "Hot Dogs", "pct": 18, "lift": 3.8}, {"cat": "Dinner Sausage", "pct": 16, "lift": 3.8}, {"cat": "Dinner Mxs Dry", "pct": 21, "lift": 3.7}], "Pet Care Supplies": [{"cat": "Dog Foods", "pct": 30, "lift": 9.7}, {"cat": "Cat Litter", "pct": 9, "lift": 7.2}, {"cat": "Cat Food", "pct": 17, "lift": 6.0}, {"cat": "Air Care", "pct": 7, "lift": 4.3}], "Value Added Vegetables": [{"cat": "Processed", "pct": 17, "lift": 8.8}, {"cat": "Squash", "pct": 4, "lift": 5.7}, {"cat": "Mushrooms", "pct": 11, "lift": 5.3}, {"cat": "Value Added Fruit", "pct": 12, "lift": 5.2}], "Processed": [{"cat": "Value Added Vegetables", "pct": 7, "lift": 8.8}, {"cat": "Juice", "pct": 3, "lift": 7.6}, {"cat": "Broccoli/cauliflower", "pct": 10, "lift": 5.1}, {"cat": "Chips&snacks", "pct": 4, "lift": 4.9}], "Pwdr/crystl Drnk Mx": [{"cat": "Sugars/sweetners", "pct": 21, "lift": 5.2}, {"cat": "Cocoa Mixes", "pct": 7, "lift": 4.2}, {"cat": "Teas", "pct": 5, "lift": 4.0}, {"cat": "Dinner Mxs Dry", "pct": 22, "lift": 3.8}], "Herbs": [{"cat": "Squash", "pct": 7, "lift": 9.2}, {"cat": "Mushrooms", "pct": 16, "lift": 8.1}, {"cat": "Organics Fruit & Vegetables", "pct": 17, "lift": 7.4}, {"cat": "Peppers-all", "pct": 25, "lift": 7.3}], "Warehouse Snacks": [{"cat": "Snack Nuts", "pct": 7, "lift": 3.6}, {"cat": "Popcorn", "pct": 5, "lift": 2.8}, {"cat": "Convenient Brkfst/whlsm Snacks", "pct": 14, "lift": 2.3}, {"cat": "Isotonic Drinks", "pct": 5, "lift": 2.2}], "Liquor": [{"cat": "Beers/ales", "pct": 21, "lift": 3.1}, {"cat": "Domestic Wine", "pct": 5, "lift": 2.7}, {"cat": "Cat Food", "pct": 7, "lift": 2.6}, {"cat": "Paper Housewares", "pct": 5, "lift": 1.6}], "Snacks": [{"cat": "Salads/dips", "pct": 16, "lift": 6.2}, {"cat": "Cheeses", "pct": 30, "lift": 6.2}, {"cat": "Seafood-fresh", "pct": 7, "lift": 4.5}, {"cat": "Organics Fruit & Vegetables", "pct": 10, "lift": 4.4}], "Dinner Sausage": [{"cat": "Miscellaneous", "pct": 5, "lift": 5.7}, {"cat": "Hot Dogs", "pct": 23, "lift": 4.8}, {"cat": "Meat - Misc", "pct": 14, "lift": 3.8}, {"cat": "Bacon", "pct": 17, "lift": 3.7}], "Bath": [{"cat": "Makeup And Treatment", "pct": 14, "lift": 8.2}, {"cat": "Household Cleang Needs", "pct": 10, "lift": 3.1}, {"cat": "Facial Tiss/dnr Napkin", "pct": 9, "lift": 2.9}, {"cat": "Laundry Detergents", "pct": 10, "lift": 2.8}], "Fd Wraps/bags/trsh Bg": [{"cat": "Facial Tiss/dnr Napkin", "pct": 13, "lift": 4.2}, {"cat": "Paper Housewares", "pct": 14, "lift": 4.2}, {"cat": "Paper Towels", "pct": 17, "lift": 4.0}, {"cat": "Dishwash Detergents", "pct": 11, "lift": 4.0}], "Miscellaneous": [{"cat": "Dinner Sausage", "pct": 24, "lift": 5.7}, {"cat": "Olives", "pct": 6, "lift": 5.0}, {"cat": "Pork", "pct": 23, "lift": 4.5}, {"cat": "Heat/serve", "pct": 8, "lift": 3.7}], "Stone Fruit": [{"cat": "Melons", "pct": 12, "lift": 6.7}, {"cat": "Pears", "pct": 5, "lift": 6.0}, {"cat": "Corn", "pct": 6, "lift": 4.8}, {"cat": "Berries", "pct": 19, "lift": 4.7}], "Imported Wine": [{"cat": "Domestic Wine", "pct": 20, "lift": 10.0}, {"cat": "Herbs", "pct": 7, "lift": 4.6}, {"cat": "Organics Fruit & Vegetables", "pct": 10, "lift": 4.3}, {"cat": "Mushrooms", "pct": 8, "lift": 4.2}], "Makeup And Treatment": [{"cat": "Bath", "pct": 4, "lift": 8.2}, {"cat": "Household Cleang Needs", "pct": 10, "lift": 3.0}, {"cat": "Laundry Additives", "pct": 6, "lift": 3.0}, {"cat": "Air Care", "pct": 4, "lift": 2.6}], "Cereal/breakfast": [{"cat": "Prepared/pkgd Foods", "pct": 7, "lift": 26.4}, {"cat": "Snks/ckys/crkr/cndy", "pct": 10, "lift": 25.2}, {"cat": "Frozen", "pct": 15, "lift": 22.0}, {"cat": "Chips&snacks", "pct": 11, "lift": 15.2}], "Deli Supplies": [{"cat": "Deli Meats", "pct": 17, "lift": 2.3}, {"cat": "Crackers/misc Bkd Fd", "pct": 16, "lift": 1.6}, {"cat": "Cold Cereal", "pct": 17, "lift": 1.6}, {"cat": "Eggs", "pct": 19, "lift": 1.6}], "Domestic Wine": [{"cat": "Imported Wine", "pct": 8, "lift": 10.0}, {"cat": "Misc Wine", "pct": 2, "lift": 4.2}, {"cat": "Herbs", "pct": 5, "lift": 3.5}, {"cat": "Beers/ales", "pct": 20, "lift": 3.0}], "Fitness&diet": [{"cat": "Snks/ckys/crkr/cndy", "pct": 6, "lift": 16.5}, {"cat": "Cereal/breakfast", "pct": 9, "lift": 14.3}, {"cat": "Frozen", "pct": 8, "lift": 11.5}, {"cat": "Chips&snacks", "pct": 7, "lift": 9.9}], "Squash": [{"cat": "Mushrooms", "pct": 20, "lift": 9.8}, {"cat": "Herbs", "pct": 13, "lift": 9.2}, {"cat": "Broccoli/cauliflower", "pct": 16, "lift": 8.1}, {"cat": "Peppers-all", "pct": 27, "lift": 7.9}], "Corn": [{"cat": "Melons", "pct": 12, "lift": 6.6}, {"cat": "Squash", "pct": 4, "lift": 5.0}, {"cat": "Stone Fruit", "pct": 11, "lift": 4.8}, {"cat": "Berries", "pct": 18, "lift": 4.7}], "Water": [{"cat": "Refrigerated", "pct": 8, "lift": 3.8}, {"cat": "Value Added Fruit", "pct": 6, "lift": 2.7}, {"cat": "Yogurt", "pct": 14, "lift": 2.1}, {"cat": "Grapes", "pct": 8, "lift": 1.8}], "Juice": [{"cat": "Refrigerated", "pct": 21, "lift": 9.6}, {"cat": "Processed", "pct": 15, "lift": 7.6}, {"cat": "Melons", "pct": 10, "lift": 5.7}, {"cat": "Organics Fruit & Vegetables", "pct": 12, "lift": 5.4}], "Bleach": [{"cat": "Laundry Additives", "pct": 20, "lift": 10.2}, {"cat": "Laundry Detergents", "pct": 35, "lift": 9.6}, {"cat": "Household Cleang Needs", "pct": 22, "lift": 6.8}, {"cat": "Dishwash Detergents", "pct": 17, "lift": 6.4}], "Dog Foods": [{"cat": "Pet Care Supplies", "pct": 10, "lift": 9.7}, {"cat": "Cat Food", "pct": 13, "lift": 4.5}, {"cat": "Cat Litter", "pct": 5, "lift": 3.6}, {"cat": "Laundry Additives", "pct": 6, "lift": 3.0}], "Prepared/pkgd Foods": [{"cat": "Frozen", "pct": 19, "lift": 28.4}, {"cat": "Cereal/breakfast", "pct": 17, "lift": 26.4}, {"cat": "Chips&snacks", "pct": 15, "lift": 19.8}, {"cat": "Refrigerated", "pct": 33, "lift": 15.1}], "Cocoa Mixes": [{"cat": "Teas", "pct": 6, "lift": 4.5}, {"cat": "Pwdr/crystl Drnk Mx", "pct": 9, "lift": 4.2}, {"cat": "Molasses/syrup/pancake Mixs", "pct": 8, "lift": 4.1}, {"cat": "Hot Cereal", "pct": 10, "lift": 4.0}], "Facial Tiss/dnr Napkin": [{"cat": "Paper Housewares", "pct": 18, "lift": 5.5}, {"cat": "Paper Towels", "pct": 23, "lift": 5.5}, {"cat": "Bath Tissues", "pct": 28, "lift": 4.7}, {"cat": "Household Cleang Needs", "pct": 14, "lift": 4.5}], "Sweet Goods & Snacks": [{"cat": "Cookies", "pct": 5, "lift": 3.3}, {"cat": "Breakfast Sweets", "pct": 10, "lift": 2.9}, {"cat": "Cakes", "pct": 5, "lift": 2.9}, {"cat": "Rolls", "pct": 6, "lift": 2.8}], "Party Trays": [{"cat": "Crackers/misc Bkd Fd", "pct": 21, "lift": 2.1}, {"cat": "Bag Snacks", "pct": 33, "lift": 1.8}, {"cat": "Cheese", "pct": 28, "lift": 1.4}, {"cat": "Baked Bread/buns/rolls", "pct": 32, "lift": 1.2}], "Snks/ckys/crkr/cndy": [{"cat": "Cereal/breakfast", "pct": 16, "lift": 25.2}, {"cat": "Frozen", "pct": 14, "lift": 21.4}, {"cat": "Chips&snacks", "pct": 16, "lift": 21.3}, {"cat": "Fitness&diet", "pct": 12, "lift": 16.5}], "Frozen": [{"cat": "Condiments", "pct": 6, "lift": 35.7}, {"cat": "Prepared/pkgd Foods", "pct": 8, "lift": 28.4}, {"cat": "Cereal/breakfast", "pct": 14, "lift": 22.0}, {"cat": "Snks/ckys/crkr/cndy", "pct": 8, "lift": 21.4}], "Syrups/toppings": [{"cat": "Ice Cream/milk/sherbts", "pct": 62, "lift": 7.1}, {"cat": "Frozen Pie/desserts", "pct": 15, "lift": 5.2}, {"cat": "Baking Needs", "pct": 16, "lift": 3.4}, {"cat": "Baking Mixes", "pct": 16, "lift": 3.2}], "Condiments": [{"cat": "Chips&snacks", "pct": 29, "lift": 40.0}, {"cat": "Frozen", "pct": 24, "lift": 35.7}, {"cat": "Refrigerated", "pct": 34, "lift": 15.5}, {"cat": "Organics Fruit & Vegetables", "pct": 28, "lift": 12.6}], "Non-dairy Beverages": [{"cat": "Refrigerated", "pct": 24, "lift": 10.8}, {"cat": "Organics Fruit & Vegetables", "pct": 17, "lift": 7.4}, {"cat": "Pnt Btr/jelly/jams", "pct": 17, "lift": 3.9}, {"cat": "Citrus", "pct": 16, "lift": 3.7}], "Nuts": [{"cat": "Dried Fruit", "pct": 11, "lift": 8.5}, {"cat": "Organics Fruit & Vegetables", "pct": 13, "lift": 5.7}, {"cat": "Broccoli/cauliflower", "pct": 9, "lift": 4.7}, {"cat": "Herbs", "pct": 6, "lift": 4.6}], "Coupon/misc Items": [{"cat": "Facial Tiss/dnr Napkin", "pct": 6, "lift": 2.1}, {"cat": "Frozen Meat", "pct": 7, "lift": 2.0}, {"cat": "Frzn Breakfast Foods", "pct": 6, "lift": 2.0}, {"cat": "Meat - Misc", "pct": 7, "lift": 2.0}], "Beverage": [{"cat": "Beef", "pct": 24, "lift": 1.5}, {"cat": "Cheese", "pct": 25, "lift": 1.2}, {"cat": "Baked Bread/buns/rolls", "pct": 28, "lift": 1.1}, {"cat": "Fluid Milk Products", "pct": 31, "lift": 1.0}], "Rice Cakes": [{"cat": "Hot Cereal", "pct": 10, "lift": 4.2}, {"cat": "Convenient Brkfst/whlsm Snacks", "pct": 22, "lift": 3.6}, {"cat": "Yogurt", "pct": 24, "lift": 3.6}, {"cat": "Pnt Btr/jelly/jams", "pct": 14, "lift": 3.3}], "Pears": [{"cat": "Apples", "pct": 36, "lift": 6.7}, {"cat": "Squash", "pct": 5, "lift": 6.3}, {"cat": "Stone Fruit", "pct": 13, "lift": 6.0}, {"cat": "Organics Fruit & Vegetables", "pct": 13, "lift": 5.6}], "Frzn Jce Conc/drnks": [{"cat": "Cereal/breakfast", "pct": 4, "lift": 6.8}, {"cat": "Dried Fruit", "pct": 6, "lift": 4.4}, {"cat": "Olives", "pct": 5, "lift": 4.1}, {"cat": "Frzn Breakfast Foods", "pct": 12, "lift": 3.9}], "Sandwiches": [{"cat": "Bag Snacks", "pct": 33, "lift": 1.8}, {"cat": "Deli Meats", "pct": 12, "lift": 1.6}, {"cat": "Soft Drinks", "pct": 37, "lift": 1.2}, {"cat": "Frzn Meat/meat Dinners", "pct": 12, "lift": 1.2}], "Packaged Natural Snacks": [{"cat": "Apples", "pct": 22, "lift": 4.1}, {"cat": "Crackers/misc Bkd Fd", "pct": 23, "lift": 2.3}, {"cat": "Cold Cereal", "pct": 25, "lift": 2.3}, {"cat": "Tropical Fruit", "pct": 29, "lift": 2.3}], "Frozen Chicken": [{"cat": "Frozen Meat", "pct": 23, "lift": 6.6}, {"cat": "Frzn Potatoes", "pct": 20, "lift": 5.8}, {"cat": "Frozen Pizza", "pct": 41, "lift": 4.1}, {"cat": "Dinner Mxs Dry", "pct": 23, "lift": 4.1}], "Deli Specialties (retail Pk)": [{"cat": "Cheeses", "pct": 22, "lift": 4.5}, {"cat": "Deli Meats", "pct": 28, "lift": 3.8}, {"cat": "Crackers/misc Bkd Fd", "pct": 29, "lift": 2.9}, {"cat": "Cold Cereal", "pct": 28, "lift": 2.5}], "Sushi": [{"cat": "Tomatoes", "pct": 14, "lift": 2.4}, {"cat": "Vegetables - All Others", "pct": 14, "lift": 2.2}, {"cat": "Salad Mix", "pct": 14, "lift": 2.1}, {"cat": "Tropical Fruit", "pct": 23, "lift": 1.8}], "Baking": [{"cat": "Organics Fruit & Vegetables", "pct": 29, "lift": 12.9}, {"cat": "Refrigerated", "pct": 24, "lift": 11.0}, {"cat": "Vegetables - All Others", "pct": 24, "lift": 3.8}, {"cat": "Tropical Fruit", "pct": 25, "lift": 1.9}], "New Age": [{"cat": "Soft Drinks", "pct": 34, "lift": 1.1}, {"cat": "Bag Snacks", "pct": 20, "lift": 1.1}, {"cat": "Cheese", "pct": 21, "lift": 1.1}, {"cat": "Baked Bread/buns/rolls", "pct": 24, "lift": 0.9}]}, "lift": {"Air Care": 1.09, "Apples": 1.35, "Bacon": 2.02, "Bag Snacks": 1.13, "Baked Bread/buns/rolls": 1.12, "Baked Sweet Goods": 1.21, "Baking Mixes": 1.16, "Baking Needs": 1.39, "Bath": 1.0, "Bath Tissues": 1.42, "Beans - Canned Glass & Mw": 1.26, "Beef": 1.38, "Berries": 1.81, "Bleach": 1.18, "Bread": 1.16, "Breakfast Sausage/sandwiches": 1.73, "Breakfast Sweets": 1.33, "Cakes": 1.0, "Canned Juices": 1.22, "Cat Food": 1.02, "Cat Litter": 1.1, "Cereal/breakfast": 1.02, "Cheese": 1.16, "Cheeses": 1.0, "Chicken": 1.33, "Chicken/poultry": 1.0, "Chips&snacks": 1.08, "Citrus": 2.5, "Cocoa Mixes": 1.25, "Coffee": 1.06, "Cold Cereal": 1.48, "Condiments": 1.0, "Condiments/sauces": 1.09, "Convenient Brkfst/whlsm Snacks": 1.39, "Cookies": 1.12, "Cookies/cones": 1.17, "Crackers/misc Bkd Fd": 1.24, "Deli Meats": 1.21, "Dinner Mxs Dry": 1.38, "Dinner Sausage": 1.33, "Dishwash Detergents": 1.05, "Dog Foods": 1.02, "Dried Fruit": 1.18, "Dry Bn/veg/potato/rice": 1.15, "Dry Mix Desserts": 1.21, "Dry Noodles/pasta": 1.15, "Dry Sauces/gravy": 1.2, "Dry Tea/coffee/coco Mix": 1.0, "Eggs": 1.06, "Facial Tiss/dnr Napkin": 1.18, "Fd Wraps/bags/trsh Bg": 1.24, "Fitness&diet": 1.22, "Fluid Milk Products": 1.18, "Frozen": 1.0, "Frozen - Boxed(grocery)": 1.15, "Frozen Bread/dough": 1.26, "Frozen Meat": 1.24, "Frozen Pie/desserts": 1.39, "Frozen Pizza": 1.33, "Fruit - Shelf Stable": 1.36, "Frzn Breakfast Foods": 1.18, "Frzn Jce Conc/drnks": 0.97, "Frzn Meat/meat Dinners": 1.27, "Frzn Novelties/wtr Ice": 1.24, "Frzn Potatoes": 1.27, "Frzn Vegetable/veg Dsh": 1.29, "Grapes": 1.0, "Heat/serve": 1.28, "Hispanic": 1.09, "Hot Cereal": 1.04, "Hot Dogs": 1.64, "Household Cleang Needs": 1.06, "Ice Cream/milk/sherbts": 1.27, "Isotonic Drinks": 1.24, "Juice": 1.12, "Laundry Additives": 1.1, "Laundry Detergents": 1.21, "Lunchmeat": 1.66, "Makeup And Treatment": 1.0, "Margarines": 1.26, "Meat - Misc": 1.22, "Meat - Shelf Stable": 1.32, "Milk By-products": 1.09, "Misc. Dairy": 1.08, "Molasses/syrup/pancake Mixs": 1.21, "Non-dairy Beverages": 1.29, "Olives": 1.17, "Organics Fruit & Vegetables": 1.14, "Paper Housewares": 1.18, "Paper Towels": 1.3, "Pasta Sauce": 1.03, "Pet Care Supplies": 1.0, "Pickle/relish/pkld Veg": 1.17, "Pies": 1.28, "Pnt Btr/jelly/jams": 1.05, "Popcorn": 1.36, "Pork": 1.67, "Potatoes": 1.19, "Prepared/pkgd Foods": 1.0, "Processed": 1.04, "Pwdr/crystl Drnk Mx": 1.19, "Refrgratd Dough Products": 1.52, "Refrgratd Juices/drnks": 1.3, "Refrigerated": 1.07, "Rice Cakes": 1.36, "Rolls": 1.11, "Salad Mix": 1.59, "Salads/dips": 1.0, "Sald Drsng/sndwch Sprd": 1.15, "Seafood - Frozen": 1.45, "Seafood - Misc": 1.0, "Seafood - Shelf Stable": 1.2, "Seafood-fresh": 1.34, "Shortening/oil": 1.19, "Smoked Meats": 1.63, "Snack Nuts": 1.1, "Snacks": 1.0, "Snks/ckys/crkr/cndy": 1.0, "Soft Drinks": 1.33, "Soup": 1.33, "Spices & Extracts": 1.0, "Sugars/sweetners": 1.2, "Syrups/toppings": 1.04, "Teas": 1.0, "Turkey": 1.93, "Value Added Vegetables": 1.37, "Vegetables - All Others": 1.0, "Vegetables - Shelf Stable": 1.33, "Warehouse Snacks": 1.41, "Water": 1.8, "Water - Carbonated/flvrd Drink": 1.49, "Yogurt": 1.2}};
-const TREE=DATA.tree, AFF=DATA.affinity, LIFT=DATA.lift;
-const peso=n=>"₱"+Math.round(n).toLocaleString();
-function predict(x){let n=TREE;while(!n.leaf){n=(x[n.f]<=n.thr)?n.l:n.r;}return n.prob;}
-
-/* Reading bands — Filipino first, English underneath. Colours come straight
-   from the Manila palette: forest = healthy, blue = steady, orange = slowing,
-   red = stalled. */
-function band(p){
-  if(p>=.75)return{label:"MABENTA",en:"Moving well",cls:"good",col:"#3E5C4B"};
-  if(p>=.55)return{label:"OKAY LANG",en:"Steady enough",cls:"calm",col:"#5B7F97"};
-  if(p>=.40)return{label:"BUMABAGAL",en:"Slowing down",cls:"warm",col:"#FF8C00"};
-  return{label:"NATIGIL",en:"Stalled",cls:"bad",col:"#DD0B00"};
-}
-function badgeFor(p){const b=band(p);return `<span class="badge b-${b.cls}">${b.label} ${Math.round(p*100)}%</span>`;}
-function _(id){return document.getElementById(id);}
-function cap(s){return s?s.charAt(0).toUpperCase()+s.slice(1):s;}
-function low(s){return s?s.toLowerCase():s;}
-const CATS=Object.keys(AFF).sort();
-const CAT_OPTS='<option value="">— pick —</option>'+CATS.map(c=>`<option>${c}</option>`).join('');
-
-_('tabs').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
-  document.querySelectorAll('.tabs button').forEach(x=>x.classList.toggle('on',x===b));
-  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('on',t.id===b.dataset.t));});
-
-_('cat').innerHTML=CAT_OPTS;
-_('cat').value = AFF['Baked Bread/buns/rolls']?'Baked Bread/buns/rolls':(CATS.filter(c=>LIFT[c]!==undefined).sort((a,b)=>LIFT[b]-LIFT[a])[0]||'');
-
-/* The triage ribbon: KEEP → PUSH → CUT, with the active step lit up. */
-function triageBar(state){
-  const on=k=>state===k?` on-${k}`:'';
-  return `<div class="triage-bar">
-    <div class="tb${on('keep')}">PANATILIHIN<small>Keep it</small></div>
-    <div class="tb${on('push')}">ITULAK<small>Push it</small></div>
-    <div class="tb${on('cut')}">BITAWAN<small>Cut it loose</small></div>
-  </div>`;
-}
-
-function rescueBlock(c,fin){
-  const lift=(c&&LIFT[c]!==undefined)?LIFT[c]:null;
-  const partners=(c&&AFF[c])?AFF[c]:null;
-  const top=partners?partners[0]:null;
-  const discClass=lift===null?'unknown':lift>=1.4?'strong':lift>=1.2?'some':'weak';
-  const responsive=(discClass==='strong'||discClass==='some');
-  let dp=null;
-  if(fin&&fin.price>0&&fin.price>fin.cost&&lift){
-    const newPrice=fin.price*0.85, newMargin=newPrice-fin.cost;
-    const oldWk=fin.rate*(fin.price-fin.cost), newWk=fin.rate*lift*newMargin;
-    dp={belowCost:newMargin<=0, delta:newWk-oldWk};
-  }
-  const discountOK = dp ? (!dp.belowCost && dp.delta>0) : null;
-  let plays=[];
-  if(responsive&&discountOK!==false){
-    const note = discountOK===true ? ` At your margin, a ~15% cut still <b>adds about ${peso(dp.delta)}/week</b> in profit — worth doing.` : '';
-    plays.push({k:'discount',t:(discClass==='strong'?'Ibaba ang presyo':'Bahagyang discount'),g:(discClass==='strong'?'cut the price':'light price cut'),
-      d:`${cap(c)} sells about <b>${lift.toFixed(1)}×</b> more units when discounted${discClass==='some'?' (modestly)':''} — a price cut is a real lever.${note}`});
-  }
-  if(top&&top.pct>=8)plays.push({k:'bundle',t:`Ipares sa ${low(top.cat)}`,g:'bundle it',
-    d:`Shoppers who buy ${low(c)} grab ${low(top.cat)} <b>${top.pct}%</b> of the time — a combo deal lets that habit pull it along.`});
-  if(plays.length===0)plays.push({k:'retire',t:'Huwag nang mag-reorder',g:'stop restocking it',
-    d:`${cap(c)||'This product'}${(responsive&&discountOK===false)?' responds to discounts, but not profitably at your margin,':' barely responds to discounts'} and has no strong pairing partner${fin?`. It earns only about ${peso(fin.margin*fin.rate)}/week in margin${fin.frozen>0?`, with about <b>${peso(fin.frozen)}</b> of cash frozen in unsold stock`:''}`:''}. The honest move is to stop reordering — that cash could be buying a winner.`});
-  const primary=plays[0];
-  const cutting = primary.k==='retire';
-  let h=triageBar(cutting?'cut':'push');
-  h+=`<div class="playlabel">${cutting?'Ang desisyon · the call':'Rescue play · ang gagawin'}</div>`;
-  h+=`<div class="rp ${primary.k}"><div class="rp-h">${cutting?'Bitawan':'Itulak'} — ${primary.t}<span class="gloss">${primary.g}</span></div><p>${primary.d}</p></div>`;
-  if(plays.length>1)h+=`<p class="sub" style="margin-top:12px">Also worth a shot:</p>`+plays.slice(1).map(pl=>`<div class="rp2"><b>${pl.t}</b> <span style="color:var(--muted);font-size:12px">(${pl.g})</span> — ${pl.d}</div>`).join('');
-  if(responsive&&discountOK===false){
-    h+=`<div class="warn"><b>⚠ Huwag i-discount.</b> ${cap(c)} does respond to price cuts, but at your margin a 15% cut would ${dp.belowCost?'sell you <b>below cost</b>':`lose about <b>${peso(-dp.delta)}/week</b>`} — the extra volume doesn't cover the margin you'd give up.`+((top&&top.pct>=8)?` Pair it instead.`:'')+`</div>`;
-  } else if(discClass==='weak'){
-    h+=`<div class="warn"><b>⚠ Huwag i-discount.</b> ${cap(c)} barely responds to price cuts (about ${lift.toFixed(1)}×) — you'd give up margin for almost no extra sales.`+((top&&top.pct>=8)?` Pair it instead.`:'')+`</div>`;
-  }
-  if(discClass==='unknown')h+=`<p class="note">Pick a category above to get discount vs bundle advice.</p>`;
-  return h;
-}
-
-const IN={stale:_('stale'),weeks:_('weeks'),units:_('units'),stock:_('stock'),cat:_('cat'),price:_('price'),cost:_('cost')};
-function renderCheck(){
-  const stale=+IN.stale.value,weeks=+IN.weeks.value;
-  const units=Math.max(0,parseInt(IN.units.value)||0),stock=Math.max(0,parseInt(IN.stock.value)||0);
-  _('stale-v').textContent=stale;_('weeks-v').textContent=weeks;
-  const p=predict({weeks_since_last:stale,weeks,units}),b=band(p),pct=Math.round(p*100);
-  const hh=150*p;_('merc').setAttribute('y',(10+150-hh).toFixed(1));_('merc').setAttribute('height',hh.toFixed(1));
-  _('merc').setAttribute('fill',b.col);_('bulb').setAttribute('fill',b.col);
-  _('verdict').innerHTML='<small>Lagay ng paninda · Reading</small>'+b.label+'<em>'+b.en+'</em>';
-  _('pbig').textContent=pct+'% chance it keeps selling';
-  const received=stock, rate=weeks>0?units/weeks:0;
-  let str=null;
-  if(received>0){str=Math.round(units/received*100);
-    const scls=str>=70?'b-good':str>=40?'b-warm':'b-bad';
-    _('str').innerHTML=`<span class="badge ${scls}">${str}%</span>`;_('str-chip').style.display='';}
-  else _('str-chip').style.display='none';
-  const price=parseFloat(IN.price.value)||0, cost=parseFloat(IN.cost.value)||0;
-  let margin=null;
-  if(price>0&&price>cost){margin=price-cost;const mpct=margin/price;
-    const mcls=mpct>=0.20?'b-good':mpct>=0.10?'b-warm':'b-bad';
-    _('margin').innerHTML=`<span class="badge ${mcls}">${peso(margin)} (${Math.round(mpct*100)}%)</span>`;_('margin-chip').style.display='';}
-  else _('margin-chip').style.display='none';
-  const rem0=Math.max(0,received-units);
-  if(received>0&&cost>0){_('frozen').innerHTML=peso(rem0*cost);_('frozen-chip').style.display='';}
-  else _('frozen-chip').style.display='none';
-  const fin=(margin!==null)?{price,cost,margin,rate,units,frozen:(cost>0?rem0*cost:0)}:null;
-  const remaining=Math.max(0,received-units);
-  if(received>0&&remaining===0){_('reorder').textContent='sold out';_('reorder-chip').style.display='';}
-  else if(remaining>0&&rate>0){const wk=remaining/rate;_('reorder').textContent=wk<1?'under a week':Math.round(wk)+' wks';_('reorder-chip').style.display='';}
-  else _('reorder-chip').style.display='none';
-  const w=[];
-  w.push(stale<=6?`Still selling recently (${stale} wks ago) — the strongest good sign.`:stale<=15?`A little quiet lately (${stale} wks since a sale).`:`Gone quiet — ${stale} weeks with no sale is the biggest red flag.`);
-  w.push(weeks>=8?`Sold steadily across ${weeks} weeks — it has a rhythm.`:`Only sold in ${weeks} week${weeks>1?'s':''} so far — thin track record.`);
-  w.push(units>=25?`Healthy volume — ${units} units sold.`:`Low volume so far — only ${units} units sold.`);
-  if(str!==null)w.push(str>=70?`Sell-through ${str}% — strong; most of what you stocked has sold.`:str>=40?`Sell-through ${str}% — middling; a good chunk is still on the shelf.`:`Sell-through ${str}% — low; most of what you stocked hasn't sold.`);
-  if(margin!==null)w.push(`Earns about ${peso(margin*rate)}/week in margin (${units} sold × ${peso(margin)}).`);
-  _('why').innerHTML=w.map(t=>`<li>${t}</li>`).join('');
-  if(p>=0.55)_('check-rescue').innerHTML=triageBar('keep')+
-    `<div class="playlabel">Ang desisyon · the call</div>`+
-    `<div class="rp keep"><div class="rp-h">Panatilihin<span class="gloss">keep stocking it</span></div><p>This one reads healthy. Keep stocking it. (If a product's slipping, its push-or-cut play shows up right here.)</p></div>`;
-  else _('check-rescue').innerHTML=rescueBlock(IN.cat.value,fin);
-}
-Object.values(IN).forEach(el=>el.addEventListener('input',renderCheck));
-
-// ---- BATCH ----
-const seed=[["Canned mushrooms","Mushrooms",22,3,6],["Chili sauce","Condiments",6,14,40],["","",0,1,1]];
-function makeRow(name="",cat="",stale=8,weeks=8,units=15){
-  const div=document.createElement('div');div.className='srow';
-  div.innerHTML=`<input type="text" placeholder="product name" value="${name}">
-    <select class="rowcat">${CAT_OPTS}</select>
-    <input type="number" min="0" value="${stale}"><input type="number" min="1" value="${weeks}">
-    <input type="number" min="0" value="${units}"><span class="res"></span>
-    <button class="xbtn" title="remove">×</button>`;
-  if(cat)div.querySelector('.rowcat').value=cat;
-  const nums=div.querySelectorAll('input[type=number]');
-  const score=()=>{const st=+nums[0].value||0,wk=+nums[1].value||1,un=+nums[2].value||0;
-    div.querySelector('.res').innerHTML=badgeFor(predict({weeks_since_last:st,weeks:wk,units:un}));updateSummary();};
-  div.querySelectorAll('input').forEach(i=>i.addEventListener('input',score));
-  div.querySelector('.xbtn').addEventListener('click',()=>{div.remove();updateSummary();});
-  _('rows').appendChild(div);score();
-}
-function updateSummary(){
-  const rows=[..._('rows').children];let cut=0,keep=0;
-  rows.forEach(r=>{const ins=r.querySelectorAll('input[type=number]');
-    const p=predict({weeks_since_last:+ins[0].value||0,weeks:+ins[1].value||1,units:+ins[2].value||0});
-    if(p<0.5)cut++;else keep++;});
-  _('batch-summary').innerHTML=`Out of <b>${rows.length}</b> products: <b>${cut}</b> read as likely to drop, <b>${keep}</b> worth keeping. For any you still want to push, run it through <b>Check a product</b> to get its itulak-o-bitawan play.`;
-}
-_('addrow').addEventListener('click',()=>makeRow("","",4,8,15));
-seed.forEach(s=>makeRow(...s));
-
-renderCheck();
-
-
-/* ---- CSV bulk upload for the batch tab ---- */
-(function(){
-  var HEAD=["Product","Category","Weeks since last sold","Weeks selling","Units sold"];
-  function msg(t,warn){var e=_('upload-msg');if(!e)return;e.innerHTML=t;e.className=warn?'upl-warn':'upl-ok';}
-  function setMode(up){_('mode-type').classList.toggle('on',!up);_('mode-upload').classList.toggle('on',up);_('upload-panel').style.display=up?'block':'none';}
-  var mt=_('mode-type'),mu=_('mode-upload');
-  if(mt&&mu){mt.addEventListener('click',function(){setMode(false);});mu.addEventListener('click',function(){setMode(true);});}
-  var dl=_('dl-template');
-  if(dl)dl.addEventListener('click',function(){
-    var csv=[HEAD.join(","),"Canned mushrooms,Mushrooms,22,3,6","Chili sauce,Condiments,6,14,40"].join("\n");
-    var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
-    a.download='shelf-temp-check-template.csv';document.body.appendChild(a);a.click();a.remove();
-  });
-  function parseLine(line){var o=[],c="",q=false;for(var i=0;i<line.length;i++){var ch=line[i];
-    if(q){if(ch=='"'){if(line[i+1]=='"'){c+='"';i++;}else q=false;}else c+=ch;}
-    else{if(ch=='"')q=true;else if(ch==','){o.push(c);c="";}else c+=ch;}}o.push(c);
-    return o.map(function(s){return s.trim();});}
-  function load(text){
-    var lines=text.replace(/\r/g,'').split('\n').filter(function(l){return l.trim().length;});
-    if(lines.length<2){msg('That file looks empty — download the template and add a couple of rows.',true);return;}
-    var head=parseLine(lines[0]).map(function(h){return h.toLowerCase();});
-    var idx={name:head.findIndex(function(h){return h.indexOf('product')>=0;}),
-      cat:head.findIndex(function(h){return h.indexOf('categ')>=0;}),
-      stale:head.findIndex(function(h){return h.indexOf('since')>=0;}),
-      weeks:head.findIndex(function(h){return h.indexOf('selling')>=0;}),
-      units:head.findIndex(function(h){return h.indexOf('unit')>=0;})};
-    var miss=['name','stale','weeks','units'].filter(function(k){return idx[k]<0;});
-    if(miss.length){msg('Could not find the right columns — please use the template. Missing: '+miss.join(', '),true);return;}
-    _('rows').innerHTML='';
-    var ok=0,bad=[];
-    lines.slice(1).forEach(function(ln,i){var r=parseLine(ln);
-      if(!r.some(function(x){return x;}))return;
-      var name=(idx.name>=0?r[idx.name]:'')||'';
-      var st=parseFloat(r[idx.stale]),wk=parseFloat(r[idx.weeks]),un=parseFloat(r[idx.units]);
-      if([st,wk,un].some(function(v){return isNaN(v);})){bad.push(i+2);return;}
-      makeRow(name,(idx.cat>=0?r[idx.cat]:''),Math.max(0,st),Math.max(1,wk),Math.max(0,un));ok++;});
-    var m='Loaded <b>'+ok+'</b> product'+(ok==1?'':'s')+' into the table below.';
-    if(bad.length)m+=' Skipped row'+(bad.length>1?'s':'')+' '+bad.join(', ')+' — the numbers there did not look right.';
-    msg(m,bad.length>0);updateSummary();
-  }
-  var fi=_('csv-file'),dz=_('dropzone');
-  function handle(f){if(!f)return;var r=new FileReader();r.onload=function(){load(r.result);};r.readAsText(f);}
-  if(fi)fi.addEventListener('change',function(e){handle(e.target.files[0]);});
-  if(dz){['dragover','dragenter'].forEach(function(ev){dz.addEventListener(ev,function(e){e.preventDefault();dz.classList.add('drag');});});
-    ['dragleave'].forEach(function(ev){dz.addEventListener(ev,function(e){e.preventDefault();dz.classList.remove('drag');});});
-    dz.addEventListener('drop',function(e){e.preventDefault();dz.classList.remove('drag');handle(e.dataTransfer.files[0]);});}
-})();
-
-
-/* ============================================================
-   CONTRIBUTIONS + FEEDBACK
-
-   CONFIG below is the only thing you need to touch to turn on
-   real submission. Leave the strings empty and nothing breaks:
-   entries are kept in this browser and can be exported to CSV
-   or copied out by hand. The UI says which mode it is in — it
-   never claims to have sent something it hasn't.
-   ============================================================ */
-const CONFIG={
-  contactEmail:"",        /* e.g. "hello@yourdomain.ph" — turns on the email route for feedback */
-  contributeEndpoint:"",  /* e.g. a Formspree / Apps Script / your-own-API URL that accepts POST JSON */
-  feedbackEndpoint:""     /* optional; if blank, feedback falls back to contactEmail, then to local */
-};
-
-const K_CONTRIB='stc.contributions.v1', K_FEED='stc.feedback.v1';
-const STORE={
-  ok:(function(){try{localStorage.setItem('stc.t','1');localStorage.removeItem('stc.t');return true}catch(e){return false}})(),
-  get(k,d){try{const v=JSON.parse(localStorage.getItem(k));return v==null?d:v}catch(e){return d}},
-  set(k,v){try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){return false}}
-};
-const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-function say(el,msg,kind){el.className='status show '+(kind||'info');el.innerHTML=msg;}
-function hide(el){el.className='status';}
-function hostOf(u){try{return new URL(u).host}catch(e){return 'the configured endpoint'}}
-
-const DID_LBL={kept:'Kept it',discounted:'Discounted',bundled:'Bundled',stopped:'Stopped reordering',nothing:'Nothing yet'};
-const OUT_LBL={soldout:'Sold out',faster:'Moved faster',same:'No change',wasted:'Spoiled / written off',early:'Too early to tell'};
-const OUT_GOOD={soldout:1,faster:1}, OUT_BAD={same:1,wasted:1};
-
-/* ---------- where does it go? honest banners ---------- */
-(function(){
-  const cw=_('contrib-where'), cwt=_('contrib-where-txt');
-  if(CONFIG.contributeEndpoint){
-    cw.className='whereto live';
-    cwt.innerHTML=`Entries are sent to <b>${esc(hostOf(CONFIG.contributeEndpoint))}</b> and also kept on this device so you keep your own copy.`;
-  }else{
-    cw.className='whereto local';
-    cwt.innerHTML=STORE.ok
-      ? `<b>Saved on this device only — nothing is uploaded.</b> Build your list over time, then export it as CSV and send it over when you're ready.`
-      : `<b>This browser is blocking local storage,</b> so entries can't be saved between visits. You can still fill the form and copy the entry out straight away.`;
-  }
-  const fw=_('fb-where'), fwt=_('fb-where-txt');
-  if(CONFIG.feedbackEndpoint){
-    fw.className='whereto live';
-    fwt.innerHTML=`Messages go to <b>${esc(hostOf(CONFIG.feedbackEndpoint))}</b>.`;
-  }else if(CONFIG.contactEmail){
-    fw.className='whereto live';
-    fwt.innerHTML=`Sending opens your email app with the message ready for <b>${esc(CONFIG.contactEmail)}</b> — you stay in control of what actually goes out.`;
-  }else{
-    fw.className='whereto local';
-    fwt.innerHTML=`<b>No inbox is wired up yet,</b> so messages are kept on this device. Use <i>Copy my message</i> and send it wherever you like — nothing is transmitted from this page.`;
-  }
-})();
-
-/* ---------- contribute ---------- */
-_('c-cat').innerHTML=CAT_OPTS;
-const CF={name:_('c-name'),cat:_('c-cat'),stale:_('c-stale'),weeks:_('c-weeks'),units:_('c-units'),
-  stock:_('c-stock'),price:_('c-price'),cost:_('c-cost'),region:_('c-region'),type:_('c-type'),consent:_('c-consent')};
-const cStatus=_('c-status');
-
-_('c-prefill').addEventListener('click',()=>{
-  CF.cat.value=IN.cat.value; CF.stale.value=IN.stale.value; CF.weeks.value=IN.weeks.value;
-  CF.units.value=IN.units.value; CF.stock.value=IN.stock.value; CF.price.value=IN.price.value; CF.cost.value=IN.cost.value;
-  say(cStatus,'Pulled the numbers from the checker above. Now tell it what you did and what happened.','info');
-  CF.name.focus();
-});
-
-function numOrNull(el){const v=el.value.trim();if(v==='')return null;const n=parseFloat(v);return isFinite(n)?n:null;}
-function pick(name){const el=document.querySelector(`input[name="${name}"]:checked`);return el?el.value:'';}
-
-_('contrib-form').addEventListener('submit',async e=>{
-  e.preventDefault();
-  const stale=numOrNull(CF.stale), weeks=numOrNull(CF.weeks), units=numOrNull(CF.units);
-  const did=pick('c-did'), out=pick('c-out');
-  [CF.stale,CF.weeks,CF.units].forEach(el=>el.classList.remove('bad'));
-  const missing=[];
-  if(stale===null||stale<0){missing.push('weeks since it last sold');CF.stale.classList.add('bad');}
-  if(weeks===null||weeks<1){missing.push('weeks you’ve been selling it');CF.weeks.classList.add('bad');}
-  if(units===null||units<0){missing.push('units sold');CF.units.classList.add('bad');}
-  if(!did)missing.push('what you decided');
-  if(!out)missing.push('how it turned out');
-  if(missing.length){say(cStatus,'Kulang pa — still need: '+missing.join(', ')+'.','err');return;}
-  if(!CF.consent.checked){say(cStatus,'Tick the box below so we know it’s alright to use this entry.','err');return;}
-
-  const p=predict({weeks_since_last:stale,weeks:weeks,units:units});
-  const rec={
-    id:'c_'+Date.now().toString(36)+Math.random().toString(36).slice(2,7),
-    ts:new Date().toISOString(),
-    name:CF.name.value.trim(), category:CF.cat.value,
-    weeks_since_last:stale, weeks:weeks, units:units,
-    stocked:numOrNull(CF.stock), price:numOrNull(CF.price), cost:numOrNull(CF.cost),
-    decision:did, outcome:out,
-    region:CF.region.value, store_type:CF.type.value,
-    model_prob:Math.round(p*1000)/1000, model_reading:band(p).label,
-    app_said:p>=0.55?'keep':'rescue-or-cut',
-    sent:false
-  };
-
-  const all=STORE.get(K_CONTRIB,[]);
-  all.unshift(rec);
-  const saved=STORE.set(K_CONTRIB,all);
-
-  if(CONFIG.contributeEndpoint){
-    say(cStatus,'Sending…','info');
-    try{
-      const r=await fetch(CONFIG.contributeEndpoint,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(rec)});
-      if(!r.ok)throw new Error('HTTP '+r.status);
-      rec.sent=true; STORE.set(K_CONTRIB,all);
-      say(cStatus,'<b>Salamat!</b> Entry sent and kept in your own list below.','ok');
-    }catch(err){
-      say(cStatus,'<b>Saved on this device,</b> but the upload failed ('+esc(err.message)+'). It stays in your list — hit <i>Send all</i> later, or export the CSV.','info');
-    }
-  }else if(saved){
-    say(cStatus,'<b>Salamat!</b> Logged on this device. Nothing was uploaded — export the CSV when you want to send it over.','ok');
-  }else{
-    say(cStatus,'<b>Couldn’t save it</b> — this browser is blocking local storage. Use <i>Copy as JSON</i> on the right to grab the entry before you leave the page.','err');
-  }
-  renderLedger();
-  _('contrib-form').reset();
-  document.querySelectorAll('#c-did input,#c-out input').forEach(i=>i.checked=false);
-  _('led-count').scrollIntoView({block:'nearest'});
-});
-
-/* ---------- the local ledger ---------- */
-function renderLedger(){
-  const all=STORE.get(K_CONTRIB,[]);
-  _('led-count').textContent=all.length;
-  _('led-count-lbl').textContent=all.length===1?'outcome logged':'outcomes logged';
-  _('led-empty').style.display=all.length?'none':'block';
-  _('led-send').style.display=(CONFIG.contributeEndpoint&&all.some(r=>!r.sent))?'':'none';
-  _('led-blurb').textContent=all.length
-    ? 'Your running list. Export it as CSV any time — it opens straight in Excel.'
-    : 'Nothing logged yet. Anything you add stays in this browser until you send it — so you can build the list over weeks and export it in one go.';
-
-  const judged=all.filter(r=>OUT_GOOD[r.outcome]||OUT_BAD[r.outcome]);
-  const ag=_('led-agree');
-  if(judged.length>=3){
-    const hits=judged.filter(r=>(r.app_said==='keep')===!!OUT_GOOD[r.outcome]).length;
-    const pct=Math.round(hits/judged.length*100);
-    ag.style.display='';
-    ag.innerHTML=`On the <b>${judged.length}</b> entries with a real outcome, the app’s call matched what happened <b>${hits}</b> times — <b>${pct}%</b>. ${pct>=70?'It’s reading your shelf well.':pct>=45?'Middling on your shelf — the gap is exactly what the dataset needs.':'It’s misreading your shelf, which is the most useful thing you can report.'}`;
-  }else ag.style.display='none';
-
-  _('led-entries').innerHTML=all.map(r=>{
-    const g=OUT_GOOD[r.outcome]?'out-good':OUT_BAD[r.outcome]?'out-bad':'';
-    const d=new Date(r.ts);
-    return `<div class="entry">
-      <div class="meta">
-        <div class="nm">${esc(r.name||'(unnamed product)')}</div>
-        <div class="dt">${d.toLocaleDateString()} · ${r.weeks_since_last}w quiet · ${r.units} sold in ${r.weeks}w · app read ${esc(r.model_reading)} ${Math.round(r.model_prob*100)}%${r.sent?' · sent':''}</div>
-        <div class="tags">
-          ${r.category?`<span class="t">${esc(r.category)}</span>`:''}
-          <span class="t did">${esc(DID_LBL[r.decision]||r.decision)}</span>
-          <span class="t ${g}">${esc(OUT_LBL[r.outcome]||r.outcome)}</span>
-        </div>
-      </div>
-      <button class="del" data-id="${r.id}" title="Remove this entry" aria-label="Remove entry">&times;</button>
-    </div>`;
-  }).join('');
-}
-
-_('led-entries').addEventListener('click',e=>{
-  const b=e.target.closest('.del');if(!b)return;
-  STORE.set(K_CONTRIB,STORE.get(K_CONTRIB,[]).filter(r=>r.id!==b.dataset.id));
-  renderLedger(); say(_('led-status'),'Entry removed.','info');
-});
-
-const CSV_COLS=['ts','name','category','weeks_since_last','weeks','units','stocked','price','cost',
-  'decision','outcome','region','store_type','model_prob','model_reading','app_said'];
-function csvCell(v){if(v==null)return'';const s=String(v);return /[",\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s;}
-_('led-csv').addEventListener('click',()=>{
-  const all=STORE.get(K_CONTRIB,[]);
-  if(!all.length){say(_('led-status'),'Nothing to export yet.','err');return;}
-  const csv=[CSV_COLS.join(',')].concat(all.map(r=>CSV_COLS.map(c=>csvCell(r[c])).join(','))).join('\n');
-  const a=document.createElement('a');
-  a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
-  a.download='shelf-temp-check-contributions.csv';
-  document.body.appendChild(a);a.click();a.remove();
-  say(_('led-status'),`Exported <b>${all.length}</b> entr${all.length===1?'y':'ies'}.`,'ok');
-});
-async function copyText(t){
-  try{await navigator.clipboard.writeText(t);return true}
-  catch(e){
-    const ta=document.createElement('textarea');ta.value=t;ta.style.position='fixed';ta.style.opacity='0';
-    document.body.appendChild(ta);ta.select();
-    let ok=false;try{ok=document.execCommand('copy')}catch(e2){}
-    ta.remove();return ok;
-  }
-}
-_('led-json').addEventListener('click',async()=>{
-  const all=STORE.get(K_CONTRIB,[]);
-  if(!all.length){say(_('led-status'),'Nothing to copy yet.','err');return;}
-  const ok=await copyText(JSON.stringify(all,null,2));
-  say(_('led-status'),ok?'Copied to your clipboard as JSON.':'Couldn’t reach the clipboard — try Export CSV instead.',ok?'ok':'err');
-});
-_('led-clear').addEventListener('click',()=>{
-  const all=STORE.get(K_CONTRIB,[]);
-  if(!all.length){say(_('led-status'),'Nothing to clear.','info');return;}
-  if(!confirm('Delete all '+all.length+' saved entries from this device? Export them first if you want a copy.'))return;
-  STORE.set(K_CONTRIB,[]);renderLedger();say(_('led-status'),'All entries deleted from this device.','info');
-});
-_('led-send').addEventListener('click',async()=>{
-  const all=STORE.get(K_CONTRIB,[]), pend=all.filter(r=>!r.sent);
-  if(!pend.length){say(_('led-status'),'Everything has been sent already.','info');return;}
-  say(_('led-status'),'Sending '+pend.length+'…','info');
-  let ok=0,fail=0;
-  for(const r of pend){
-    try{
-      const res=await fetch(CONFIG.contributeEndpoint,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(r)});
-      if(!res.ok)throw new Error('HTTP '+res.status);
-      r.sent=true;ok++;
-    }catch(e){fail++;}
-  }
-  STORE.set(K_CONTRIB,all);renderLedger();
-  say(_('led-status'),`Sent <b>${ok}</b>${fail?`, <b>${fail}</b> failed and stayed in your list`:''}.`,fail?'info':'ok');
-});
-renderLedger();
-
-/* ---------- feedback ---------- */
-const fbStatus=_('fb-status');
-function fbPayload(){
-  return{
-    id:'f_'+Date.now().toString(36)+Math.random().toString(36).slice(2,7),
-    ts:new Date().toISOString(),
-    topic:pick('fb-topic'),
-    name:_('fb-name').value.trim(),
-    email:_('fb-email').value.trim(),
-    message:_('fb-msg').value.trim(),
-    page:location.href
-  };
-}
-function fbText(p){
-  return `Topic: ${p.topic}\nName: ${p.name||'(not given)'}\nEmail: ${p.email||'(not given)'}\nWhen: ${p.ts}\n\n${p.message}`;
-}
-function fbValid(p){
-  const m=_('fb-msg');m.classList.remove('bad');
-  const e=_('fb-email');e.classList.remove('bad');
-  if(p.message.length<5){m.classList.add('bad');say(fbStatus,'Add a line or two about what happened first.','err');return false}
-  if(p.email&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(p.email)){e.classList.add('bad');say(fbStatus,'That email doesn’t look right — fix it, or leave it blank.','err');return false}
-  return true;
-}
-_('fb-form').addEventListener('submit',async e=>{
-  e.preventDefault();
-  const p=fbPayload();
-  if(!fbValid(p))return;
-  const log=STORE.get(K_FEED,[]);log.unshift(p);STORE.set(K_FEED,log);
-
-  if(CONFIG.feedbackEndpoint){
-    say(fbStatus,'Sending…','info');
-    try{
-      const r=await fetch(CONFIG.feedbackEndpoint,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(p)});
-      if(!r.ok)throw new Error('HTTP '+r.status);
-      say(fbStatus,'<b>Salamat!</b> Message sent. If you left an email we’ll get back to you.','ok');
-      _('fb-form').reset();
-    }catch(err){
-      say(fbStatus,'<b>That didn’t send</b> ('+esc(err.message)+'). Your message is saved on this device — hit <i>Copy my message</i> and send it another way.','err');
-    }
-  }else if(CONFIG.contactEmail){
-    const subj='Shelf Temp Check — '+p.topic;
-    location.href='mailto:'+encodeURIComponent(CONFIG.contactEmail)+'?subject='+encodeURIComponent(subj)+'&body='+encodeURIComponent(fbText(p));
-    say(fbStatus,'Your email app should be opening with the message ready. Nothing is sent until you hit send there.','ok');
-  }else{
-    const ok=await copyText(fbText(p));
-    say(fbStatus,ok
-      ? '<b>Saved on this device and copied to your clipboard.</b> No inbox is wired up to this page yet, so paste it wherever you’d like it to land.'
-      : '<b>Saved on this device.</b> No inbox is wired up to this page yet — use <i>Copy my message</i> to take it with you.','info');
-  }
-});
-_('fb-copy').addEventListener('click',async()=>{
-  const p=fbPayload();
-  if(!p.message){say(fbStatus,'Write the message first, then copy it.','err');return}
-  const ok=await copyText(fbText(p));
-  say(fbStatus,ok?'Copied to your clipboard.':'Couldn’t reach the clipboard — select the text and copy it manually.',ok?'ok':'err');
-});
-
-</script>
+<script src="assets/model.js"></script>
 </body></html>
