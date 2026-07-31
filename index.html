@@ -1,600 +1,502 @@
 <!doctype html>
 <html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Shelf Temperature Check</title>
+<title>Shelf Temp Check — keep your shelf healthy</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>&#127978;</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700;12..96,800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
 <style>
-/* ============================================================
-   Palette drawn from the produce-stack photo + Filipino grocery:
-   CD222B red - EEC59E peach - E8A10C amber
-   354D0C deep green - 73A753 sage - E4D57C pale yellow
-   Deep green carries structure/text; red + amber stay as accents
-   so status colours (good/warn/bad) never fight the brand colours.
-   ============================================================ */
+.grain{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;opacity:.045;mix-blend-mode:multiply;z-index:60}
+.hero-art{position:relative;z-index:1}
+.shelf-scene{width:100%;height:auto;display:block;overflow:visible}
+.brand .mark svg,.sitefoot .mark svg{width:19px;height:19px;display:block}
+.cost .ic-cost{width:48px;height:48px;margin-bottom:6px}
+.cost .ic-cost svg{width:48px;height:48px;display:block}
+:root{--paper:#eef4e6;}
 :root{
-  --c-red:#cd222b; --c-peach:#eec59e; --c-amber:#e8a10c;
-  --c-green:#354d0c; --c-sage:#73a753; --c-yellow:#e4d57c;
-  --crate:#c98f52; --crate-d:#8a5c30; --stall:#fbf4e4; --jar:#eef4e6;
-
-  --bg:#fdf8ec; --panel:#fffdf8; --soft:#f6f0df; --ink:#22300f;
-  --line:#ddd3b6; --muted:#6b7355;
-  --brand:#3d5a12; --brand-s:#e7eddb; --brand2:#b9770a;
-  --good:#3a721f; --good-s:#e6efdc; --good-b:#bcd6a6;
-  --warm:#8f6108; --warm-s:#faf0d5; --warm-b:#e8cf88;
-  --bad:#b62a24;  --bad-s:#f9e3e0;  --bad-b:#eab6ae;
-  --shadow:0 1px 2px rgba(34,48,15,.07);
-  color-scheme:light;
+  --paper:#eef4e6; --card:#fbfcf6; --ink:#123626; --ink-soft:#4a6154;
+  --leaf:#3e9b4f; --leaf-deep:#1c6236; --sprout:#8ec63f;
+  --honey:#e7a52b; --honey-soft:#faf0d6; --tomato:#cb4b2e; --tomato-soft:#f6e3dd; --line:#d6e1c9;
 }
-/* Dark mode: deep-green night palette. Accents are lightened so every
-   pairing clears WCAG AA against the dark panels. */
-:root[data-theme="dark"]{
-  --c-red:#e4695c; --c-peach:#c9a583; --c-amber:#e0a83f;
-  --c-green:#4e6f1c; --c-sage:#7fae5c; --c-yellow:#d6c877;
-  --crate:#9c6f3f; --crate-d:#6d4826; --stall:#232a17; --jar:#2c3520;
-
-  --bg:#141a0c; --panel:#1e2513; --soft:#252d18; --ink:#eef1e0;
-  --line:#414a2c; --muted:#b3bd96;
-  --brand:#a9d178; --brand-s:#2b3a17; --brand2:#e0a83f;
-  --good:#8ecb6a; --good-s:#24331a; --good-b:#3d5a26;
-  --warm:#e2b558; --warm-s:#352c14; --warm-b:#5a4922;
-  --bad:#f0897b;  --bad-s:#3a211d;  --bad-b:#5e332c;
-  --shadow:0 1px 3px rgba(0,0,0,.45);
-  color-scheme:dark;
-}
-@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){
-  --c-red:#e4695c; --c-peach:#c9a583; --c-amber:#e0a83f;
-  --c-green:#4e6f1c; --c-sage:#7fae5c; --c-yellow:#d6c877;
-  --crate:#9c6f3f; --crate-d:#6d4826; --stall:#232a17; --jar:#2c3520;
-
-  --bg:#141a0c; --panel:#1e2513; --soft:#252d18; --ink:#eef1e0;
-  --line:#414a2c; --muted:#b3bd96;
-  --brand:#a9d178; --brand-s:#2b3a17; --brand2:#e0a83f;
-  --good:#8ecb6a; --good-s:#24331a; --good-b:#3d5a26;
-  --warm:#e2b558; --warm-s:#352c14; --warm-b:#5a4922;
-  --bad:#f0897b;  --bad-s:#3a211d;  --bad-b:#5e332c;
-  --shadow:0 1px 3px rgba(0,0,0,.45);
-  color-scheme:dark;
-}}
 *{box-sizing:border-box}
-html{background:var(--bg)}
-body{margin:0;background:var(--bg);color:var(--ink);font-family:"Inter",system-ui,sans-serif;
-  padding:0 clamp(14px,3.5vw,34px) clamp(14px,3.5vw,34px);transition:background .2s,color .2s}
-.awning{height:10px;background:repeating-linear-gradient(90deg,
-  var(--c-red) 0 26px,var(--c-yellow) 26px 52px,var(--c-sage) 52px 78px,var(--c-amber) 78px 104px);
-  margin:0 calc(-1 * clamp(14px,3.5vw,34px))}
-.banderitas{display:block;width:100%;height:30px;margin-bottom:4px}
-.wrap{max-width:960px;margin:0 auto}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:"DM Sans",system-ui,sans-serif;font-size:17px;line-height:1.55;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1080px;margin:0 auto;padding:0 24px}
+h1,h2,h3{font-family:"Bricolage Grotesque",sans-serif;font-weight:700;letter-spacing:-.02em;line-height:1.04;margin:0}
+.eyebrow{font-family:"IBM Plex Mono",monospace;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--leaf-deep);margin:0 0 14px}
+.accent{color:var(--leaf)}
+a{color:inherit}
+.leaf{width:20px;height:20px;display:inline-block;vertical-align:middle}
+.btn{display:inline-block;font-family:"Bricolage Grotesque";font-weight:600;font-size:16px;text-decoration:none;padding:14px 26px;border-radius:100px;transition:transform .15s,box-shadow .15s;cursor:pointer;border:none}
+.btn-leaf{background:var(--leaf);color:#fff;box-shadow:0 6px 0 var(--leaf-deep)}
+.btn-leaf:hover{transform:translateY(-2px);box-shadow:0 8px 0 var(--leaf-deep)}
+.btn-ghost{border:2px solid var(--ink);color:var(--ink);padding:12px 24px;background:transparent}
+.btn-ghost:hover{background:var(--ink);color:var(--paper)}
+:focus-visible{outline:3px solid var(--honey);outline-offset:3px}
 
-/* --- floating controls: language + theme --- */
-.controls{position:fixed;top:18px;right:16px;display:flex;gap:8px;align-items:center;z-index:20}
-.langswitch{display:flex;background:var(--panel);border:1px solid var(--line);border-radius:20px;
-  padding:2px;box-shadow:var(--shadow)}
-.langswitch button{font-family:"Archivo";font-weight:700;font-size:11.5px;letter-spacing:.04em;
-  cursor:pointer;background:transparent;border:none;border-radius:16px;padding:6px 11px;color:var(--muted)}
-.langswitch button.on{background:var(--brand);color:var(--panel)}
-.langswitch button:focus-visible,.theme-toggle:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
-.theme-toggle{width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:var(--panel);
-  color:var(--ink);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;
-  box-shadow:var(--shadow)}
-.theme-toggle:hover,.langswitch button:hover{border-color:var(--brand)}
+/* dark Frutin-style nav */
+.navbar{background:var(--ink)}
+.navbar nav{display:flex;align-items:center;justify-content:space-between;padding:16px 0}
+.brand{display:flex;align-items:center;gap:10px;font-family:"Bricolage Grotesque";font-weight:800;font-size:19px;color:#fff}
+.brand .mark{width:30px;height:30px;border-radius:9px;background:var(--sprout);display:grid;place-items:center;color:var(--ink);font-size:15px}
+.navlinks{display:flex;gap:26px;align-items:center;font-size:15px;font-weight:500}
+.navlinks a{text-decoration:none;color:#cfe0cd}
+.navlinks a:hover{color:#fff}
+.navlinks .btn{color:var(--ink);box-shadow:0 4px 0 #6ba32c}
+@media(max-width:760px){.navlinks a:not(.btn){display:none}}
 
-/* --- header --- */
-.hero-art{display:block;width:100%;max-width:760px;height:auto;margin:2px auto 10px}
-h1{font-family:"Archivo";font-weight:800;font-size:clamp(26px,5vw,40px);letter-spacing:-.02em;margin:0;line-height:1}
-.eyebrow{display:inline-flex;align-items:center;gap:6px;font-family:"IBM Plex Mono";font-size:11px;
-  letter-spacing:.14em;text-transform:uppercase;color:var(--brand);margin:0 0 10px;background:var(--brand-s);
-  border:1px dashed var(--brand);border-radius:20px;padding:4px 12px 4px 10px}
-.lead{color:var(--muted);margin:10px 0 0;font-size:14.5px;max-width:66ch}
-header{border-bottom:1px solid var(--line);padding-bottom:20px;margin:0 0 20px}
-.ico{width:20px;height:20px;vertical-align:-4px;margin-right:7px;flex:none}
+.hero{display:grid;grid-template-columns:1.08fr .92fr;gap:48px;align-items:center;padding:56px 0 76px;position:relative}
+@media(max-width:860px){.hero{grid-template-columns:1fr;gap:36px}}
+.hero h1{font-size:clamp(40px,6.6vw,70px)}
+.hero .lead{font-size:19px;color:var(--ink-soft);max-width:44ch;margin:22px 0 30px}
+.hero .cta{display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+.hero .trust{margin-top:22px;font-size:13.5px;color:var(--ink-soft);font-family:"IBM Plex Mono"}
+.hero .leaf{position:absolute;color:var(--sprout);opacity:.5}
+.blob{position:absolute;z-index:0;opacity:.5;pointer-events:none}
 
-/* --- tabs --- */
-.tabs{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:22px}
-.tabs button{font-family:"Archivo";font-weight:600;font-size:13.5px;cursor:pointer;background:transparent;
-  border:1px solid transparent;border-radius:9px;padding:9px 14px;color:var(--muted)}
-.tabs button:hover{color:var(--ink);background:var(--soft)}
-.tabs button.on{background:var(--brand);color:var(--panel);box-shadow:var(--shadow)}
-.tabs button:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
-.tab{display:none}.tab.on{display:block;animation:fade .25s ease}
-@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.healthcard{background:var(--card);border:1px solid var(--line);border-radius:26px;padding:26px;box-shadow:0 30px 70px -34px rgba(18,54,38,.5);position:relative;z-index:1}
+.healthcard .tag{font-family:"IBM Plex Mono";font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft)}
+.healthcard .pname{font-family:"Bricolage Grotesque";font-weight:700;font-size:22px;margin:2px 0 18px}
+.meter{height:16px;border-radius:100px;background:linear-gradient(90deg,var(--tomato),var(--honey),var(--leaf));position:relative;margin:8px 0 6px}
+.meter .pin{position:absolute;top:-7px;width:30px;height:30px;border-radius:50%;background:#fff;border:4px solid var(--leaf-deep);transform:translateX(-50%);box-shadow:0 4px 10px rgba(0,0,0,.15)}
+.meter-scale{display:flex;justify-content:space-between;font-family:"IBM Plex Mono";font-size:10.5px;color:var(--ink-soft);margin-bottom:20px}
+.pill{display:inline-flex;align-items:center;gap:8px;font-family:"Bricolage Grotesque";font-weight:700;font-size:15px;padding:8px 15px;border-radius:100px}
+.pill.warn{background:var(--honey-soft);color:#9c6b12}
+.rescue-row{margin-top:18px;padding-top:18px;border-top:1px dashed var(--line);display:flex;gap:12px;align-items:flex-start}
+.rescue-row .ic{width:34px;height:34px;border-radius:10px;background:#eaf5e7;display:grid;place-items:center;flex:none;font-size:17px}
+.rescue-row b{font-family:"Bricolage Grotesque"}
+.rescue-row .d{font-size:14px;color:var(--ink-soft)}
 
-.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px;box-shadow:var(--shadow)}
-/* sari-sari awning stripe across the top edge of a card (top edge only) */
-.card.striped{position:relative;overflow:hidden;padding-top:24px}
-.card.striped::before{content:"";position:absolute;top:0;left:0;right:0;height:5px;
-  background:repeating-linear-gradient(90deg,var(--c-red) 0 18px,var(--c-yellow) 18px 36px,
-    var(--c-sage) 36px 54px,var(--c-amber) 54px 72px)}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
-@media(max-width:720px){.grid2{grid-template-columns:1fr}}
-h2{font-family:"Archivo";font-weight:700;font-size:15px;letter-spacing:.02em;margin:0 0 4px;display:flex;align-items:center}
-.sub{color:var(--muted);font-size:13px;margin:0 0 16px}
-.field{margin:16px 0}
-.field .top{display:flex;justify-content:space-between;align-items:baseline}
-.field label{font-weight:600;font-size:13.5px}
-.field .hint{font-size:11.5px;color:var(--muted)}
-.field .val{font-family:"Archivo";font-weight:700;font-size:20px}
-input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:6px;border-radius:4px;
-  background:var(--line);margin-top:10px;cursor:pointer}
-input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;
-  background:var(--brand);border:3px solid var(--panel);box-shadow:0 1px 4px rgba(0,0,0,.3)}
-input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:var(--brand);
-  border:3px solid var(--panel)}
-input[type=number],input[type=text]{font-family:"Inter";font-size:14px;padding:8px 10px;border:1px solid var(--line);
-  border-radius:8px;background:var(--soft);color:var(--ink)}
-input:focus-visible,select:focus-visible{outline:2px solid var(--brand);outline-offset:1px}
-.temp-wrap{display:flex;gap:22px;align-items:center}
-.verdict{font-family:"Archivo";font-weight:800;font-size:clamp(28px,6vw,42px);line-height:1;margin:0}
-.verdict small{display:block;font-size:11.5px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;
-  color:var(--muted);margin-bottom:4px}
-.pbig{font-family:"Archivo";font-weight:700;font-size:22px;margin:10px 0 0}
-.chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
-.chip{font-size:12px;background:var(--soft);border:1px solid var(--line);border-radius:20px;padding:5px 11px}
-.chip b{font-family:"Archivo"}
-.why{margin-top:16px;border-top:1px solid var(--line);padding-top:14px}
-.why h3{font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:0 0 8px;font-family:"Archivo"}
-.why li{font-size:13px;margin:5px 0;list-style:none;padding-left:16px;position:relative}
-.why li::before{content:"\203A";position:absolute;left:0;color:var(--brand);font-weight:700}
-.why ul{margin:0;padding:0}
-.badge{display:inline-block;font-family:"IBM Plex Mono";font-size:11.5px;padding:2px 8px;border-radius:20px}
-.b-good{background:var(--good-s);color:var(--good)}
-.b-warm{background:var(--warm-s);color:var(--warm)}
-.b-bad{background:var(--bad-s);color:var(--bad)}
-select{font-family:"Inter";font-size:14px;padding:9px 11px;border:1px solid var(--line);border-radius:8px;
-  background:var(--soft);color:var(--ink)}
-/* batch rows */
-.srow-head,.srow{display:grid;grid-template-columns:1.4fr 1.2fr .8fr .8fr .8fr 1.1fr 30px;gap:8px;
-  align-items:center;min-width:720px}
-.srow-head{font-family:"Archivo";font-size:11px;letter-spacing:.03em;text-transform:uppercase;color:var(--muted);
-  margin-bottom:6px}
-.srow{margin:6px 0}
-.srow input{width:100%}
-.srow .rowcat{width:100%;font-size:12.5px;padding:7px 5px}
-.srow .res{font-size:12px;text-align:center}
-.xbtn{background:transparent;border:none;color:var(--muted);cursor:pointer;font-size:16px;border-radius:6px}
-.xbtn:hover{color:var(--bad)}
-.xbtn:focus-visible{outline:2px solid var(--brand)}
-.hscroll{overflow-x:auto}
-.addbtn{margin-top:12px;font-family:"Archivo";font-weight:600;font-size:13px;cursor:pointer;background:var(--soft);
-  border:1px solid var(--line);border-radius:8px;padding:8px 14px;color:var(--ink)}
-.addbtn:hover{border-color:var(--brand)}
-.addbtn:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
-.summary{margin-top:16px;padding:12px 16px;border-radius:10px;background:var(--soft);border:1px solid var(--line);font-size:14px}
-/* promo */
-.pair{display:flex;align-items:center;gap:12px;padding:12px 0;border-top:1px solid var(--line)}
-.pair:first-child{border-top:none}
-.pair .pn{font-family:"Archivo";font-weight:700;font-size:15px;min-width:150px}
-.pair .track{flex:1;background:var(--soft);border-radius:5px;height:14px;overflow:hidden;border:1px solid var(--line)}
-.pair .track i{display:block;height:100%;background:var(--brand)}
-.pair .pv{font-family:"IBM Plex Mono";font-size:12px;color:var(--muted);min-width:120px;text-align:right}
-.rec{margin-top:16px;background:var(--good-s);border:1px solid var(--good-b);border-radius:12px;padding:14px 16px;font-size:14px}
-.rec b{color:var(--good)}
-.note{margin-top:14px;font-size:12px;color:var(--muted)}
-.rp{border-radius:12px;padding:16px 18px;border:1px solid var(--line)}
-.rp-h{font-family:"Archivo";font-weight:800;font-size:18px;margin-bottom:6px}
-.rp.discount,.rp.bundle{background:var(--good-s);border-color:var(--good-b)}
-.rp.discount .rp-h,.rp.bundle .rp-h{color:var(--good)}
-.rp.keep{background:var(--soft)}
-.rp.retire{background:var(--bad-s);border-color:var(--bad-b)}.rp.retire .rp-h{color:var(--bad)}
-.rp p{margin:0;font-size:14px}
-.rp2{background:var(--soft);border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin-top:8px;font-size:13.5px}
-.warn{margin-top:14px;background:var(--warm-s);border:1px solid var(--warm-b);border-radius:10px;padding:12px 14px;font-size:13.5px}
-.rescue-label{font-family:"Archivo";font-weight:700;font-size:12px;letter-spacing:.06em;text-transform:uppercase;
-  color:var(--brand);margin-bottom:8px}
-footer{margin-top:24px;padding-top:16px;border-top:1px solid var(--line);font-size:12px;color:var(--muted);max-width:72ch}
-footer b{color:var(--ink)}
-@media(max-width:560px){
-  .controls{top:14px;right:10px}
-  .temp-wrap{gap:14px}
-}
-@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
-</style>
-</head>
+section{padding:76px 0;position:relative}
+.sec-head{max-width:62ch;margin-bottom:44px}
+.sec-head.center{margin:0 auto 46px;text-align:center}
+.sec-head h2{font-size:clamp(30px,4.6vw,46px)}
+.sec-head p{color:var(--ink-soft);font-size:18px;margin:16px 0 0}
+
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+@media(max-width:820px){.grid3{grid-template-columns:1fr}}
+.cost{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:28px}
+.cost .n{font-family:"Bricolage Grotesque";font-weight:800;font-size:34px;color:var(--tomato);line-height:1}
+.cost h3{font-size:20px;margin:14px 0 8px}
+.cost p{color:var(--ink-soft);font-size:15px;margin:0}
+
+.dark{background:var(--ink);border-radius:36px;padding:66px 0;overflow:hidden}
+.dark .eyebrow{color:var(--sprout)}
+.dark h2{color:#f4faf0;font-size:clamp(30px,4.6vw,46px)}
+.dark .sub{color:#b6ccbd;max-width:56ch;margin:16px 0 44px;font-size:18px}
+.plays{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+@media(max-width:820px){.plays{grid-template-columns:1fr}}
+.play{background:#194831;border:1px solid #2b6144;border-radius:20px;padding:26px}
+.play .k{font-family:"IBM Plex Mono";font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--sprout)}
+.play h3{color:#f4faf0;font-size:22px;margin:8px 0 10px}
+.play p{color:#b6ccbd;font-size:14.5px;margin:0}
+.play.retire .k{color:var(--honey)}
+
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+@media(max-width:820px){.steps{grid-template-columns:1fr}}
+.step .b{width:44px;height:44px;border-radius:14px;background:var(--sprout);color:var(--ink);display:grid;place-items:center;font-family:"Bricolage Grotesque";font-weight:800;font-size:20px;margin-bottom:16px}
+.step h3{font-size:20px;margin:0 0 8px}
+.step p{color:var(--ink-soft);font-size:15px;margin:0}
+
+.uvp{background:var(--honey-soft);border:1px solid #ecd9a6;border-radius:28px;padding:52px;display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center}
+@media(max-width:820px){.uvp{grid-template-columns:1fr;padding:34px}}
+.uvp .eyebrow{color:#9c6b12}
+.uvp h2{font-size:clamp(28px,4vw,40px)}
+.uvp p{color:#6b5a2e;margin:16px 0 0;font-size:17px}
+.uvp .demo{background:#fff;border:1px solid #ecd9a6;border-radius:18px;padding:22px}
+.uvp .demo .warnbox{background:var(--tomato-soft);border:1px solid #e6bfb3;border-radius:12px;padding:14px 16px;font-size:14.5px;color:#7a3320}
+.uvp .demo .warnbox b{color:var(--tomato)}
+
+/* model story */
+.story{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;counter-reset:st}
+@media(max-width:900px){.story{grid-template-columns:1fr 1fr}}
+@media(max-width:560px){.story{grid-template-columns:1fr}}
+.stepcard{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:22px}
+.stepcard .num{font-family:"IBM Plex Mono";font-size:13px;color:var(--leaf)}
+.stepcard h3{font-size:17px;margin:10px 0 8px}
+.stepcard p{color:var(--ink-soft);font-size:14px;margin:0}
+.discovered{margin-top:24px;background:#e6efdb;border:1px dashed var(--line);border-radius:16px;padding:20px 24px;font-size:15.5px;color:var(--ink-soft)}
+.discovered b{color:var(--ink)}
+
+/* stats band */
+.stats{background:var(--leaf-deep);border-radius:32px;padding:44px 0;color:#fff}
+.stats .row{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;text-align:center}
+@media(max-width:720px){.stats .row{grid-template-columns:1fr 1fr;gap:28px}}
+.stats .big{font-family:"Bricolage Grotesque";font-weight:800;font-size:40px;line-height:1;color:var(--sprout)}
+.stats .lbl{font-size:13.5px;color:#cfe0cd;margin-top:6px}
+
+/* embedded app */
+#try{scroll-margin-top:12px}
+#app{background:var(--card);border:1px solid var(--line);border-radius:26px;padding:28px;box-shadow:0 30px 70px -40px rgba(18,54,38,.4);
+  --panel:#fff; --soft:#eef4e6; --ink:#123626; --line:#d6e1c9; --muted:#4a6154; --brand:#1c6236;
+  --good:#3e9b4f; --good-s:#e7f2e3; --warm:#c98a1f; --warm-s:#faf0d6; --bad:#cb4b2e; --bad-s:#f6e3dd;}
+#app .tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:22px}
+#app .tabs button{font-family:"Bricolage Grotesque";font-weight:600;font-size:14px;cursor:pointer;background:transparent;border:1px solid transparent;border-radius:100px;padding:10px 18px;color:var(--muted)}
+#app .tabs button:hover{background:var(--soft);color:var(--ink)}
+#app .tabs button.on{background:var(--leaf-deep);color:#fff}
+#app .tab{display:none}#app .tab.on{display:block}
+#app .card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:22px}
+#app .grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+@media(max-width:760px){#app .grid2{grid-template-columns:1fr}}
+#app h2{font-family:"Bricolage Grotesque";font-size:18px;margin:0 0 4px;color:var(--ink)}
+#app .sub{color:var(--muted);font-size:13px;margin:0 0 16px}
+#app .field{margin:15px 0}
+#app .field .top{display:flex;justify-content:space-between;align-items:baseline}
+#app label{font-weight:600;font-size:13.5px;color:var(--ink);font-family:"DM Sans"}
+#app .hint{font-size:11.5px;color:var(--muted)}
+#app .val{font-family:"Bricolage Grotesque";font-weight:700;font-size:20px;color:var(--ink)}
+#app input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:6px;border-radius:4px;background:#cfe0c4;margin-top:10px;cursor:pointer}
+#app input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--leaf-deep);border:3px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.25)}
+#app input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:var(--leaf-deep);border:3px solid #fff}
+#app input[type=number],#app select{font-family:"DM Sans";font-size:14px;padding:9px 11px;border:1px solid var(--line);border-radius:10px;background:var(--soft);color:var(--ink)}
+#app .temp-wrap{display:flex;gap:20px;align-items:center}
+#app .verdict{font-family:"Bricolage Grotesque";font-weight:800;font-size:clamp(26px,6vw,40px);line-height:1;margin:0;color:var(--ink)}
+#app .verdict small{display:block;font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:4px;font-family:"IBM Plex Mono"}
+#app .pbig{font-family:"Bricolage Grotesque";font-weight:700;font-size:20px;margin:10px 0 0;color:var(--ink)}
+#app .chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+#app .chip{font-size:12px;background:var(--soft);border:1px solid var(--line);border-radius:100px;padding:5px 12px;color:var(--ink)}
+#app .chip b{font-family:"Bricolage Grotesque"}
+#app .why{margin-top:16px;border-top:1px solid var(--line);padding-top:14px}
+#app .why h3{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:0 0 8px;font-family:"IBM Plex Mono"}
+#app .why li{font-size:13px;color:var(--ink);margin:5px 0;list-style:none;padding-left:16px;position:relative}
+#app .why li::before{content:"›";position:absolute;left:0;color:var(--leaf);font-weight:700}
+#app .why ul{margin:0;padding:0}
+#app .badge{display:inline-block;font-family:"IBM Plex Mono";font-size:11.5px;padding:2px 9px;border-radius:100px}
+#app .b-good{background:var(--good-s);color:var(--brand)}#app .b-warm{background:var(--warm-s);color:#9c6b12}#app .b-bad{background:var(--bad-s);color:var(--bad)}
+#app .rp{border-radius:14px;padding:16px 18px;border:1px solid var(--line);margin-top:2px}
+#app .rp-h{font-family:"Bricolage Grotesque";font-weight:800;font-size:18px;margin-bottom:6px}
+#app .rp p{margin:0;font-size:14px;color:var(--ink)}
+#app .rp.discount,#app .rp.bundle{background:var(--good-s);border-color:#bfe0cf}
+#app .rp.discount .rp-h,#app .rp.bundle .rp-h{color:var(--brand)}
+#app .rp.keep{background:var(--soft)}
+#app .rp.retire{background:var(--bad-s);border-color:#e6c3b8}#app .rp.retire .rp-h{color:var(--bad)}
+#app .rp2{background:var(--soft);border:1px solid var(--line);border-radius:12px;padding:10px 14px;margin-top:8px;font-size:13.5px;color:var(--ink)}
+#app .warn{margin-top:14px;background:var(--warm-s);border:1px solid #e6d2a0;border-radius:12px;padding:12px 14px;font-size:13.5px;color:#6b5a2e}
+#app .warn b{color:#7a3320}
+#app .note{margin-top:12px;font-size:12.5px;color:var(--muted)}
+#app .hscroll{overflow-x:auto}
+#app .srow-head,#app .srow{display:grid;grid-template-columns:1.4fr 1.2fr .8fr .8fr .8fr 1.1fr 30px;gap:8px;align-items:center;min-width:720px}
+#app .srow-head{font-family:"IBM Plex Mono";font-size:10.5px;letter-spacing:.03em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+#app .srow{margin:6px 0}
+#app .srow input,#app .srow .rowcat{width:100%}
+#app .srow .rowcat{font-size:12.5px;padding:7px 6px}
+#app .srow .res{font-size:12px;text-align:center}
+#app .xbtn{background:transparent;border:none;color:var(--muted);cursor:pointer;font-size:16px}
+#app .xbtn:hover{color:var(--bad)}
+#app .addbtn{margin-top:12px;font-family:"Bricolage Grotesque";font-weight:600;font-size:13px;cursor:pointer;background:var(--soft);border:1px solid var(--line);border-radius:100px;padding:9px 16px;color:var(--ink)}
+#app .summary{margin-top:16px;padding:12px 16px;border-radius:12px;background:var(--soft);border:1px solid var(--line);font-size:14px;color:var(--ink)}
+#app .mode-toggle{display:inline-flex;background:var(--soft);border:1px solid var(--line);border-radius:100px;padding:4px;margin-bottom:16px;gap:4px}
+#app .mode-toggle button{border:none;background:transparent;font-family:"Bricolage Grotesque";font-weight:600;font-size:13px;padding:8px 16px;border-radius:100px;cursor:pointer;color:var(--muted)}
+#app .mode-toggle button.on{background:#fff;color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+#app #upload-panel{margin-bottom:18px;background:var(--soft);border:1px solid var(--line);border-radius:14px;padding:18px}
+#app #upload-panel p{font-size:13.5px;color:var(--muted);margin:0 0 12px}
+#app .dropzone{display:block;border:2px dashed var(--line);border-radius:14px;padding:24px;text-align:center;color:var(--muted);cursor:pointer;margin-top:12px;font-size:14px;background:var(--panel)}
+#app .dropzone.drag{border-color:var(--leaf);background:var(--good-s);color:var(--brand)}
+#app #upload-msg{margin-top:12px;font-size:13px}
+#app .upl-ok{color:var(--brand)}
+#app .upl-warn{color:#7a3320;background:var(--warm-s);border:1px solid #e6d2a0;border-radius:10px;padding:10px 12px}
+#app footer{display:none}
+
+.cta-band{text-align:center;padding:86px 0}
+.cta-band h2{font-size:clamp(32px,5vw,54px);max-width:16ch;margin:0 auto 12px}
+.cta-band p{color:var(--ink-soft);margin:0 auto 28px;max-width:46ch}
+
+.sitefoot{background:var(--ink);color:#cfe0cd;padding:44px 0;margin-top:20px}
+.sitefoot .wrap{display:flex;justify-content:space-between;gap:24px;flex-wrap:wrap;font-size:13.5px}
+.sitefoot .brand{color:#fff;margin-bottom:8px}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto}}
+</style></head>
 <body>
-<div class="awning" aria-hidden="true"></div>
+<svg class="grain" aria-hidden="true"><filter id="grainf"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter><rect width="100%" height="100%" filter="url(#grainf)"/></svg>
 
-<div class="controls">
-  <div class="langswitch" role="group" aria-label="Language / Wika">
-    <button id="langEn" class="on" type="button" lang="en">EN</button>
-    <button id="langFil" type="button" lang="fil">FIL</button>
+<div class="navbar"><div class="wrap"><nav>
+  <div class="brand"><span class="mark"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 3.5C11 3 3.5 8.5 3.2 17.8c0 .7.5 1.2 1.2 1.1C13 18.2 20.5 12.5 20.5 3.5Z" fill="var(--ink)"/><path d="M6 17C9.5 12 13.5 8.5 18 6.2" stroke="#fff" stroke-width="1.3" fill="none" opacity=".55" stroke-linecap="round"/></svg></span> Shelf Temp Check</div>
+  <div class="navlinks">
+    <a href="#cost">The problem</a>
+    <a href="#how">How it works</a>
+    <a href="#method">The method</a>
+    <a href="#try" class="btn btn-leaf" style="padding:11px 20px;font-size:15px">Check a product</a>
   </div>
-  <button class="theme-toggle" id="themeToggle" type="button"
-    aria-label="Switch between light and dark theme" title="Switch theme">&#127769;</button>
-</div>
+</nav></div></div>
 
 <div class="wrap">
-<svg class="banderitas" viewBox="0 0 960 30" preserveAspectRatio="none" aria-hidden="true"><line x1="0" y1="3" x2="960" y2="3" stroke="var(--line)" stroke-width="2"/><polygon points="0,3 40,3 20,27" fill="var(--c-red)"/><polygon points="40,3 80,3 60,27" fill="var(--c-amber)"/><polygon points="80,3 120,3 100,27" fill="var(--c-sage)"/><polygon points="120,3 160,3 140,27" fill="var(--c-yellow)"/><polygon points="160,3 200,3 180,27" fill="var(--c-green)"/><polygon points="200,3 240,3 220,27" fill="var(--c-peach)"/><polygon points="240,3 280,3 260,27" fill="var(--c-red)"/><polygon points="280,3 320,3 300,27" fill="var(--c-amber)"/><polygon points="320,3 360,3 340,27" fill="var(--c-sage)"/><polygon points="360,3 400,3 380,27" fill="var(--c-yellow)"/><polygon points="400,3 440,3 420,27" fill="var(--c-green)"/><polygon points="440,3 480,3 460,27" fill="var(--c-peach)"/><polygon points="480,3 520,3 500,27" fill="var(--c-red)"/><polygon points="520,3 560,3 540,27" fill="var(--c-amber)"/><polygon points="560,3 600,3 580,27" fill="var(--c-sage)"/><polygon points="600,3 640,3 620,27" fill="var(--c-yellow)"/><polygon points="640,3 680,3 660,27" fill="var(--c-green)"/><polygon points="680,3 720,3 700,27" fill="var(--c-peach)"/><polygon points="720,3 760,3 740,27" fill="var(--c-red)"/><polygon points="760,3 800,3 780,27" fill="var(--c-amber)"/><polygon points="800,3 840,3 820,27" fill="var(--c-sage)"/><polygon points="840,3 880,3 860,27" fill="var(--c-yellow)"/><polygon points="880,3 920,3 900,27" fill="var(--c-green)"/><polygon points="920,3 960,3 940,27" fill="var(--c-peach)"/></svg>
-<header>
-<svg class="hero-art" viewBox="0 0 960 172" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
-<rect x="0" y="158" width="960" height="3" rx="1.5" fill="var(--line)"/>
-<rect x="28" y="108" width="96" height="50" rx="5" fill="var(--crate)"/><rect x="32" y="149" width="88" height="4" rx="2" fill="var(--crate-d)"/>
-<rect x="132" y="122" width="84" height="36" rx="5" fill="var(--crate)"/><rect x="136" y="149" width="76" height="4" rx="2" fill="var(--crate-d)"/>
-<circle cx="52" cy="102" r="15" fill="var(--c-sage)"/>
-<circle cx="52" cy="96" r="10" fill="var(--c-green)" opacity=".55"/>
-<circle cx="76" cy="102" r="15" fill="var(--c-sage)"/>
-<circle cx="76" cy="96" r="10" fill="var(--c-green)" opacity=".55"/>
-<circle cx="100" cy="102" r="15" fill="var(--c-sage)"/>
-<circle cx="100" cy="96" r="10" fill="var(--c-green)" opacity=".55"/>
-<circle cx="152" cy="115" r="11" fill="var(--c-red)"/>
-<rect x="151" y="101" width="3" height="7" rx="1.5" fill="var(--c-green)"/>
-<circle cx="174" cy="115" r="11" fill="var(--c-amber)"/>
-<rect x="173" y="101" width="3" height="7" rx="1.5" fill="var(--c-green)"/>
-<circle cx="196" cy="115" r="11" fill="var(--c-red)"/>
-<rect x="195" y="101" width="3" height="7" rx="1.5" fill="var(--c-green)"/>
-<path d="M232 92 q26 6 30 34 q-16 -14 -34 -18 z" fill="var(--c-yellow)"/>
-<path d="M244 90 q26 8 28 36 q-16 -16 -34 -20 z" fill="var(--c-amber)" opacity=".85"/>
-<rect x="392" y="6" width="196" height="30" rx="6" fill="var(--c-amber)"/>
-<rect x="392" y="6" width="196" height="30" rx="6" fill="none" stroke="var(--crate-d)" stroke-width="2"/>
-<text x="490" y="27" text-anchor="middle" font-family="Archivo,sans-serif" font-weight="800" font-size="16" letter-spacing="1.5" fill="#3a2a08">SARI-SARI</text>
-<rect x="316" y="44" width="28" height="30" fill="var(--c-red)"/>
-<rect x="344" y="44" width="28" height="30" fill="var(--c-yellow)"/>
-<rect x="372" y="44" width="28" height="30" fill="var(--c-red)"/>
-<rect x="400" y="44" width="28" height="30" fill="var(--c-yellow)"/>
-<rect x="428" y="44" width="28" height="30" fill="var(--c-red)"/>
-<rect x="456" y="44" width="28" height="30" fill="var(--c-yellow)"/>
-<rect x="484" y="44" width="28" height="30" fill="var(--c-red)"/>
-<rect x="512" y="44" width="28" height="30" fill="var(--c-yellow)"/>
-<rect x="540" y="44" width="28" height="30" fill="var(--c-red)"/>
-<rect x="568" y="44" width="28" height="30" fill="var(--c-yellow)"/>
-<rect x="596" y="44" width="28" height="30" fill="var(--c-red)"/>
-<rect x="624" y="44" width="28" height="30" fill="var(--c-yellow)"/>
-<rect x="316" y="44" width="336" height="30" fill="none" stroke="var(--crate-d)" stroke-width="2"/>
-<path d="M316 74 q14 16 28 0 M344 74 q14 16 28 0 M372 74 q14 16 28 0 M400 74 q14 16 28 0 M428 74 q14 16 28 0 M456 74 q14 16 28 0 M484 74 q14 16 28 0 M512 74 q14 16 28 0 M540 74 q14 16 28 0 M568 74 q14 16 28 0 M596 74 q14 16 28 0 M624 74 q14 16 28 0" fill="var(--c-peach)" stroke="var(--crate-d)" stroke-width="1.5"/>
-<rect x="320" y="74" width="9" height="84" fill="var(--crate-d)"/>
-<rect x="639" y="74" width="9" height="84" fill="var(--crate-d)"/>
-<rect x="329" y="86" width="310" height="48" fill="var(--stall)"/>
-<line x1="350" y1="86" x2="350" y2="94" stroke="var(--crate-d)" stroke-width="1.5"/>
-<rect x="343" y="94" width="15" height="12" rx="2" fill="var(--c-red)"/>
-<rect x="343" y="107" width="15" height="12" rx="2" fill="var(--c-sage)"/>
-<rect x="343" y="120" width="15" height="12" rx="2" fill="var(--c-amber)"/>
-<line x1="392" y1="86" x2="392" y2="94" stroke="var(--crate-d)" stroke-width="1.5"/>
-<rect x="385" y="94" width="15" height="12" rx="2" fill="var(--c-sage)"/>
-<rect x="385" y="107" width="15" height="12" rx="2" fill="var(--c-amber)"/>
-<rect x="385" y="120" width="15" height="12" rx="2" fill="var(--c-red)"/>
-<line x1="434" y1="86" x2="434" y2="94" stroke="var(--crate-d)" stroke-width="1.5"/>
-<rect x="427" y="94" width="15" height="12" rx="2" fill="var(--c-amber)"/>
-<rect x="427" y="107" width="15" height="12" rx="2" fill="var(--c-red)"/>
-<rect x="427" y="120" width="15" height="12" rx="2" fill="var(--c-sage)"/>
-<line x1="476" y1="86" x2="476" y2="94" stroke="var(--crate-d)" stroke-width="1.5"/>
-<rect x="469" y="94" width="15" height="12" rx="2" fill="var(--c-red)"/>
-<rect x="469" y="107" width="15" height="12" rx="2" fill="var(--c-sage)"/>
-<rect x="469" y="120" width="15" height="12" rx="2" fill="var(--c-amber)"/>
-<line x1="518" y1="86" x2="518" y2="94" stroke="var(--crate-d)" stroke-width="1.5"/>
-<rect x="511" y="94" width="15" height="12" rx="2" fill="var(--c-sage)"/>
-<rect x="511" y="107" width="15" height="12" rx="2" fill="var(--c-amber)"/>
-<rect x="511" y="120" width="15" height="12" rx="2" fill="var(--c-red)"/>
-<line x1="560" y1="86" x2="560" y2="94" stroke="var(--crate-d)" stroke-width="1.5"/>
-<rect x="553" y="94" width="15" height="12" rx="2" fill="var(--c-amber)"/>
-<rect x="553" y="107" width="15" height="12" rx="2" fill="var(--c-red)"/>
-<rect x="553" y="120" width="15" height="12" rx="2" fill="var(--c-sage)"/>
-<line x1="602" y1="86" x2="602" y2="94" stroke="var(--crate-d)" stroke-width="1.5"/>
-<rect x="595" y="94" width="15" height="12" rx="2" fill="var(--c-red)"/>
-<rect x="595" y="107" width="15" height="12" rx="2" fill="var(--c-sage)"/>
-<rect x="595" y="120" width="15" height="12" rx="2" fill="var(--c-amber)"/>
-<rect x="316" y="134" width="336" height="24" rx="3" fill="var(--crate)"/>
-<rect x="316" y="134" width="336" height="6" rx="3" fill="var(--crate-d)"/>
-<rect x="352" y="108" width="34" height="26" rx="4" fill="var(--jar)" stroke="var(--crate-d)" stroke-width="1.5"/>
-<rect x="356" y="120" width="26" height="13" rx="2" fill="var(--c-red)" opacity=".9"/>
-<rect x="359" y="103" width="20" height="6" rx="2" fill="var(--crate-d)"/>
-<rect x="404" y="108" width="34" height="26" rx="4" fill="var(--jar)" stroke="var(--crate-d)" stroke-width="1.5"/>
-<rect x="408" y="120" width="26" height="13" rx="2" fill="var(--c-yellow)" opacity=".9"/>
-<rect x="411" y="103" width="20" height="6" rx="2" fill="var(--crate-d)"/>
-<rect x="456" y="108" width="34" height="26" rx="4" fill="var(--jar)" stroke="var(--crate-d)" stroke-width="1.5"/>
-<rect x="460" y="120" width="26" height="13" rx="2" fill="var(--c-peach)" opacity=".9"/>
-<rect x="463" y="103" width="20" height="6" rx="2" fill="var(--crate-d)"/>
-<rect x="520" y="112" width="112" height="22" rx="3" fill="var(--c-red)"/>
-<circle cx="530" cy="123" r="5" fill="var(--c-yellow)" opacity=".85"/>
-<circle cx="548" cy="123" r="5" fill="var(--c-yellow)" opacity=".85"/>
-<circle cx="566" cy="123" r="5" fill="var(--c-yellow)" opacity=".85"/>
-<circle cx="584" cy="123" r="5" fill="var(--c-yellow)" opacity=".85"/>
-<circle cx="602" cy="123" r="5" fill="var(--c-yellow)" opacity=".85"/>
-<circle cx="620" cy="123" r="5" fill="var(--c-yellow)" opacity=".85"/>
-<rect x="700" y="42" width="236" height="116" rx="6" fill="var(--stall)" stroke="var(--line)" stroke-width="2"/>
-<rect x="770" y="14" width="96" height="24" rx="4" fill="var(--c-amber)"/>
-<text x="818" y="31" text-anchor="middle" font-family="Archivo,sans-serif" font-weight="700" font-size="13" fill="#3a2a08">GROCERY</text>
-<rect x="708" y="84" width="220" height="4" rx="2" fill="var(--crate-d)"/>
-<rect x="714" y="62" width="16" height="22" rx="7" fill="var(--c-red)"/>
-<rect x="714" y="70" width="16" height="5" fill="var(--stall)" opacity=".45"/>
-<rect x="738" y="62" width="16" height="22" rx="2" fill="var(--c-amber)"/>
-<rect x="738" y="70" width="16" height="5" fill="var(--stall)" opacity=".45"/>
-<rect x="762" y="62" width="16" height="22" rx="2" fill="var(--c-sage)"/>
-<rect x="762" y="70" width="16" height="5" fill="var(--stall)" opacity=".45"/>
-<rect x="786" y="62" width="16" height="22" rx="7" fill="var(--c-peach)"/>
-<rect x="786" y="70" width="16" height="5" fill="var(--stall)" opacity=".45"/>
-<rect x="810" y="62" width="16" height="22" rx="2" fill="var(--c-yellow)"/>
-<rect x="810" y="70" width="16" height="5" fill="var(--stall)" opacity=".45"/>
-<rect x="834" y="62" width="16" height="22" rx="2" fill="var(--c-red)"/>
-<rect x="834" y="70" width="16" height="5" fill="var(--stall)" opacity=".45"/>
-<rect x="858" y="62" width="16" height="22" rx="7" fill="var(--c-amber)"/>
-<rect x="858" y="70" width="16" height="5" fill="var(--stall)" opacity=".45"/>
-<rect x="882" y="62" width="16" height="22" rx="2" fill="var(--c-sage)"/>
-<rect x="882" y="70" width="16" height="5" fill="var(--stall)" opacity=".45"/>
-<rect x="906" y="62" width="16" height="22" rx="2" fill="var(--c-peach)"/>
-<rect x="906" y="70" width="16" height="5" fill="var(--stall)" opacity=".45"/>
-<rect x="708" y="118" width="220" height="4" rx="2" fill="var(--crate-d)"/>
-<rect x="714" y="96" width="16" height="22" rx="2" fill="var(--c-amber)"/>
-<rect x="714" y="104" width="16" height="5" fill="var(--stall)" opacity=".45"/>
-<rect x="738" y="96" width="16" height="22" rx="2" fill="var(--c-sage)"/>
-<rect x="738" y="104" width="16" height="5" fill="var(--stall)" opacity=".45"/>
-<rect x="762" y="96" width="16" height="22" rx="7" fill="var(--c-peach)"/>
-<rect x="762" y="104" width="16" height="5" fill="var(--stall)" opacity=".45"/>
-<rect x="786" y="96" width="16" height="22" rx="2" fill="var(--c-yellow)"/>
-<rect x="786" y="104" width="16" height="5" fill="var(--stall)" opacity=".45"/>
-<rect x="810" y="96" width="16" height="22" rx="2" fill="var(--c-red)"/>
-<rect x="810" y="104" width="16" height="5" fill="var(--stall)" opacity=".45"/>
-<rect x="834" y="96" width="16" height="22" rx="7" fill="var(--c-amber)"/>
-<rect x="834" y="104" width="16" height="5" fill="var(--stall)" opacity=".45"/>
-<rect x="858" y="96" width="16" height="22" rx="2" fill="var(--c-sage)"/>
-<rect x="858" y="104" width="16" height="5" fill="var(--stall)" opacity=".45"/>
-<rect x="882" y="96" width="16" height="22" rx="2" fill="var(--c-peach)"/>
-<rect x="882" y="104" width="16" height="5" fill="var(--stall)" opacity=".45"/>
-<rect x="906" y="96" width="16" height="22" rx="7" fill="var(--c-yellow)"/>
-<rect x="906" y="104" width="16" height="5" fill="var(--stall)" opacity=".45"/>
-<rect x="708" y="152" width="220" height="4" rx="2" fill="var(--crate-d)"/>
-<rect x="714" y="130" width="16" height="22" rx="2" fill="var(--c-sage)"/>
-<rect x="714" y="138" width="16" height="5" fill="var(--stall)" opacity=".45"/>
-<rect x="738" y="130" width="16" height="22" rx="7" fill="var(--c-peach)"/>
-<rect x="738" y="138" width="16" height="5" fill="var(--stall)" opacity=".45"/>
-<rect x="762" y="130" width="16" height="22" rx="2" fill="var(--c-yellow)"/>
-<rect x="762" y="138" width="16" height="5" fill="var(--stall)" opacity=".45"/>
-<rect x="786" y="130" width="16" height="22" rx="2" fill="var(--c-red)"/>
-<rect x="786" y="138" width="16" height="5" fill="var(--stall)" opacity=".45"/>
-<rect x="810" y="130" width="16" height="22" rx="7" fill="var(--c-amber)"/>
-<rect x="810" y="138" width="16" height="5" fill="var(--stall)" opacity=".45"/>
-<rect x="834" y="130" width="16" height="22" rx="2" fill="var(--c-sage)"/>
-<rect x="834" y="138" width="16" height="5" fill="var(--stall)" opacity=".45"/>
-<rect x="858" y="130" width="16" height="22" rx="2" fill="var(--c-peach)"/>
-<rect x="858" y="138" width="16" height="5" fill="var(--stall)" opacity=".45"/>
-<rect x="882" y="130" width="16" height="22" rx="7" fill="var(--c-yellow)"/>
-<rect x="882" y="138" width="16" height="5" fill="var(--stall)" opacity=".45"/>
-<rect x="906" y="130" width="16" height="22" rx="2" fill="var(--c-red)"/>
-<rect x="906" y="138" width="16" height="5" fill="var(--stall)" opacity=".45"/>
-</svg>
-  <p class="eyebrow" data-i18n="eyebrow">For store owners &middot; slow-mover triage</p>
-  <h1 data-i18n="title">Shelf Temperature Check</h1>
-  <p class="lead" data-i18n="lead">Check whether a slow product is worth keeping &mdash; and if it is, get the one move most likely to save it. Everything runs on your own numbers.</p>
-</header>
+  <header class="hero">
+    <div style="position:relative;z-index:2">
+      <p class="eyebrow">Slow-mover triage · for small shops</p>
+      <h1>Keep your shelf <span class="accent">healthy</span> — and your cash moving.</h1>
+      <p class="lead">Your fast sellers get all the attention. It's the slow movers that quietly freeze your working
+        capital. Shelf Temp Check reads each fading product and gives you the one move that pays — cut the price,
+        bundle it, or let it go.</p>
+      <div class="cta">
+        <a href="#try" class="btn btn-leaf">Check a product →</a>
+        <a href="#how" class="btn btn-ghost">See how it works</a>
+      </div>
+      <p class="trust">No sign-up · works on your own numbers · built on two years of real sales</p>
+    </div>
+    <div class="hero-art"><svg class="shelf-scene" viewBox="0 0 480 430" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="mtr" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#cb4b2e"/><stop offset=".5" stop-color="#e7a52b"/><stop offset="1" stop-color="#3e9b4f"/>
+    </linearGradient>
+  </defs>
+  <!-- ambient organic shapes -->
+  <path d="M430 40C470 70 470 150 420 175 360 205 300 150 330 95 355 50 400 20 430 40Z" fill="#dcecc7" opacity=".85"/>
+  <ellipse cx="150" cy="150" rx="120" ry="95" fill="#e6f1de" opacity=".8"/>
+  <!-- grounding shadow + shelf -->
+  <ellipse cx="240" cy="360" rx="205" ry="16" fill="#123626" opacity=".10"/>
+  <rect x="46" y="332" width="388" height="20" rx="8" fill="#1c6236"/>
+  <rect x="46" y="332" width="388" height="6" rx="3" fill="#2f8347"/>
+  <!-- A: fresh jar -->
+  <g>
+    <rect x="74" y="228" width="66" height="104" rx="13" fill="#4ca85b"/>
+    <rect x="80" y="214" width="54" height="18" rx="6" fill="#2f8347"/>
+    <rect x="74" y="266" width="66" height="26" fill="#fbfcf6" opacity=".9"/>
+    <rect x="86" y="273" width="30" height="3.5" rx="2" fill="#8ec63f"/><rect x="86" y="281" width="20" height="3" rx="2" fill="#cfe0c4"/>
+    <rect x="84" y="240" width="9" height="78" rx="4.5" fill="#fff" opacity=".22"/>
+    <path d="M107 214c-2-10 5-16 14-16-2 9-6 14-14 16Z" fill="#8ec63f"/>
+  </g>
+  <!-- B: fresh can -->
+  <g>
+    <rect x="156" y="252" width="58" height="80" rx="10" fill="#6bbf59"/>
+    <ellipse cx="185" cy="252" rx="29" ry="7" fill="#7cca63"/>
+    <rect x="156" y="278" width="58" height="22" fill="#fbfcf6" opacity=".9"/>
+    <rect x="166" y="285" width="26" height="3.5" rx="2" fill="#3e9b4f"/>
+    <rect x="162" y="262" width="8" height="62" rx="4" fill="#fff" opacity=".22"/>
+  </g>
+  <!-- C: wilting bottle (the flagged one) -->
+  <g>
+    <rect x="244" y="206" width="16" height="12" rx="3" fill="#b87d1f"/>
+    <rect x="247" y="216" width="10" height="34" fill="#cf9026"/>
+    <rect x="232" y="246" width="40" height="86" rx="11" fill="#e0a233"/>
+    <rect x="232" y="284" width="40" height="22" fill="#fbfcf6" opacity=".85"/>
+    <rect x="240" y="291" width="20" height="3.5" rx="2" fill="#e7a52b"/>
+    <rect x="238" y="256" width="7" height="64" rx="3.5" fill="#fff" opacity=".22"/>
+  </g>
+  <!-- D: spoiled box (faded) -->
+  <g opacity=".92">
+    <rect x="292" y="256" width="74" height="76" rx="11" fill="#cf9784"/>
+    <rect x="292" y="284" width="74" height="22" fill="#fbfcf6" opacity=".8"/>
+    <rect x="304" y="291" width="30" height="3.5" rx="2" fill="#c76b52"/>
+    <path d="M338 268l4 7h-8l4-7Z" fill="#cb4b2e"/>
+  </g>
+  <!-- E: fresh green apple -->
+  <g>
+    <circle cx="404" cy="302" r="30" fill="#5aa845"/>
+    <path d="M404 274c-1-8 4-13 12-13-1 8-5 12-12 13Z" fill="#2f8347"/>
+    <ellipse cx="396" cy="294" rx="7" ry="10" fill="#fff" opacity=".25"/>
+  </g>
+  <!-- floating leaves -->
+  <path d="M60 96c-14-6-20-22-16-38 16 6 24 20 16 38Z" fill="#8ec63f" opacity=".7"/>
+  <path d="M446 250c12 4 18 16 15 30-13-4-20-15-15-30Z" fill="#6bbf59" opacity=".65"/>
+  <!-- health tag pinned to the wilting bottle -->
+  <line x1="252" y1="206" x2="252" y2="178" stroke="#1c6236" stroke-width="1.6"/>
+  <circle cx="252" cy="206" r="3.4" fill="#1c6236"/>
+  <g>
+    <rect x="150" y="120" width="196" height="62" rx="14" fill="#fbfcf6" stroke="#e6d2a0" stroke-width="1.5"/>
+    <text x="168" y="142" font-family="Bricolage Grotesque, sans-serif" font-weight="700" font-size="15" fill="#9c6b12">⚠ Slipping</text>
+    <text x="262" y="142" font-family="IBM Plex Mono, monospace" font-size="10" fill="#4a6154">bundle it</text>
+    <rect x="168" y="152" width="160" height="9" rx="4.5" fill="url(#mtr)"/>
+    <circle cx="218" cy="156.5" r="7.5" fill="#fbfcf6" stroke="#1c6236" stroke-width="2.6"/>
+  </g>
+</svg></div>
+  </header>
+</div>
 
-<nav class="tabs" id="tabs">
-  <button class="on" data-t="check" data-i18n="tab_check">Check a product</button>
-  <button data-t="batch" data-i18n="tab_batch">Check my slow-movers</button>
+<section id="cost"><div class="wrap">
+  <div class="sec-head">
+    <p class="eyebrow">The silent killer</p>
+    <h2>Every product that just sits there is money that's stuck.</h2>
+    <p>Owners celebrate their winners and quietly tolerate the losers. But dead stock isn't harmless — it costs you three ways at once.</p>
+  </div>
+  <div class="grid3">
+    <div class="cost"><div class="ic-cost"><svg viewBox="0 0 48 48" fill="none"><circle cx="24" cy="24" r="17" stroke="var(--tomato)" stroke-width="2.4"/><path d="M19 16h6.5a4 4 0 0 1 0 8H19m0-4h11M19 16v16" stroke="var(--tomato)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M37 11l3 3m0-3l-3 3" stroke="var(--leaf-deep)" stroke-width="2.2" stroke-linecap="round"/></svg></div><h3>Frozen cash</h3>
+      <p>Money tied up in stock that won't move is money you can't spend on stock that will. The app shows the exact pesos frozen in each slow item.</p></div>
+    <div class="cost"><div class="ic-cost"><svg viewBox="0 0 48 48" fill="none"><rect x="7" y="30" width="34" height="4" rx="2" fill="var(--tomato)"/><rect x="12" y="16" width="9" height="14" rx="2" stroke="var(--tomato)" stroke-width="2.4"/><rect x="27" y="21" width="9" height="9" rx="2" stroke="var(--tomato)" stroke-width="2.4"/><path d="M11 34v5m26-5v5" stroke="var(--tomato)" stroke-width="2.4" stroke-linecap="round"/></svg></div><h3>Dead shelf space</h3>
+      <p>Every slot a loser occupies is a slot a winner can't have. Space is your scarcest asset, and slow movers hoard it.</p></div>
+    <div class="cost"><div class="ic-cost"><svg viewBox="0 0 48 48" fill="none"><path d="M24 9c6 8 10 12 10 18a10 10 0 0 1-20 0c0-6 4-10 10-18Z" stroke="var(--tomato)" stroke-width="2.4" stroke-linejoin="round"/><path d="M24 22v9m0 0l-3.5-3.5M24 31l3.5-3.5" stroke="var(--tomato)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><h3>Spoiling value</h3>
+      <p>Food, cosmetics, and trend items lose value by the week. The longer they sit, the closer their worth slides to zero.</p></div>
+  </div>
+</div></section>
+
+<div class="wrap"><div class="dark"><div class="wrap">
+  <p class="eyebrow">One product, one verdict</p>
+  <h2>Not a dashboard. A decision.</h2>
+  <p class="sub">Enter what you already know about a fading product. You get one clear call — no chart to read, no numbers to stare at.</p>
+  <div class="plays">
+    <div class="play"><div class="k">Keep</div><h3>It's still healthy</h3>
+      <p>Selling steadily and recently. Leave it be — no rescue needed, keep it stocked.</p></div>
+    <div class="play"><div class="k">Rescue</div><h3>Cut price or bundle</h3>
+      <p>Worth saving. If it responds to discounts and the margin holds, cut the price. If not, pair it with something it's already bought with.</p></div>
+    <div class="play retire"><div class="k">Retire</div><h3>Free the cash</h3>
+      <p>Won't respond, won't pair, barely earns. Stop reordering and put that frozen cash into a winner.</p></div>
+  </div>
+</div></div></div>
+
+<section id="how"><div class="wrap">
+  <div class="sec-head center"><p class="eyebrow">Dead simple</p><h2>Three numbers you already know.</h2></div>
+  <div class="steps">
+    <div class="step"><div class="b">1</div><h3>Tell it about the product</h3>
+      <p>Weeks since it last sold, how long you've stocked it, units sold. Add your cost and price for the money advice.</p></div>
+    <div class="step"><div class="b">2</div><h3>Read the temperature</h3>
+      <p>A plain health reading — thriving, slipping, or critical — with the cash tied up in it and how fast it's turning.</p></div>
+    <div class="step"><div class="b">3</div><h3>Get the move</h3>
+      <p>For anything fading, one clear play: cut the price, bundle it, or retire it — and a warning when a discount would lose money.</p></div>
+  </div>
+</div></section>
+
+<section><div class="wrap">
+  <div class="uvp">
+    <div>
+      <p class="eyebrow">The part no one else does</p>
+      <h2>It tells you when <em>not</em> to discount.</h2>
+      <p>Every owner's reflex is to slash the price on a slow item. But nearly half of products barely sell more when discounted — and at a thin margin, a price cut can lose you money for nothing. Shelf Temp Check checks the math first and stops you.</p>
+    </div>
+    <div class="demo">
+      <div style="font-family:'IBM Plex Mono';font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft)">Rescue play · bacon</div>
+      <div style="font-family:'Bricolage Grotesque';font-weight:700;font-size:19px;margin:6px 0 14px">Bundle it — don't discount</div>
+      <div class="warnbox"><b>⚠ Don't discount this.</b> Bacon does respond to price cuts, but at your ₱3 margin a 15% cut would sell you <b>below cost</b>. Pair it instead.</div>
+    </div>
+  </div>
+</div></section>
+
+<section id="method"><div class="wrap">
+  <div class="sec-head"><p class="eyebrow">Under the hood</p>
+    <h2>How the app learned to read a shelf.</h2>
+    <p>It's not magic and it's not a crystal ball. Here's exactly how it was built — in plain terms.</p></div>
+  <div class="story">
+    <div class="stepcard"><div class="num">01</div><h3>Fed it real history</h3>
+      <p>Two full years of actual store sales — millions of purchases across thousands of products.</p></div>
+    <div class="stepcard"><div class="num">02</div><h3>Boiled each product down</h3>
+      <p>Turned every product into a few honest signals: how recently it sold, how steadily, and how many people bought it.</p></div>
+    <div class="stepcard"><div class="num">03</div><h3>Taught it with endings it knew</h3>
+      <p>Showed it thousands of products where the ending was already known — which kept selling, which faded — so it could learn the difference.</p></div>
+    <div class="stepcard"><div class="num">04</div><h3>Built a wall against cheating</h3>
+      <p>It only ever sees a product's first year to call its second. It can't peek at the future, so it has to learn real patterns.</p></div>
+    <div class="stepcard"><div class="num">05</div><h3>Tested on the unseen</h3>
+      <p>Checked it against products it had never met, to be sure it learned genuine signals — not lucky flukes.</p></div>
+  </div>
+  <p class="discovered"><b>What it discovered:</b> a product's fate is written mostly in <b>how recently and how widely it sold</b> — not in its category or its brand. On top of that, the app learned which products get bought <b>together</b> (from 230,000 real baskets) and which ones actually <b>respond to a discount</b> — the two things that decide whether a slow item is worth saving, and how.</p>
+</div></section>
+
+<section><div class="wrap"><div class="stats"><div class="wrap"><div class="row">
+  <div><div class="big">2 yrs</div><div class="lbl">of real sales learned from</div></div>
+  <div><div class="big">230k</div><div class="lbl">baskets mined for pairings</div></div>
+  <div><div class="big">3</div><div class="lbl">simple signals that matter</div></div>
+  <div><div class="big">1</div><div class="lbl">clear verdict per product</div></div>
+</div></div></div></div></section>
+
+<section id="try"><div class="wrap">
+  <div class="sec-head center"><p class="eyebrow">Try it now</p>
+    <h2>Check one of your slow movers.</h2>
+    <p>Enter what you know. Get a health reading and the one move to make.</p></div>
+  <div id="app">
+    <nav class="tabs" id="tabs">
+  <button class="on" data-t="check">Check a product</button>
+  <button data-t="batch">Check my slow-movers</button>
 </nav>
-
-<!-- CHECK + RESCUE (merged) -->
-<section class="tab on" id="check">
+    <section class="tab on" id="check">
   <div class="grid2">
-    <div class="card striped">
-      <h2><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="7.5" cy="7" r="3.2" fill="var(--c-sage)"/><circle cx="13" cy="6.2" r="2.6" fill="var(--c-red)"/><circle cx="17.5" cy="7.4" r="2.4" fill="var(--c-amber)"/><rect x="2.5" y="10.5" width="19" height="10.5" rx="2" fill="var(--crate)"/><rect x="4.5" y="17" width="15" height="2.2" rx="1.1" fill="var(--crate-d)"/></svg><span data-i18n="h_about">Tell me about the product</span></h2>
-      <p class="sub" data-i18n="sub_about">Just what you already know.</p>
-      <div class="field"><div class="top"><div><label for="stale" data-i18n="l_stale">Weeks since it last sold</label>
-        <span class="hint" data-i18n="hint_stale">&mdash; 0 = sold this week</span></div><span class="val" id="stale-v">20</span></div>
+    <div class="card">
+      <h2>Tell me about the product</h2>
+      <p class="sub">Just what you already know.</p>
+      <div class="field"><div class="top"><div><label for="stale">Weeks since it last sold</label>
+        <span class="hint">— 0 = sold this week</span></div><span class="val" id="stale-v">20</span></div>
         <input type="range" id="stale" min="0" max="52" value="20"></div>
-      <div class="field"><div class="top"><div><label for="weeks" data-i18n="l_weeks">Weeks you've been selling it</label></div>
+      <div class="field"><div class="top"><div><label for="weeks">Weeks you've been selling it</label></div>
         <span class="val" id="weeks-v">3</span></div><input type="range" id="weeks" min="1" max="52" value="3"></div>
-      <div class="field"><label for="units" data-i18n="l_units">Total units sold so far</label>
-        <span class="hint" data-i18n="hint_units">&mdash; type the number</span><br>
+      <div class="field"><label for="units">Total units sold so far</label>
+        <span class="hint">— type the number</span><br>
         <input type="number" id="units" min="0" step="1" value="5" style="width:150px;margin-top:6px"></div>
-      <div class="field"><label for="cat" data-i18n="l_cat">Category</label>
-        <span class="hint" data-i18n="hint_cat">&mdash; used for rescue advice if it's slipping</span><br>
+      <div class="field"><label for="cat">Category</label>
+        <span class="hint">— used for rescue advice if it's slipping</span><br>
         <select id="cat" style="width:100%;margin-top:6px"></select></div>
-      <div class="field"><label for="stock" data-i18n="l_stock">Units you originally stocked</label>
-        <span class="hint" data-i18n="hint_stock">&mdash; optional, for sell-through &amp; reorder</span><br>
+      <div class="field"><label for="stock">Units you originally stocked</label>
+        <span class="hint">— optional, for sell-through &amp; reorder</span><br>
         <input type="number" id="stock" min="0" step="1" value="12" style="width:150px;margin-top:6px"></div>
-      <div class="field"><label for="price" data-i18n="l_price">Your selling price (&#8369;)</label>
-        <span class="hint" data-i18n="hint_price">&mdash; optional, unlocks profit advice</span><br>
+      <div class="field"><label for="price">Your selling price (₱)</label>
+        <span class="hint">— optional, unlocks profit advice</span><br>
         <input type="number" id="price" min="0" step="0.01" value="25" style="width:150px;margin-top:6px"></div>
-      <div class="field"><label for="cost" data-i18n="l_cost">What you pay for it (&#8369;)</label>
-        <span class="hint" data-i18n="hint_cost">&mdash; your cost per unit</span><br>
+      <div class="field"><label for="cost">What you pay for it (₱)</label>
+        <span class="hint">— your cost per unit</span><br>
         <input type="number" id="cost" min="0" step="0.01" value="22" style="width:150px;margin-top:6px"></div>
     </div>
     <div class="card">
       <div class="temp-wrap">
         <svg width="70" height="200" viewBox="0 0 70 200" aria-hidden="true">
-          <rect x="27" y="10" width="16" height="150" rx="8" fill="var(--soft)" stroke="var(--line)"/>
+          <rect x="27" y="10" width="16" height="150" rx="8" fill="#eef2f0" stroke="#cfd8d4"/>
           <rect id="merc" x="29" y="80" width="12" height="80" rx="6" fill="var(--good)"/>
           <circle cx="35" cy="172" r="17" id="bulb" fill="var(--good)"/>
-          <text x="52" y="16" font-size="9" fill="var(--muted)" font-family="IBM Plex Mono">100</text>
-          <text x="52" y="90" font-size="9" fill="var(--muted)" font-family="IBM Plex Mono">50</text>
-          <text x="52" y="162" font-size="9" fill="var(--muted)" font-family="IBM Plex Mono">0</text>
+          <text x="52" y="16" font-size="9" fill="#64727a" font-family="IBM Plex Mono">100</text>
+          <text x="52" y="90" font-size="9" fill="#64727a" font-family="IBM Plex Mono">50</text>
+          <text x="52" y="162" font-size="9" fill="#64727a" font-family="IBM Plex Mono">0</text>
         </svg>
         <div><p class="verdict" id="verdict"><small>Reading</small>STABLE</p>
-          <p class="pbig" id="pbig">&mdash;</p></div>
+          <p class="pbig" id="pbig">— chance it keeps selling</p></div>
       </div>
-      <div class="chips"><span class="chip" id="margin-chip"><span data-i18n="chip_margin">Margin</span> <b id="margin">&ndash;</b></span><span class="chip" id="str-chip"><span data-i18n="chip_str">Sell-through</span> <b id="str">&ndash;</b></span><span class="chip" id="reorder-chip"><span data-i18n="chip_reorder">Stock left lasts</span> <b id="reorder">&ndash;</b></span><span class="chip" id="frozen-chip"><span data-i18n="chip_frozen">Cash tied up</span> <b id="frozen">&ndash;</b></span></div>
-      <div class="why"><h3 data-i18n="h_why">How it read the shelf</h3><ul id="why"></ul></div>
+      <div class="chips"><span class="chip" id="margin-chip">Margin <b id="margin">–</b></span><span class="chip" id="str-chip">Sell-through <b id="str">–</b></span><span class="chip" id="reorder-chip">Stock left lasts <b id="reorder">–</b></span><span class="chip" id="frozen-chip">Cash tied up <b id="frozen">–</b></span></div>
+      <div class="why"><h3>How it read the shelf</h3><ul id="why"></ul></div>
     </div>
   </div>
   <div id="check-rescue" style="margin-top:18px"></div>
 </section>
-
-<!-- BATCH -->
-<section class="tab" id="batch">
-  <div class="card striped">
-    <h2><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="7.5" cy="7" r="3.2" fill="var(--c-sage)"/><circle cx="13" cy="6.2" r="2.6" fill="var(--c-red)"/><circle cx="17.5" cy="7.4" r="2.4" fill="var(--c-amber)"/><rect x="2.5" y="10.5" width="19" height="10.5" rx="2" fill="var(--crate)"/><rect x="4.5" y="17" width="15" height="2.2" rx="1.1" fill="var(--crate-d)"/></svg><span data-i18n="h_batch">Check your slow-movers in one go</span></h2>
-    <p class="sub" data-i18n="sub_batch">List the products you're unsure about. Tag each with a category and enter the three numbers &mdash; it reads whether each is worth keeping. The category is for your reference; the reading runs on the sales numbers.</p>
+    <section class="tab" id="batch">
+  <div class="card">
+    <h2>Check your slow-movers in one go</h2>
+    <p class="sub">Type them in or upload a filled list. Tag each with a category and enter the three numbers —
+      it reads whether each is worth keeping. The category is for your reference; the reading runs on the sales numbers.</p>
+    <div class="mode-toggle"><button id="mode-type" class="on" type="button">Type it in</button><button id="mode-upload" type="button">Upload a list</button></div>
+    <div id="upload-panel" style="display:none">
+      <p>Download the template, fill it in (it opens in Excel), save it as CSV, then drop it back here. It just reads the numbers you type — it doesn't connect to your till.</p>
+      <button class="addbtn" id="dl-template" type="button">↓ Download CSV template</button>
+      <label class="dropzone" id="dropzone"><input type="file" id="csv-file" accept=".csv" style="display:none"><span>Drop your filled CSV here — or click to choose</span></label>
+      <div id="upload-msg"></div>
+    </div>
     <div class="hscroll">
-      <div class="srow-head"><span data-i18n="th_product">Product</span><span data-i18n="th_cat">Category</span><span data-i18n="th_stale">Wks since sold</span><span data-i18n="th_weeks">Wks selling</span>
-        <span data-i18n="th_units">Units sold</span><span data-i18n="th_reading">Reading</span><span></span></div>
+      <div class="srow-head"><span>Product</span><span>Category</span><span>Wks since sold</span><span>Wks selling</span>
+        <span>Units sold</span><span>Reading</span><span></span></div>
       <div id="rows"></div>
     </div>
-    <button class="addbtn" id="addrow" data-i18n="btn_add">+ Add product</button>
+    <button class="addbtn" id="addrow">+ Add product</button>
     <div class="summary" id="batch-summary"></div>
   </div>
 </section>
+  </div>
+</div></section>
 
-<footer><span data-i18n="footer"><b>Good to know.</b> Sell-through uses the stock number you enter (units sold &divide; units stocked). This checks products you already stock, from how they sell (not profit) &mdash; a guide, not a guarantee, right about 4 out of 5 times. Pairing and discount advice come from real basket data; treat them as strong ideas to test, since habits differ by place. Profit and margin advice use the price and cost you enter. &#8369; shown for illustration.</span></footer>
-</div>
+<div class="cta-band"><div class="wrap">
+  <h2>Stop letting cash sit on the shelf.</h2>
+  <p>Three numbers you already know. One clear answer, in seconds.</p>
+  <a href="#try" class="btn btn-leaf">Check a product →</a>
+</div></div>
+
+<footer class="sitefoot"><div class="wrap">
+  <div><div class="brand"><span class="mark"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 3.5C11 3 3.5 8.5 3.2 17.8c0 .7.5 1.2 1.2 1.1C13 18.2 20.5 12.5 20.5 3.5Z" fill="var(--ink)"/><path d="M6 17C9.5 12 13.5 8.5 18 6.2" stroke="#fff" stroke-width="1.3" fill="none" opacity=".55" stroke-linecap="round"/></svg></span> Shelf Temp Check</div>
+    Slow-mover triage for small shops.</div>
+  <div style="max-width:46ch">Built on real grocery transaction data. It's a guide, not a guarantee, and it reads what you already stock — the method transfers to Philippine shops even where the specific numbers don't. ₱ figures illustrative.</div>
+</div></footer>
+
 <script>
+
 const DATA = {"tree": {"leaf": false, "f": "weeks", "thr": 2.5, "l": {"leaf": false, "f": "weeks", "thr": 1.5, "l": {"leaf": false, "f": "weeks_since_last", "thr": 6.5, "l": {"leaf": false, "f": "weeks_since_last", "thr": 1.5, "l": {"leaf": false, "f": "weeks_since_last", "thr": 0.5, "l": {"leaf": true, "prob": 0.56}, "r": {"leaf": true, "prob": 0.504}}, "r": {"leaf": false, "f": "weeks_since_last", "thr": 5.5, "l": {"leaf": true, "prob": 0.372}, "r": {"leaf": true, "prob": 0.336}}}, "r": {"leaf": false, "f": "weeks_since_last", "thr": 33.5, "l": {"leaf": false, "f": "weeks_since_last", "thr": 17.5, "l": {"leaf": true, "prob": 0.297}, "r": {"leaf": true, "prob": 0.254}}, "r": {"leaf": false, "f": "weeks_since_last", "thr": 43.5, "l": {"leaf": true, "prob": 0.204}, "r": {"leaf": true, "prob": 0.141}}}}, "r": {"leaf": false, "f": "weeks_since_last", "thr": 31.5, "l": {"leaf": false, "f": "weeks_since_last", "thr": 9.5, "l": {"leaf": false, "f": "weeks_since_last", "thr": 1.5, "l": {"leaf": true, "prob": 0.757}, "r": {"leaf": true, "prob": 0.615}}, "r": {"leaf": false, "f": "weeks_since_last", "thr": 16.5, "l": {"leaf": true, "prob": 0.546}, "r": {"leaf": true, "prob": 0.468}}}, "r": {"leaf": false, "f": "weeks_since_last", "thr": 34.5, "l": {"leaf": true, "prob": 0.325}, "r": {"leaf": false, "f": "weeks_since_last", "thr": 37.5, "l": {"leaf": true, "prob": 0.217}, "r": {"leaf": true, "prob": 0.174}}}}}, "r": {"leaf": false, "f": "weeks_since_last", "thr": 9.5, "l": {"leaf": false, "f": "weeks_since_last", "thr": 2.5, "l": {"leaf": false, "f": "weeks", "thr": 4.5, "l": {"leaf": false, "f": "weeks_since_last", "thr": 1.5, "l": {"leaf": true, "prob": 0.879}, "r": {"leaf": true, "prob": 0.813}}, "r": {"leaf": false, "f": "units", "thr": 13.5, "l": {"leaf": true, "prob": 0.952}, "r": {"leaf": true, "prob": 0.989}}}, "r": {"leaf": false, "f": "weeks_since_last", "thr": 6.5, "l": {"leaf": false, "f": "weeks", "thr": 4.5, "l": {"leaf": true, "prob": 0.81}, "r": {"leaf": true, "prob": 0.899}}, "r": {"leaf": false, "f": "weeks", "thr": 12.5, "l": {"leaf": true, "prob": 0.795}, "r": {"leaf": true, "prob": 0.673}}}}, "r": {"leaf": false, "f": "weeks_since_last", "thr": 18.5, "l": {"leaf": false, "f": "weeks", "thr": 11.5, "l": {"leaf": false, "f": "weeks_since_last", "thr": 13.5, "l": {"leaf": true, "prob": 0.742}, "r": {"leaf": true, "prob": 0.63}}, "r": {"leaf": true, "prob": 0.368}}, "r": {"leaf": false, "f": "weeks_since_last", "thr": 30.5, "l": {"leaf": false, "f": "weeks", "thr": 6.5, "l": {"leaf": true, "prob": 0.469}, "r": {"leaf": true, "prob": 0.254}}, "r": {"leaf": false, "f": "weeks", "thr": 3.5, "l": {"leaf": true, "prob": 0.278}, "r": {"leaf": true, "prob": 0.132}}}}}}, "affinity": {"Onions": [{"cat": "Herbs", "pct": 10, "lift": 6.8}, {"cat": "Peppers-all", "pct": 21, "lift": 6.2}, {"cat": "Mushrooms", "pct": 11, "lift": 5.3}, {"cat": "Squash", "pct": 4, "lift": 5.1}], "Organics Fruit & Vegetables": [{"cat": "Baking", "pct": 2, "lift": 12.9}, {"cat": "Condiments", "pct": 2, "lift": 12.6}, {"cat": "Prepared/pkgd Foods", "pct": 3, "lift": 11.5}, {"cat": "Cereal/breakfast", "pct": 6, "lift": 8.9}], "Potatoes": [{"cat": "Onions", "pct": 27, "lift": 4.1}, {"cat": "Squash", "pct": 3, "lift": 4.0}, {"cat": "Carrots", "pct": 14, "lift": 3.8}, {"cat": "Broccoli/cauliflower", "pct": 7, "lift": 3.5}], "Tropical Fruit": [{"cat": "Pears", "pct": 3, "lift": 3.9}, {"cat": "Stone Fruit", "pct": 7, "lift": 3.3}, {"cat": "Apples", "pct": 18, "lift": 3.2}, {"cat": "Berries", "pct": 12, "lift": 3.1}], "Vegetables - All Others": [{"cat": "Squash", "pct": 5, "lift": 6.4}, {"cat": "Broccoli/cauliflower", "pct": 11, "lift": 5.6}, {"cat": "Peppers-all", "pct": 18, "lift": 5.3}, {"cat": "Carrots", "pct": 19, "lift": 5.2}], "Baked Bread/buns/rolls": [{"cat": "Hot Dogs", "pct": 13, "lift": 2.7}, {"cat": "Deli Meats", "pct": 18, "lift": 2.4}, {"cat": "Meat - Shelf Stable", "pct": 14, "lift": 2.4}, {"cat": "Dinner Mxs Dry", "pct": 14, "lift": 2.3}], "Cookies/cones": [{"cat": "Dry Mix Desserts", "pct": 8, "lift": 3.4}, {"cat": "Convenient Brkfst/whlsm Snacks", "pct": 20, "lift": 3.2}, {"cat": "Crackers/misc Bkd Fd", "pct": 30, "lift": 3.1}, {"cat": "Fruit - Shelf Stable", "pct": 18, "lift": 3.1}], "Pnt Btr/jelly/jams": [{"cat": "Molasses/syrup/pancake Mixs", "pct": 8, "lift": 4.2}, {"cat": "Non-dairy Beverages", "pct": 1, "lift": 3.9}, {"cat": "Hot Cereal", "pct": 9, "lift": 3.6}, {"cat": "Rice Cakes", "pct": 2, "lift": 3.3}], "Beef": [{"cat": "Dry Sauces/gravy", "pct": 10, "lift": 3.4}, {"cat": "Pork", "pct": 17, "lift": 3.2}, {"cat": "Beans - Canned Glass & Mw", "pct": 13, "lift": 3.1}, {"cat": "Pasta Sauce", "pct": 15, "lift": 3.1}], "Breakfast Sausage/sandwiches": [{"cat": "Bacon", "pct": 24, "lift": 5.1}, {"cat": "Refrgratd Dough Products", "pct": 23, "lift": 4.0}, {"cat": "Molasses/syrup/pancake Mixs", "pct": 7, "lift": 3.9}, {"cat": "Frozen Meat", "pct": 13, "lift": 3.7}], "Convenient Brkfst/whlsm Snacks": [{"cat": "Frzn Breakfast Foods", "pct": 13, "lift": 4.1}, {"cat": "Hot Cereal", "pct": 10, "lift": 4.0}, {"cat": "Cold Cereal", "pct": 42, "lift": 3.8}, {"cat": "Cocoa Mixes", "pct": 6, "lift": 3.7}], "Crackers/misc Bkd Fd": [{"cat": "Beans - Canned Glass & Mw", "pct": 14, "lift": 3.3}, {"cat": "Dinner Mxs Dry", "pct": 19, "lift": 3.2}, {"cat": "Convenient Brkfst/whlsm Snacks", "pct": 19, "lift": 3.2}, {"cat": "Fruit - Shelf Stable", "pct": 18, "lift": 3.1}], "Eggs": [{"cat": "Bacon", "pct": 17, "lift": 3.7}, {"cat": "Breakfast Sausage/sandwiches", "pct": 16, "lift": 3.4}, {"cat": "Flour & Meals", "pct": 4, "lift": 3.1}, {"cat": "Butter", "pct": 7, "lift": 3.1}], "Soup": [{"cat": "Seafood - Shelf Stable", "pct": 11, "lift": 3.4}, {"cat": "Meat - Shelf Stable", "pct": 18, "lift": 3.1}, {"cat": "Vegetables - Shelf Stable", "pct": 26, "lift": 3.1}, {"cat": "Dinner Mxs Dry", "pct": 18, "lift": 3.1}], "Bag Snacks": [{"cat": "Hispanic", "pct": 15, "lift": 2.4}, {"cat": "Popcorn", "pct": 4, "lift": 2.3}, {"cat": "Miscellaneous", "pct": 2, "lift": 2.3}, {"cat": "Meat - Shelf Stable", "pct": 13, "lift": 2.3}], "Baked Sweet Goods": [{"cat": "Convenient Brkfst/whlsm Snacks", "pct": 19, "lift": 3.0}, {"cat": "Frzn Breakfast Foods", "pct": 10, "lift": 3.0}, {"cat": "Frozen Meat", "pct": 10, "lift": 2.9}, {"cat": "Cocoa Mixes", "pct": 5, "lift": 2.9}], "Bath Tissues": [{"cat": "Paper Towels", "pct": 26, "lift": 6.1}, {"cat": "Facial Tiss/dnr Napkin", "pct": 14, "lift": 4.7}, {"cat": "Laundry Detergents", "pct": 14, "lift": 3.9}, {"cat": "Dishwash Detergents", "pct": 10, "lift": 3.8}], "Cat Food": [{"cat": "Cat Litter", "pct": 20, "lift": 15.4}, {"cat": "Pet Care Supplies", "pct": 6, "lift": 6.0}, {"cat": "Dog Foods", "pct": 14, "lift": 4.5}, {"cat": "Air Care", "pct": 5, "lift": 3.2}], "Fluid Milk Products": [{"cat": "Cold Cereal", "pct": 24, "lift": 2.2}, {"cat": "Eggs", "pct": 25, "lift": 2.1}, {"cat": "Cocoa Mixes", "pct": 3, "lift": 2.0}, {"cat": "Dinner Mxs Dry", "pct": 11, "lift": 2.0}], "Meat - Shelf Stable": [{"cat": "Dinner Mxs Dry", "pct": 29, "lift": 5.0}, {"cat": "Hot Dogs", "pct": 20, "lift": 4.3}, {"cat": "Seafood - Shelf Stable", "pct": 13, "lift": 4.2}, {"cat": "Frozen Meat", "pct": 14, "lift": 3.9}], "Prepared Food": [{"cat": "Chicken/poultry", "pct": 12, "lift": 4.8}, {"cat": "Salads/dips", "pct": 9, "lift": 3.7}, {"cat": "Rolls", "pct": 6, "lift": 2.7}, {"cat": "Deli Meats", "pct": 14, "lift": 1.9}], "Soft Drinks": [{"cat": "Warehouse Snacks", "pct": 4, "lift": 1.5}, {"cat": "Bag Snacks", "pct": 27, "lift": 1.5}, {"cat": "Frzn Ice", "pct": 2, "lift": 1.5}, {"cat": "Popcorn", "pct": 2, "lift": 1.5}], "Sugars/sweetners": [{"cat": "Flour & Meals", "pct": 10, "lift": 7.1}, {"cat": "Canned Milk", "pct": 4, "lift": 5.4}, {"cat": "Pwdr/crystl Drnk Mx", "pct": 11, "lift": 5.2}, {"cat": "Shortening/oil", "pct": 15, "lift": 4.5}], "Bacon": [{"cat": "Breakfast Sausage/sandwiches", "pct": 24, "lift": 5.1}, {"cat": "Molasses/syrup/pancake Mixs", "pct": 7, "lift": 3.9}, {"cat": "Dinner Sausage", "pct": 16, "lift": 3.7}, {"cat": "Eggs", "pct": 45, "lift": 3.7}], "Cheeses": [{"cat": "Deli Meats", "pct": 63, "lift": 8.5}, {"cat": "Snacks", "pct": 3, "lift": 6.2}, {"cat": "Deli Specialties (retail Pk)", "pct": 1, "lift": 4.5}, {"cat": "Salads/dips", "pct": 9, "lift": 3.7}], "Chicken": [{"cat": "Pork", "pct": 20, "lift": 3.9}, {"cat": "Dry Bn/veg/potato/rice", "pct": 20, "lift": 3.5}, {"cat": "Squash", "pct": 3, "lift": 3.3}, {"cat": "Broccoli/cauliflower", "pct": 6, "lift": 3.3}], "Cold Cereal": [{"cat": "Convenient Brkfst/whlsm Snacks", "pct": 23, "lift": 3.8}, {"cat": "Hot Cereal", "pct": 9, "lift": 3.7}, {"cat": "Molasses/syrup/pancake Mixs", "pct": 6, "lift": 3.2}, {"cat": "Cocoa Mixes", "pct": 5, "lift": 3.2}], "Deli Meats": [{"cat": "Cheeses", "pct": 42, "lift": 8.5}, {"cat": "Deli Specialties (retail Pk)", "pct": 1, "lift": 3.8}, {"cat": "Salads/dips", "pct": 9, "lift": 3.5}, {"cat": "Snacks", "pct": 1, "lift": 2.9}], "Dinner Mxs Dry": [{"cat": "Meat - Shelf Stable", "pct": 29, "lift": 5.0}, {"cat": "Dry Sauces/gravy", "pct": 14, "lift": 4.9}, {"cat": "Dry Bn/veg/potato/rice", "pct": 28, "lift": 4.9}, {"cat": "Seafood - Shelf Stable", "pct": 13, "lift": 4.3}], "Dry Bn/veg/potato/rice": [{"cat": "Dinner Mxs Dry", "pct": 28, "lift": 4.9}, {"cat": "Dry Sauces/gravy", "pct": 14, "lift": 4.8}, {"cat": "Beans - Canned Glass & Mw", "pct": 17, "lift": 4.2}, {"cat": "Fruit - Shelf Stable", "pct": 23, "lift": 4.0}], "Dry Noodles/pasta": [{"cat": "Pasta Sauce", "pct": 43, "lift": 8.8}, {"cat": "Frozen Bread/dough", "pct": 16, "lift": 5.1}, {"cat": "Dry Sauces/gravy", "pct": 12, "lift": 4.2}, {"cat": "Beans - Canned Glass & Mw", "pct": 16, "lift": 4.0}], "Frozen Pizza": [{"cat": "Frozen Chicken", "pct": 1, "lift": 4.1}, {"cat": "Frozen Meat", "pct": 13, "lift": 3.7}, {"cat": "Frzn Potatoes", "pct": 13, "lift": 3.6}, {"cat": "Frzn Breakfast Foods", "pct": 11, "lift": 3.5}], "Frzn Breakfast Foods": [{"cat": "Molasses/syrup/pancake Mixs", "pct": 12, "lift": 6.5}, {"cat": "Frozen Bread/dough", "pct": 14, "lift": 4.6}, {"cat": "Frozen Meat", "pct": 15, "lift": 4.3}, {"cat": "Convenient Brkfst/whlsm Snacks", "pct": 25, "lift": 4.1}], "Frzn Meat/meat Dinners": [{"cat": "Frzn Breakfast Foods", "pct": 11, "lift": 3.5}, {"cat": "Frozen Bread/dough", "pct": 10, "lift": 3.3}, {"cat": "Frzn Potatoes", "pct": 11, "lift": 3.2}, {"cat": "Frozen Meat", "pct": 11, "lift": 3.2}], "Frzn Novelties/wtr Ice": [{"cat": "Frzn Breakfast Foods", "pct": 11, "lift": 3.5}, {"cat": "Frozen Bread/dough", "pct": 8, "lift": 2.6}, {"cat": "Frozen Meat", "pct": 9, "lift": 2.5}, {"cat": "Frzn Jce Conc/drnks", "pct": 2, "lift": 2.5}], "Hispanic": [{"cat": "Misc. Dairy", "pct": 16, "lift": 5.1}, {"cat": "Olives", "pct": 5, "lift": 4.4}, {"cat": "Dry Bn/veg/potato/rice", "pct": 22, "lift": 3.9}, {"cat": "Herbs", "pct": 5, "lift": 3.8}], "Milk By-products": [{"cat": "Hispanic", "pct": 21, "lift": 3.5}, {"cat": "Olives", "pct": 4, "lift": 3.4}, {"cat": "Misc. Dairy", "pct": 10, "lift": 3.1}, {"cat": "Broccoli/cauliflower", "pct": 6, "lift": 3.0}], "Paper Housewares": [{"cat": "Facial Tiss/dnr Napkin", "pct": 16, "lift": 5.5}, {"cat": "Paper Towels", "pct": 18, "lift": 4.2}, {"cat": "Fd Wraps/bags/trsh Bg", "pct": 21, "lift": 4.2}, {"cat": "Olives", "pct": 3, "lift": 3.0}], "Refrgratd Juices/drnks": [{"cat": "Bacon", "pct": 11, "lift": 2.3}, {"cat": "Refrgratd Dough Products", "pct": 14, "lift": 2.3}, {"cat": "Breakfast Sausage/sandwiches", "pct": 11, "lift": 2.2}, {"cat": "Molasses/syrup/pancake Mixs", "pct": 4, "lift": 2.2}], "Seafood - Frozen": [{"cat": "Seafood - Misc", "pct": 7, "lift": 14.9}, {"cat": "Frozen - Boxed(grocery)", "pct": 3, "lift": 7.6}, {"cat": "Seafood-fresh", "pct": 9, "lift": 5.7}, {"cat": "Frozen Meat", "pct": 12, "lift": 3.3}], "Tomatoes": [{"cat": "Vegetables Salad", "pct": 25, "lift": 6.0}, {"cat": "Squash", "pct": 3, "lift": 4.5}, {"cat": "Peppers-all", "pct": 15, "lift": 4.3}, {"cat": "Vegetables - All Others", "pct": 27, "lift": 4.2}], "Vegetables - Shelf Stable": [{"cat": "Dry Sauces/gravy", "pct": 13, "lift": 4.7}, {"cat": "Beans - Canned Glass & Mw", "pct": 19, "lift": 4.6}, {"cat": "Dry Noodles/pasta", "pct": 21, "lift": 3.4}, {"cat": "Turkey", "pct": 4, "lift": 3.4}], "Bread": [{"cat": "Squash", "pct": 3, "lift": 4.5}, {"cat": "Herbs", "pct": 6, "lift": 4.3}, {"cat": "Mushrooms", "pct": 8, "lift": 4.0}, {"cat": "Organics Fruit & Vegetables", "pct": 9, "lift": 4.0}], "Cakes": [{"cat": "Sweet Goods & Snacks", "pct": 2, "lift": 2.9}, {"cat": "Pies", "pct": 3, "lift": 2.6}, {"cat": "Cookies", "pct": 4, "lift": 2.5}, {"cat": "Frozen Pie/desserts", "pct": 7, "lift": 2.5}], "Canned Juices": [{"cat": "Cocoa Mixes", "pct": 6, "lift": 3.5}, {"cat": "Convenient Brkfst/whlsm Snacks", "pct": 20, "lift": 3.3}, {"cat": "Fruit - Shelf Stable", "pct": 18, "lift": 3.1}, {"cat": "Pwdr/crystl Drnk Mx", "pct": 6, "lift": 3.0}], "Cheese": [{"cat": "Olives", "pct": 3, "lift": 2.8}, {"cat": "Dry Noodles/pasta", "pct": 17, "lift": 2.8}, {"cat": "Hispanic", "pct": 17, "lift": 2.7}, {"cat": "Milk By-products", "pct": 23, "lift": 2.7}], "Condiments/sauces": [{"cat": "Pickle/relish/pkld Veg", "pct": 11, "lift": 4.5}, {"cat": "Sald Drsng/sndwch Sprd", "pct": 24, "lift": 3.6}, {"cat": "Beans - Canned Glass & Mw", "pct": 14, "lift": 3.5}, {"cat": "Dinner Mxs Dry", "pct": 20, "lift": 3.4}], "Grapes": [{"cat": "Pears", "pct": 4, "lift": 4.7}, {"cat": "Berries", "pct": 18, "lift": 4.6}, {"cat": "Melons", "pct": 8, "lift": 4.4}, {"cat": "Stone Fruit", "pct": 9, "lift": 4.2}], "Misc. Dairy": [{"cat": "Hispanic", "pct": 31, "lift": 5.1}, {"cat": "Olives", "pct": 4, "lift": 3.9}, {"cat": "Molasses/syrup/pancake Mixs", "pct": 7, "lift": 3.5}, {"cat": "Cereal/breakfast", "pct": 2, "lift": 3.5}], "Pasta Sauce": [{"cat": "Dry Noodles/pasta", "pct": 54, "lift": 8.8}, {"cat": "Frozen Bread/dough", "pct": 20, "lift": 6.4}, {"cat": "Dinner Mxs Dry", "pct": 25, "lift": 4.2}, {"cat": "Frozen Meat", "pct": 14, "lift": 4.0}], "Vegetables Salad": [{"cat": "Tomatoes", "pct": 36, "lift": 6.0}, {"cat": "Vegetables - All Others", "pct": 27, "lift": 4.2}, {"cat": "Broccoli/cauliflower", "pct": 8, "lift": 4.0}, {"cat": "Peppers-all", "pct": 13, "lift": 3.7}], "Yogurt": [{"cat": "Cereal/breakfast", "pct": 3, "lift": 4.0}, {"cat": "Rice Cakes", "pct": 2, "lift": 3.6}, {"cat": "Pears", "pct": 3, "lift": 3.3}, {"cat": "Broccoli/cauliflower", "pct": 6, "lift": 3.1}], "Baking Mixes": [{"cat": "Dry Mix Desserts", "pct": 12, "lift": 5.1}, {"cat": "Baking Needs", "pct": 23, "lift": 5.1}, {"cat": "Canned Milk", "pct": 4, "lift": 4.6}, {"cat": "Flour & Meals", "pct": 6, "lift": 4.1}], "Beans - Canned Glass & Mw": [{"cat": "Dry Sauces/gravy", "pct": 19, "lift": 6.8}, {"cat": "Vegetables - Shelf Stable", "pct": 39, "lift": 4.6}, {"cat": "Dry Bn/veg/potato/rice", "pct": 24, "lift": 4.2}, {"cat": "Dry Noodles/pasta", "pct": 24, "lift": 4.0}], "Butter": [{"cat": "Canned Milk", "pct": 5, "lift": 6.0}, {"cat": "Flour & Meals", "pct": 8, "lift": 5.8}, {"cat": "Herbs", "pct": 7, "lift": 5.0}, {"cat": "Baking Needs", "pct": 22, "lift": 4.8}], "Chips&snacks": [{"cat": "Condiments", "pct": 7, "lift": 40.0}, {"cat": "Snks/ckys/crkr/cndy", "pct": 8, "lift": 21.3}, {"cat": "Prepared/pkgd Foods", "pct": 5, "lift": 19.8}, {"cat": "Frozen", "pct": 12, "lift": 17.8}], "Dishwash Detergents": [{"cat": "Bleach", "pct": 10, "lift": 6.4}, {"cat": "Laundry Additives", "pct": 12, "lift": 6.3}, {"cat": "Household Cleang Needs", "pct": 20, "lift": 6.1}, {"cat": "Laundry Detergents", "pct": 22, "lift": 6.0}], "Dry Mix Desserts": [{"cat": "Frozen Pie/desserts", "pct": 17, "lift": 6.2}, {"cat": "Baking Mixes", "pct": 25, "lift": 5.1}, {"cat": "Fruit - Shelf Stable", "pct": 27, "lift": 4.6}, {"cat": "Baking Needs", "pct": 20, "lift": 4.4}], "Dry Sauces/gravy": [{"cat": "Beans - Canned Glass & Mw", "pct": 28, "lift": 6.8}, {"cat": "Dinner Mxs Dry", "pct": 28, "lift": 4.9}, {"cat": "Dry Bn/veg/potato/rice", "pct": 28, "lift": 4.8}, {"cat": "Vegetables - Shelf Stable", "pct": 40, "lift": 4.7}], "Frozen Meat": [{"cat": "Frozen Chicken", "pct": 1, "lift": 6.6}, {"cat": "Frzn Potatoes", "pct": 18, "lift": 5.2}, {"cat": "Frozen - Boxed(grocery)", "pct": 2, "lift": 4.8}, {"cat": "Frozen Bread/dough", "pct": 14, "lift": 4.4}], "Frozen Pie/desserts": [{"cat": "Frzn Fruits", "pct": 4, "lift": 8.0}, {"cat": "Dry Mix Desserts", "pct": 15, "lift": 6.2}, {"cat": "Syrups/toppings", "pct": 2, "lift": 5.2}, {"cat": "Canned Milk", "pct": 4, "lift": 5.2}], "Fruit - Shelf Stable": [{"cat": "Dried Fruit", "pct": 7, "lift": 5.0}, {"cat": "Dry Mix Desserts", "pct": 11, "lift": 4.6}, {"cat": "Dinner Mxs Dry", "pct": 24, "lift": 4.2}, {"cat": "Dry Sauces/gravy", "pct": 11, "lift": 4.1}], "Frzn Fruits": [{"cat": "Frozen Pie/desserts", "pct": 22, "lift": 8.0}, {"cat": "Refrigerated", "pct": 11, "lift": 4.9}, {"cat": "Dry Mix Desserts", "pct": 10, "lift": 4.4}, {"cat": "Broccoli/cauliflower", "pct": 8, "lift": 3.9}], "Frzn Potatoes": [{"cat": "Frozen Chicken", "pct": 1, "lift": 5.8}, {"cat": "Frozen Meat", "pct": 18, "lift": 5.2}, {"cat": "Frozen Bread/dough", "pct": 13, "lift": 4.2}, {"cat": "Frozen - Boxed(grocery)", "pct": 1, "lift": 3.9}], "Frzn Vegetable/veg Dsh": [{"cat": "Frozen - Boxed(grocery)", "pct": 1, "lift": 3.8}, {"cat": "Frzn Potatoes", "pct": 13, "lift": 3.6}, {"cat": "Dry Bn/veg/potato/rice", "pct": 19, "lift": 3.4}, {"cat": "Frozen Bread/dough", "pct": 10, "lift": 3.4}], "Hot Dogs": [{"cat": "Dinner Sausage", "pct": 21, "lift": 4.8}, {"cat": "Meat - Shelf Stable", "pct": 25, "lift": 4.3}, {"cat": "Meat - Misc", "pct": 14, "lift": 3.8}, {"cat": "Frozen Meat", "pct": 13, "lift": 3.7}], "Ice Cream/milk/sherbts": [{"cat": "Syrups/toppings", "pct": 3, "lift": 7.1}, {"cat": "Frozen Pie/desserts", "pct": 7, "lift": 2.5}, {"cat": "Cocoa Mixes", "pct": 4, "lift": 2.4}, {"cat": "Frzn Breakfast Foods", "pct": 8, "lift": 2.4}], "Laundry Detergents": [{"cat": "Laundry Additives", "pct": 22, "lift": 11.6}, {"cat": "Bleach", "pct": 15, "lift": 9.6}, {"cat": "Dishwash Detergents", "pct": 16, "lift": 6.0}, {"cat": "Air Care", "pct": 9, "lift": 5.4}], "Lunchmeat": [{"cat": "Hot Dogs", "pct": 14, "lift": 3.1}, {"cat": "Frozen Meat", "pct": 10, "lift": 2.9}, {"cat": "Frozen Chicken", "pct": 1, "lift": 2.9}, {"cat": "Meat - Shelf Stable", "pct": 16, "lift": 2.8}], "Laundry Additives": [{"cat": "Laundry Detergents", "pct": 42, "lift": 11.6}, {"cat": "Bleach", "pct": 16, "lift": 10.2}, {"cat": "Air Care", "pct": 12, "lift": 7.5}, {"cat": "Household Cleang Needs", "pct": 23, "lift": 7.3}], "Baking Needs": [{"cat": "Canned Milk", "pct": 6, "lift": 7.9}, {"cat": "Flour & Meals", "pct": 9, "lift": 6.5}, {"cat": "Baking Mixes", "pct": 25, "lift": 5.1}, {"cat": "Butter", "pct": 10, "lift": 4.8}], "Canned Milk": [{"cat": "Baking Needs", "pct": 36, "lift": 7.9}, {"cat": "Flour & Meals", "pct": 9, "lift": 6.7}, {"cat": "Butter", "pct": 13, "lift": 6.0}, {"cat": "Sugars/sweetners", "pct": 22, "lift": 5.4}], "Chicken/poultry": [{"cat": "Prepared Food", "pct": 10, "lift": 4.8}, {"cat": "Salads/dips", "pct": 9, "lift": 3.6}, {"cat": "Rolls", "pct": 5, "lift": 2.5}, {"cat": "Bread", "pct": 7, "lift": 2.1}], "Hot Cereal": [{"cat": "Dried Fruit", "pct": 6, "lift": 4.2}, {"cat": "Rice Cakes", "pct": 2, "lift": 4.2}, {"cat": "Molasses/syrup/pancake Mixs", "pct": 8, "lift": 4.1}, {"cat": "Convenient Brkfst/whlsm Snacks", "pct": 25, "lift": 4.0}], "Melons": [{"cat": "Stone Fruit", "pct": 15, "lift": 6.7}, {"cat": "Corn", "pct": 8, "lift": 6.6}, {"cat": "Juice", "pct": 2, "lift": 5.7}, {"cat": "Berries", "pct": 21, "lift": 5.3}], "Refrigerated": [{"cat": "Frozen", "pct": 11, "lift": 17.0}, {"cat": "Condiments", "pct": 3, "lift": 15.5}, {"cat": "Prepared/pkgd Foods", "pct": 4, "lift": 15.1}, {"cat": "Snks/ckys/crkr/cndy", "pct": 5, "lift": 12.3}], "Salad Mix": [{"cat": "Processed", "pct": 8, "lift": 4.4}, {"cat": "Mushrooms", "pct": 9, "lift": 4.2}, {"cat": "Value Added Vegetables", "pct": 3, "lift": 4.2}, {"cat": "Sald Drsng/sndwch Sprd", "pct": 27, "lift": 3.9}], "Air Care": [{"cat": "Household Cleang Needs", "pct": 28, "lift": 8.8}, {"cat": "Laundry Additives", "pct": 14, "lift": 7.5}, {"cat": "Bleach", "pct": 10, "lift": 6.3}, {"cat": "Dishwash Detergents", "pct": 15, "lift": 5.6}], "Household Cleang Needs": [{"cat": "Air Care", "pct": 15, "lift": 8.8}, {"cat": "Laundry Additives", "pct": 14, "lift": 7.3}, {"cat": "Bleach", "pct": 10, "lift": 6.8}, {"cat": "Dishwash Detergents", "pct": 17, "lift": 6.1}], "Spices & Extracts": [{"cat": "Flour & Meals", "pct": 7, "lift": 5.5}, {"cat": "Shortening/oil", "pct": 16, "lift": 4.8}, {"cat": "Sugars/sweetners", "pct": 17, "lift": 4.2}, {"cat": "Canned Milk", "pct": 3, "lift": 4.1}], "Beers/ales": [{"cat": "Misc Wine", "pct": 2, "lift": 4.3}, {"cat": "Liquor", "pct": 3, "lift": 3.1}, {"cat": "Domestic Wine", "pct": 6, "lift": 3.0}, {"cat": "Imported Wine", "pct": 2, "lift": 2.6}], "Heat/serve": [{"cat": "Frozen - Boxed(grocery)", "pct": 2, "lift": 4.4}, {"cat": "Frozen Meat", "pct": 14, "lift": 3.8}, {"cat": "Miscellaneous", "pct": 3, "lift": 3.7}, {"cat": "Frozen Bread/dough", "pct": 11, "lift": 3.4}], "Misc Wine": [{"cat": "Beers/ales", "pct": 29, "lift": 4.3}, {"cat": "Domestic Wine", "pct": 8, "lift": 4.2}, {"cat": "Seafood - Frozen", "pct": 7, "lift": 2.2}, {"cat": "Bread", "pct": 7, "lift": 2.0}], "Pork": [{"cat": "Miscellaneous", "pct": 4, "lift": 4.5}, {"cat": "Chicken", "pct": 25, "lift": 3.9}, {"cat": "Meat - Misc", "pct": 13, "lift": 3.6}, {"cat": "Dinner Mxs Dry", "pct": 20, "lift": 3.4}], "Seafood-fresh": [{"cat": "Seafood - Misc", "pct": 9, "lift": 19.1}, {"cat": "Seafood - Frozen", "pct": 17, "lift": 5.7}, {"cat": "Squash", "pct": 4, "lift": 5.1}, {"cat": "Snacks", "pct": 2, "lift": 4.5}], "Frozen Bread/dough": [{"cat": "Pasta Sauce", "pct": 31, "lift": 6.4}, {"cat": "Dry Noodles/pasta", "pct": 31, "lift": 5.1}, {"cat": "Frzn Breakfast Foods", "pct": 14, "lift": 4.6}, {"cat": "Frozen Meat", "pct": 16, "lift": 4.4}], "Margarines": [{"cat": "Molasses/syrup/pancake Mixs", "pct": 6, "lift": 3.4}, {"cat": "Flour & Meals", "pct": 5, "lift": 3.4}, {"cat": "Dinner Mxs Dry", "pct": 19, "lift": 3.3}, {"cat": "Bacon", "pct": 14, "lift": 3.1}], "Water - Carbonated/flvrd Drink": [{"cat": "Rice Cakes", "pct": 1, "lift": 2.2}, {"cat": "Isotonic Drinks", "pct": 5, "lift": 2.0}, {"cat": "Paper Housewares", "pct": 6, "lift": 1.9}, {"cat": "Paper Towels", "pct": 8, "lift": 1.9}], "Cookies": [{"cat": "Sweet Goods & Snacks", "pct": 2, "lift": 3.3}, {"cat": "Cakes", "pct": 5, "lift": 2.5}, {"cat": "Paper Housewares", "pct": 7, "lift": 2.2}, {"cat": "Convenient Brkfst/whlsm Snacks", "pct": 13, "lift": 2.2}], "Mushrooms": [{"cat": "Squash", "pct": 8, "lift": 9.8}, {"cat": "Herbs", "pct": 11, "lift": 8.1}, {"cat": "Peppers-all", "pct": 24, "lift": 7.0}, {"cat": "Organics Fruit & Vegetables", "pct": 15, "lift": 6.6}], "Seafood - Misc": [{"cat": "Seafood-fresh", "pct": 29, "lift": 19.1}, {"cat": "Seafood - Frozen", "pct": 45, "lift": 14.9}, {"cat": "Shortening/oil", "pct": 14, "lift": 4.2}, {"cat": "Meat - Misc", "pct": 11, "lift": 3.2}], "Berries": [{"cat": "Melons", "pct": 10, "lift": 5.3}, {"cat": "Cereal/breakfast", "pct": 3, "lift": 5.1}, {"cat": "Stone Fruit", "pct": 10, "lift": 4.7}, {"cat": "Corn", "pct": 6, "lift": 4.7}], "Carrots": [{"cat": "Broccoli/cauliflower", "pct": 14, "lift": 7.4}, {"cat": "Squash", "pct": 4, "lift": 5.2}, {"cat": "Vegetables - All Others", "pct": 33, "lift": 5.2}, {"cat": "Peppers-all", "pct": 16, "lift": 4.6}], "Coffee": [{"cat": "Cocoa Mixes", "pct": 6, "lift": 3.5}, {"cat": "Teas", "pct": 5, "lift": 3.5}, {"cat": "Hot Cereal", "pct": 7, "lift": 3.0}, {"cat": "Facial Tiss/dnr Napkin", "pct": 9, "lift": 2.9}], "Dried Fruit": [{"cat": "Snks/ckys/crkr/cndy", "pct": 3, "lift": 9.0}, {"cat": "Nuts", "pct": 7, "lift": 8.5}, {"cat": "Cereal/breakfast", "pct": 5, "lift": 7.3}, {"cat": "Frozen", "pct": 4, "lift": 5.5}], "Pickle/relish/pkld Veg": [{"cat": "Olives", "pct": 8, "lift": 7.6}, {"cat": "Sald Drsng/sndwch Sprd", "pct": 32, "lift": 4.7}, {"cat": "Condiments/sauces", "pct": 35, "lift": 4.5}, {"cat": "Seafood - Shelf Stable", "pct": 12, "lift": 4.0}], "Salads/dips": [{"cat": "Snacks", "pct": 3, "lift": 6.2}, {"cat": "Prepared Food", "pct": 8, "lift": 3.7}, {"cat": "Cheeses", "pct": 18, "lift": 3.7}, {"cat": "Chicken/poultry", "pct": 9, "lift": 3.6}], "Sald Drsng/sndwch Sprd": [{"cat": "Pickle/relish/pkld Veg", "pct": 12, "lift": 4.7}, {"cat": "Salad Mix", "pct": 25, "lift": 3.9}, {"cat": "Olives", "pct": 4, "lift": 3.9}, {"cat": "Condiments/sauces", "pct": 28, "lift": 3.6}], "Smoked Meats": [{"cat": "Turkey", "pct": 4, "lift": 3.9}, {"cat": "Potatoes", "pct": 22, "lift": 3.4}, {"cat": "Pork", "pct": 17, "lift": 3.3}, {"cat": "Miscellaneous", "pct": 3, "lift": 3.3}], "Breakfast Sweets": [{"cat": "Sweet Goods & Snacks", "pct": 2, "lift": 2.9}, {"cat": "Rolls", "pct": 5, "lift": 2.6}, {"cat": "Pies", "pct": 3, "lift": 2.5}, {"cat": "Cookies", "pct": 3, "lift": 1.8}], "Molasses/syrup/pancake Mixs": [{"cat": "Frzn Breakfast Foods", "pct": 21, "lift": 6.5}, {"cat": "Flour & Meals", "pct": 6, "lift": 4.6}, {"cat": "Pnt Btr/jelly/jams", "pct": 18, "lift": 4.2}, {"cat": "Hot Cereal", "pct": 10, "lift": 4.1}], "Olives": [{"cat": "Pickle/relish/pkld Veg", "pct": 19, "lift": 7.6}, {"cat": "Mushrooms", "pct": 10, "lift": 5.1}, {"cat": "Herbs", "pct": 7, "lift": 5.0}, {"cat": "Miscellaneous", "pct": 5, "lift": 5.0}], "Refrgratd Dough Products": [{"cat": "Breakfast Sausage/sandwiches", "pct": 19, "lift": 4.0}, {"cat": "Bacon", "pct": 16, "lift": 3.4}, {"cat": "Margarines", "pct": 18, "lift": 3.0}, {"cat": "Dry Sauces/gravy", "pct": 8, "lift": 3.0}], "Shortening/oil": [{"cat": "Flour & Meals", "pct": 10, "lift": 7.4}, {"cat": "Spices & Extracts", "pct": 18, "lift": 4.8}, {"cat": "Sugars/sweetners", "pct": 18, "lift": 4.5}, {"cat": "Seafood - Misc", "pct": 2, "lift": 4.2}], "Isotonic Drinks": [{"cat": "Convenient Brkfst/whlsm Snacks", "pct": 20, "lift": 3.3}, {"cat": "Frzn Breakfast Foods", "pct": 9, "lift": 2.9}, {"cat": "Pwdr/crystl Drnk Mx", "pct": 6, "lift": 2.8}, {"cat": "Canned Juices", "pct": 25, "lift": 2.8}], "Citrus": [{"cat": "Herbs", "pct": 8, "lift": 5.5}, {"cat": "Pears", "pct": 4, "lift": 5.3}, {"cat": "Apples", "pct": 26, "lift": 4.8}, {"cat": "Cereal/breakfast", "pct": 3, "lift": 4.7}], "Peppers-all": [{"cat": "Squash", "pct": 6, "lift": 7.9}, {"cat": "Herbs", "pct": 10, "lift": 7.3}, {"cat": "Mushrooms", "pct": 14, "lift": 7.0}, {"cat": "Onions", "pct": 41, "lift": 6.2}], "Snack Nuts": [{"cat": "Juice", "pct": 2, "lift": 4.8}, {"cat": "Popcorn", "pct": 7, "lift": 4.4}, {"cat": "Dried Fruit", "pct": 5, "lift": 4.0}, {"cat": "Warehouse Snacks", "pct": 9, "lift": 3.6}], "Value Added Fruit": [{"cat": "Value Added Vegetables", "pct": 4, "lift": 5.2}, {"cat": "Juice", "pct": 2, "lift": 5.0}, {"cat": "Stone Fruit", "pct": 9, "lift": 4.2}, {"cat": "Berries", "pct": 16, "lift": 4.1}], "Popcorn": [{"cat": "Snack Nuts", "pct": 8, "lift": 4.4}, {"cat": "Nuts", "pct": 3, "lift": 3.3}, {"cat": "Pwdr/crystl Drnk Mx", "pct": 7, "lift": 3.1}, {"cat": "Convenient Brkfst/whlsm Snacks", "pct": 18, "lift": 3.0}], "Apples": [{"cat": "Pears", "pct": 6, "lift": 6.7}, {"cat": "Citrus", "pct": 21, "lift": 4.8}, {"cat": "Cereal/breakfast", "pct": 3, "lift": 4.8}, {"cat": "Dried Fruit", "pct": 6, "lift": 4.5}], "Rolls": [{"cat": "Cheeses", "pct": 15, "lift": 3.1}, {"cat": "Sweet Goods & Snacks", "pct": 2, "lift": 2.8}, {"cat": "Salads/dips", "pct": 7, "lift": 2.8}, {"cat": "Pies", "pct": 3, "lift": 2.7}], "Turkey": [{"cat": "Canned Milk", "pct": 3, "lift": 4.1}, {"cat": "Dry Sauces/gravy", "pct": 11, "lift": 4.0}, {"cat": "Smoked Meats", "pct": 6, "lift": 3.9}, {"cat": "Vegetables - All Others", "pct": 23, "lift": 3.6}], "Cat Litter": [{"cat": "Cat Food", "pct": 44, "lift": 15.4}, {"cat": "Pet Care Supplies", "pct": 8, "lift": 7.2}, {"cat": "Air Care", "pct": 7, "lift": 4.0}, {"cat": "Dog Foods", "pct": 11, "lift": 3.6}], "Broccoli/cauliflower": [{"cat": "Squash", "pct": 6, "lift": 8.1}, {"cat": "Carrots", "pct": 27, "lift": 7.4}, {"cat": "Mushrooms", "pct": 12, "lift": 6.0}, {"cat": "Herbs", "pct": 8, "lift": 5.7}], "Frzn Ice": [{"cat": "Paper Housewares", "pct": 9, "lift": 2.8}, {"cat": "Beers/ales", "pct": 15, "lift": 2.2}, {"cat": "Water - Carbonated/flvrd Drink", "pct": 12, "lift": 1.7}, {"cat": "Warehouse Snacks", "pct": 4, "lift": 1.6}], "Flour & Meals": [{"cat": "Shortening/oil", "pct": 24, "lift": 7.4}, {"cat": "Sugars/sweetners", "pct": 28, "lift": 7.1}, {"cat": "Canned Milk", "pct": 5, "lift": 6.7}, {"cat": "Baking Needs", "pct": 29, "lift": 6.5}], "Teas": [{"cat": "Cocoa Mixes", "pct": 7, "lift": 4.5}, {"cat": "Sugars/sweetners", "pct": 18, "lift": 4.4}, {"cat": "Pwdr/crystl Drnk Mx", "pct": 9, "lift": 4.0}, {"cat": "Coffee", "pct": 17, "lift": 3.5}], "Paper Towels": [{"cat": "Bath Tissues", "pct": 36, "lift": 6.1}, {"cat": "Facial Tiss/dnr Napkin", "pct": 16, "lift": 5.5}, {"cat": "Household Cleang Needs", "pct": 14, "lift": 4.3}, {"cat": "Paper Housewares", "pct": 14, "lift": 4.2}], "Pies": [{"cat": "Frozen Pie/desserts", "pct": 13, "lift": 4.7}, {"cat": "Smoked Meats", "pct": 4, "lift": 2.8}, {"cat": "Salads/dips", "pct": 7, "lift": 2.7}, {"cat": "Rolls", "pct": 6, "lift": 2.7}], "Seafood - Shelf Stable": [{"cat": "Dinner Mxs Dry", "pct": 25, "lift": 4.3}, {"cat": "Meat - Shelf Stable", "pct": 25, "lift": 4.2}, {"cat": "Pickle/relish/pkld Veg", "pct": 10, "lift": 4.0}, {"cat": "Dry Bn/veg/potato/rice", "pct": 21, "lift": 3.6}], "Frozen - Boxed(grocery)": [{"cat": "Seafood - Frozen", "pct": 23, "lift": 7.6}, {"cat": "Frozen Meat", "pct": 17, "lift": 4.8}, {"cat": "Heat/serve", "pct": 10, "lift": 4.4}, {"cat": "Frzn Potatoes", "pct": 14, "lift": 3.9}], "Meat - Misc": [{"cat": "Frozen Meat", "pct": 14, "lift": 3.9}, {"cat": "Hot Dogs", "pct": 18, "lift": 3.8}, {"cat": "Dinner Sausage", "pct": 16, "lift": 3.8}, {"cat": "Dinner Mxs Dry", "pct": 21, "lift": 3.7}], "Pet Care Supplies": [{"cat": "Dog Foods", "pct": 30, "lift": 9.7}, {"cat": "Cat Litter", "pct": 9, "lift": 7.2}, {"cat": "Cat Food", "pct": 17, "lift": 6.0}, {"cat": "Air Care", "pct": 7, "lift": 4.3}], "Value Added Vegetables": [{"cat": "Processed", "pct": 17, "lift": 8.8}, {"cat": "Squash", "pct": 4, "lift": 5.7}, {"cat": "Mushrooms", "pct": 11, "lift": 5.3}, {"cat": "Value Added Fruit", "pct": 12, "lift": 5.2}], "Processed": [{"cat": "Value Added Vegetables", "pct": 7, "lift": 8.8}, {"cat": "Juice", "pct": 3, "lift": 7.6}, {"cat": "Broccoli/cauliflower", "pct": 10, "lift": 5.1}, {"cat": "Chips&snacks", "pct": 4, "lift": 4.9}], "Pwdr/crystl Drnk Mx": [{"cat": "Sugars/sweetners", "pct": 21, "lift": 5.2}, {"cat": "Cocoa Mixes", "pct": 7, "lift": 4.2}, {"cat": "Teas", "pct": 5, "lift": 4.0}, {"cat": "Dinner Mxs Dry", "pct": 22, "lift": 3.8}], "Herbs": [{"cat": "Squash", "pct": 7, "lift": 9.2}, {"cat": "Mushrooms", "pct": 16, "lift": 8.1}, {"cat": "Organics Fruit & Vegetables", "pct": 17, "lift": 7.4}, {"cat": "Peppers-all", "pct": 25, "lift": 7.3}], "Warehouse Snacks": [{"cat": "Snack Nuts", "pct": 7, "lift": 3.6}, {"cat": "Popcorn", "pct": 5, "lift": 2.8}, {"cat": "Convenient Brkfst/whlsm Snacks", "pct": 14, "lift": 2.3}, {"cat": "Isotonic Drinks", "pct": 5, "lift": 2.2}], "Liquor": [{"cat": "Beers/ales", "pct": 21, "lift": 3.1}, {"cat": "Domestic Wine", "pct": 5, "lift": 2.7}, {"cat": "Cat Food", "pct": 7, "lift": 2.6}, {"cat": "Paper Housewares", "pct": 5, "lift": 1.6}], "Snacks": [{"cat": "Salads/dips", "pct": 16, "lift": 6.2}, {"cat": "Cheeses", "pct": 30, "lift": 6.2}, {"cat": "Seafood-fresh", "pct": 7, "lift": 4.5}, {"cat": "Organics Fruit & Vegetables", "pct": 10, "lift": 4.4}], "Dinner Sausage": [{"cat": "Miscellaneous", "pct": 5, "lift": 5.7}, {"cat": "Hot Dogs", "pct": 23, "lift": 4.8}, {"cat": "Meat - Misc", "pct": 14, "lift": 3.8}, {"cat": "Bacon", "pct": 17, "lift": 3.7}], "Bath": [{"cat": "Makeup And Treatment", "pct": 14, "lift": 8.2}, {"cat": "Household Cleang Needs", "pct": 10, "lift": 3.1}, {"cat": "Facial Tiss/dnr Napkin", "pct": 9, "lift": 2.9}, {"cat": "Laundry Detergents", "pct": 10, "lift": 2.8}], "Fd Wraps/bags/trsh Bg": [{"cat": "Facial Tiss/dnr Napkin", "pct": 13, "lift": 4.2}, {"cat": "Paper Housewares", "pct": 14, "lift": 4.2}, {"cat": "Paper Towels", "pct": 17, "lift": 4.0}, {"cat": "Dishwash Detergents", "pct": 11, "lift": 4.0}], "Miscellaneous": [{"cat": "Dinner Sausage", "pct": 24, "lift": 5.7}, {"cat": "Olives", "pct": 6, "lift": 5.0}, {"cat": "Pork", "pct": 23, "lift": 4.5}, {"cat": "Heat/serve", "pct": 8, "lift": 3.7}], "Stone Fruit": [{"cat": "Melons", "pct": 12, "lift": 6.7}, {"cat": "Pears", "pct": 5, "lift": 6.0}, {"cat": "Corn", "pct": 6, "lift": 4.8}, {"cat": "Berries", "pct": 19, "lift": 4.7}], "Imported Wine": [{"cat": "Domestic Wine", "pct": 20, "lift": 10.0}, {"cat": "Herbs", "pct": 7, "lift": 4.6}, {"cat": "Organics Fruit & Vegetables", "pct": 10, "lift": 4.3}, {"cat": "Mushrooms", "pct": 8, "lift": 4.2}], "Makeup And Treatment": [{"cat": "Bath", "pct": 4, "lift": 8.2}, {"cat": "Household Cleang Needs", "pct": 10, "lift": 3.0}, {"cat": "Laundry Additives", "pct": 6, "lift": 3.0}, {"cat": "Air Care", "pct": 4, "lift": 2.6}], "Cereal/breakfast": [{"cat": "Prepared/pkgd Foods", "pct": 7, "lift": 26.4}, {"cat": "Snks/ckys/crkr/cndy", "pct": 10, "lift": 25.2}, {"cat": "Frozen", "pct": 15, "lift": 22.0}, {"cat": "Chips&snacks", "pct": 11, "lift": 15.2}], "Deli Supplies": [{"cat": "Deli Meats", "pct": 17, "lift": 2.3}, {"cat": "Crackers/misc Bkd Fd", "pct": 16, "lift": 1.6}, {"cat": "Cold Cereal", "pct": 17, "lift": 1.6}, {"cat": "Eggs", "pct": 19, "lift": 1.6}], "Domestic Wine": [{"cat": "Imported Wine", "pct": 8, "lift": 10.0}, {"cat": "Misc Wine", "pct": 2, "lift": 4.2}, {"cat": "Herbs", "pct": 5, "lift": 3.5}, {"cat": "Beers/ales", "pct": 20, "lift": 3.0}], "Fitness&diet": [{"cat": "Snks/ckys/crkr/cndy", "pct": 6, "lift": 16.5}, {"cat": "Cereal/breakfast", "pct": 9, "lift": 14.3}, {"cat": "Frozen", "pct": 8, "lift": 11.5}, {"cat": "Chips&snacks", "pct": 7, "lift": 9.9}], "Squash": [{"cat": "Mushrooms", "pct": 20, "lift": 9.8}, {"cat": "Herbs", "pct": 13, "lift": 9.2}, {"cat": "Broccoli/cauliflower", "pct": 16, "lift": 8.1}, {"cat": "Peppers-all", "pct": 27, "lift": 7.9}], "Corn": [{"cat": "Melons", "pct": 12, "lift": 6.6}, {"cat": "Squash", "pct": 4, "lift": 5.0}, {"cat": "Stone Fruit", "pct": 11, "lift": 4.8}, {"cat": "Berries", "pct": 18, "lift": 4.7}], "Water": [{"cat": "Refrigerated", "pct": 8, "lift": 3.8}, {"cat": "Value Added Fruit", "pct": 6, "lift": 2.7}, {"cat": "Yogurt", "pct": 14, "lift": 2.1}, {"cat": "Grapes", "pct": 8, "lift": 1.8}], "Juice": [{"cat": "Refrigerated", "pct": 21, "lift": 9.6}, {"cat": "Processed", "pct": 15, "lift": 7.6}, {"cat": "Melons", "pct": 10, "lift": 5.7}, {"cat": "Organics Fruit & Vegetables", "pct": 12, "lift": 5.4}], "Bleach": [{"cat": "Laundry Additives", "pct": 20, "lift": 10.2}, {"cat": "Laundry Detergents", "pct": 35, "lift": 9.6}, {"cat": "Household Cleang Needs", "pct": 22, "lift": 6.8}, {"cat": "Dishwash Detergents", "pct": 17, "lift": 6.4}], "Dog Foods": [{"cat": "Pet Care Supplies", "pct": 10, "lift": 9.7}, {"cat": "Cat Food", "pct": 13, "lift": 4.5}, {"cat": "Cat Litter", "pct": 5, "lift": 3.6}, {"cat": "Laundry Additives", "pct": 6, "lift": 3.0}], "Prepared/pkgd Foods": [{"cat": "Frozen", "pct": 19, "lift": 28.4}, {"cat": "Cereal/breakfast", "pct": 17, "lift": 26.4}, {"cat": "Chips&snacks", "pct": 15, "lift": 19.8}, {"cat": "Refrigerated", "pct": 33, "lift": 15.1}], "Cocoa Mixes": [{"cat": "Teas", "pct": 6, "lift": 4.5}, {"cat": "Pwdr/crystl Drnk Mx", "pct": 9, "lift": 4.2}, {"cat": "Molasses/syrup/pancake Mixs", "pct": 8, "lift": 4.1}, {"cat": "Hot Cereal", "pct": 10, "lift": 4.0}], "Facial Tiss/dnr Napkin": [{"cat": "Paper Housewares", "pct": 18, "lift": 5.5}, {"cat": "Paper Towels", "pct": 23, "lift": 5.5}, {"cat": "Bath Tissues", "pct": 28, "lift": 4.7}, {"cat": "Household Cleang Needs", "pct": 14, "lift": 4.5}], "Sweet Goods & Snacks": [{"cat": "Cookies", "pct": 5, "lift": 3.3}, {"cat": "Breakfast Sweets", "pct": 10, "lift": 2.9}, {"cat": "Cakes", "pct": 5, "lift": 2.9}, {"cat": "Rolls", "pct": 6, "lift": 2.8}], "Party Trays": [{"cat": "Crackers/misc Bkd Fd", "pct": 21, "lift": 2.1}, {"cat": "Bag Snacks", "pct": 33, "lift": 1.8}, {"cat": "Cheese", "pct": 28, "lift": 1.4}, {"cat": "Baked Bread/buns/rolls", "pct": 32, "lift": 1.2}], "Snks/ckys/crkr/cndy": [{"cat": "Cereal/breakfast", "pct": 16, "lift": 25.2}, {"cat": "Frozen", "pct": 14, "lift": 21.4}, {"cat": "Chips&snacks", "pct": 16, "lift": 21.3}, {"cat": "Fitness&diet", "pct": 12, "lift": 16.5}], "Frozen": [{"cat": "Condiments", "pct": 6, "lift": 35.7}, {"cat": "Prepared/pkgd Foods", "pct": 8, "lift": 28.4}, {"cat": "Cereal/breakfast", "pct": 14, "lift": 22.0}, {"cat": "Snks/ckys/crkr/cndy", "pct": 8, "lift": 21.4}], "Syrups/toppings": [{"cat": "Ice Cream/milk/sherbts", "pct": 62, "lift": 7.1}, {"cat": "Frozen Pie/desserts", "pct": 15, "lift": 5.2}, {"cat": "Baking Needs", "pct": 16, "lift": 3.4}, {"cat": "Baking Mixes", "pct": 16, "lift": 3.2}], "Condiments": [{"cat": "Chips&snacks", "pct": 29, "lift": 40.0}, {"cat": "Frozen", "pct": 24, "lift": 35.7}, {"cat": "Refrigerated", "pct": 34, "lift": 15.5}, {"cat": "Organics Fruit & Vegetables", "pct": 28, "lift": 12.6}], "Non-dairy Beverages": [{"cat": "Refrigerated", "pct": 24, "lift": 10.8}, {"cat": "Organics Fruit & Vegetables", "pct": 17, "lift": 7.4}, {"cat": "Pnt Btr/jelly/jams", "pct": 17, "lift": 3.9}, {"cat": "Citrus", "pct": 16, "lift": 3.7}], "Nuts": [{"cat": "Dried Fruit", "pct": 11, "lift": 8.5}, {"cat": "Organics Fruit & Vegetables", "pct": 13, "lift": 5.7}, {"cat": "Broccoli/cauliflower", "pct": 9, "lift": 4.7}, {"cat": "Herbs", "pct": 6, "lift": 4.6}], "Coupon/misc Items": [{"cat": "Facial Tiss/dnr Napkin", "pct": 6, "lift": 2.1}, {"cat": "Frozen Meat", "pct": 7, "lift": 2.0}, {"cat": "Frzn Breakfast Foods", "pct": 6, "lift": 2.0}, {"cat": "Meat - Misc", "pct": 7, "lift": 2.0}], "Beverage": [{"cat": "Beef", "pct": 24, "lift": 1.5}, {"cat": "Cheese", "pct": 25, "lift": 1.2}, {"cat": "Baked Bread/buns/rolls", "pct": 28, "lift": 1.1}, {"cat": "Fluid Milk Products", "pct": 31, "lift": 1.0}], "Rice Cakes": [{"cat": "Hot Cereal", "pct": 10, "lift": 4.2}, {"cat": "Convenient Brkfst/whlsm Snacks", "pct": 22, "lift": 3.6}, {"cat": "Yogurt", "pct": 24, "lift": 3.6}, {"cat": "Pnt Btr/jelly/jams", "pct": 14, "lift": 3.3}], "Pears": [{"cat": "Apples", "pct": 36, "lift": 6.7}, {"cat": "Squash", "pct": 5, "lift": 6.3}, {"cat": "Stone Fruit", "pct": 13, "lift": 6.0}, {"cat": "Organics Fruit & Vegetables", "pct": 13, "lift": 5.6}], "Frzn Jce Conc/drnks": [{"cat": "Cereal/breakfast", "pct": 4, "lift": 6.8}, {"cat": "Dried Fruit", "pct": 6, "lift": 4.4}, {"cat": "Olives", "pct": 5, "lift": 4.1}, {"cat": "Frzn Breakfast Foods", "pct": 12, "lift": 3.9}], "Sandwiches": [{"cat": "Bag Snacks", "pct": 33, "lift": 1.8}, {"cat": "Deli Meats", "pct": 12, "lift": 1.6}, {"cat": "Soft Drinks", "pct": 37, "lift": 1.2}, {"cat": "Frzn Meat/meat Dinners", "pct": 12, "lift": 1.2}], "Packaged Natural Snacks": [{"cat": "Apples", "pct": 22, "lift": 4.1}, {"cat": "Crackers/misc Bkd Fd", "pct": 23, "lift": 2.3}, {"cat": "Cold Cereal", "pct": 25, "lift": 2.3}, {"cat": "Tropical Fruit", "pct": 29, "lift": 2.3}], "Frozen Chicken": [{"cat": "Frozen Meat", "pct": 23, "lift": 6.6}, {"cat": "Frzn Potatoes", "pct": 20, "lift": 5.8}, {"cat": "Frozen Pizza", "pct": 41, "lift": 4.1}, {"cat": "Dinner Mxs Dry", "pct": 23, "lift": 4.1}], "Deli Specialties (retail Pk)": [{"cat": "Cheeses", "pct": 22, "lift": 4.5}, {"cat": "Deli Meats", "pct": 28, "lift": 3.8}, {"cat": "Crackers/misc Bkd Fd", "pct": 29, "lift": 2.9}, {"cat": "Cold Cereal", "pct": 28, "lift": 2.5}], "Sushi": [{"cat": "Tomatoes", "pct": 14, "lift": 2.4}, {"cat": "Vegetables - All Others", "pct": 14, "lift": 2.2}, {"cat": "Salad Mix", "pct": 14, "lift": 2.1}, {"cat": "Tropical Fruit", "pct": 23, "lift": 1.8}], "Baking": [{"cat": "Organics Fruit & Vegetables", "pct": 29, "lift": 12.9}, {"cat": "Refrigerated", "pct": 24, "lift": 11.0}, {"cat": "Vegetables - All Others", "pct": 24, "lift": 3.8}, {"cat": "Tropical Fruit", "pct": 25, "lift": 1.9}], "New Age": [{"cat": "Soft Drinks", "pct": 34, "lift": 1.1}, {"cat": "Bag Snacks", "pct": 20, "lift": 1.1}, {"cat": "Cheese", "pct": 21, "lift": 1.1}, {"cat": "Baked Bread/buns/rolls", "pct": 24, "lift": 0.9}]}, "lift": {"Air Care": 1.09, "Apples": 1.35, "Bacon": 2.02, "Bag Snacks": 1.13, "Baked Bread/buns/rolls": 1.12, "Baked Sweet Goods": 1.21, "Baking Mixes": 1.16, "Baking Needs": 1.39, "Bath": 1.0, "Bath Tissues": 1.42, "Beans - Canned Glass & Mw": 1.26, "Beef": 1.38, "Berries": 1.81, "Bleach": 1.18, "Bread": 1.16, "Breakfast Sausage/sandwiches": 1.73, "Breakfast Sweets": 1.33, "Cakes": 1.0, "Canned Juices": 1.22, "Cat Food": 1.02, "Cat Litter": 1.1, "Cereal/breakfast": 1.02, "Cheese": 1.16, "Cheeses": 1.0, "Chicken": 1.33, "Chicken/poultry": 1.0, "Chips&snacks": 1.08, "Citrus": 2.5, "Cocoa Mixes": 1.25, "Coffee": 1.06, "Cold Cereal": 1.48, "Condiments": 1.0, "Condiments/sauces": 1.09, "Convenient Brkfst/whlsm Snacks": 1.39, "Cookies": 1.12, "Cookies/cones": 1.17, "Crackers/misc Bkd Fd": 1.24, "Deli Meats": 1.21, "Dinner Mxs Dry": 1.38, "Dinner Sausage": 1.33, "Dishwash Detergents": 1.05, "Dog Foods": 1.02, "Dried Fruit": 1.18, "Dry Bn/veg/potato/rice": 1.15, "Dry Mix Desserts": 1.21, "Dry Noodles/pasta": 1.15, "Dry Sauces/gravy": 1.2, "Dry Tea/coffee/coco Mix": 1.0, "Eggs": 1.06, "Facial Tiss/dnr Napkin": 1.18, "Fd Wraps/bags/trsh Bg": 1.24, "Fitness&diet": 1.22, "Fluid Milk Products": 1.18, "Frozen": 1.0, "Frozen - Boxed(grocery)": 1.15, "Frozen Bread/dough": 1.26, "Frozen Meat": 1.24, "Frozen Pie/desserts": 1.39, "Frozen Pizza": 1.33, "Fruit - Shelf Stable": 1.36, "Frzn Breakfast Foods": 1.18, "Frzn Jce Conc/drnks": 0.97, "Frzn Meat/meat Dinners": 1.27, "Frzn Novelties/wtr Ice": 1.24, "Frzn Potatoes": 1.27, "Frzn Vegetable/veg Dsh": 1.29, "Grapes": 1.0, "Heat/serve": 1.28, "Hispanic": 1.09, "Hot Cereal": 1.04, "Hot Dogs": 1.64, "Household Cleang Needs": 1.06, "Ice Cream/milk/sherbts": 1.27, "Isotonic Drinks": 1.24, "Juice": 1.12, "Laundry Additives": 1.1, "Laundry Detergents": 1.21, "Lunchmeat": 1.66, "Makeup And Treatment": 1.0, "Margarines": 1.26, "Meat - Misc": 1.22, "Meat - Shelf Stable": 1.32, "Milk By-products": 1.09, "Misc. Dairy": 1.08, "Molasses/syrup/pancake Mixs": 1.21, "Non-dairy Beverages": 1.29, "Olives": 1.17, "Organics Fruit & Vegetables": 1.14, "Paper Housewares": 1.18, "Paper Towels": 1.3, "Pasta Sauce": 1.03, "Pet Care Supplies": 1.0, "Pickle/relish/pkld Veg": 1.17, "Pies": 1.28, "Pnt Btr/jelly/jams": 1.05, "Popcorn": 1.36, "Pork": 1.67, "Potatoes": 1.19, "Prepared/pkgd Foods": 1.0, "Processed": 1.04, "Pwdr/crystl Drnk Mx": 1.19, "Refrgratd Dough Products": 1.52, "Refrgratd Juices/drnks": 1.3, "Refrigerated": 1.07, "Rice Cakes": 1.36, "Rolls": 1.11, "Salad Mix": 1.59, "Salads/dips": 1.0, "Sald Drsng/sndwch Sprd": 1.15, "Seafood - Frozen": 1.45, "Seafood - Misc": 1.0, "Seafood - Shelf Stable": 1.2, "Seafood-fresh": 1.34, "Shortening/oil": 1.19, "Smoked Meats": 1.63, "Snack Nuts": 1.1, "Snacks": 1.0, "Snks/ckys/crkr/cndy": 1.0, "Soft Drinks": 1.33, "Soup": 1.33, "Spices & Extracts": 1.0, "Sugars/sweetners": 1.2, "Syrups/toppings": 1.04, "Teas": 1.0, "Turkey": 1.93, "Value Added Vegetables": 1.37, "Vegetables - All Others": 1.0, "Vegetables - Shelf Stable": 1.33, "Warehouse Snacks": 1.41, "Water": 1.8, "Water - Carbonated/flvrd Drink": 1.49, "Yogurt": 1.2}};
-/* ============================================================
-   i18n — US English + Filipino (Tagalog).
-   Product CATEGORY names stay in English on purpose: they are data
-   labels from the basket dataset, and Philippine retail uses the
-   English category vocabulary day to day.
-   ============================================================ */
-const I18N={
-en:{
-eyebrow:"For store owners &middot; slow-mover triage",
-title:"Shelf Temperature Check",
-lead:"Check whether a slow product is worth keeping &mdash; and if it is, get the one move most likely to save it. Everything runs on your own numbers.",
-tab_check:"Check a product", tab_batch:"Check my slow-movers",
-h_about:"Tell me about the product", sub_about:"Just what you already know.",
-l_stale:"Weeks since it last sold", hint_stale:"&mdash; 0 = sold this week",
-l_weeks:"Weeks you've been selling it",
-l_units:"Total units sold so far", hint_units:"&mdash; type the number",
-l_cat:"Category", hint_cat:"&mdash; used for rescue advice if it's slipping",
-l_stock:"Units you originally stocked", hint_stock:"&mdash; optional, for sell-through &amp; reorder",
-l_price:"Your selling price (₱)", hint_price:"&mdash; optional, unlocks profit advice",
-l_cost:"What you pay for it (₱)", hint_cost:"&mdash; your cost per unit",
-chip_margin:"Margin", chip_str:"Sell-through", chip_reorder:"Stock left lasts", chip_frozen:"Cash tied up",
-h_why:"How it read the shelf",
-h_batch:"Check your slow-movers in one go",
-sub_batch:"List the products you're unsure about. Tag each with a category and enter the three numbers &mdash; it reads whether each is worth keeping. The category is for your reference; the reading runs on the sales numbers.",
-th_product:"Product", th_cat:"Category", th_stale:"Wks since sold", th_weeks:"Wks selling",
-th_units:"Units sold", th_reading:"Reading",
-btn_add:"+ Add product",
-footer:"<b>Good to know.</b> Sell-through uses the stock number you enter (units sold &divide; units stocked). This checks products you already stock, from how they sell (not profit) &mdash; a guide, not a guarantee, right about 4 out of 5 times. Pairing and discount advice come from real basket data; treat them as strong ideas to test, since habits differ by place. Profit and margin advice use the price and cost you enter. ₱ shown for illustration.",
-
-reading:"Reading",
-band_thriving:"THRIVING", band_stable:"STABLE", band_watch:"WATCH", band_critical:"CRITICAL",
-pct_chance:"{p}% chance it keeps selling",
-opt_pick:"— pick —", ph_product:"product name", remove:"remove",
-sold_out:"sold out", under_week:"under a week", wks:"{n} wks",
-
-why_recent:"Still selling recently ({n} wks ago) — the strongest good sign.",
-why_quiet:"A little quiet lately ({n} wks since a sale).",
-why_gone:"Gone quiet — {n} weeks with no sale is the biggest red flag.",
-why_steady:"Sold steadily across {n} weeks — it has a rhythm.",
-why_thin:"Only sold in {n} weeks so far — thin track record.",
-why_thin1:"Only sold in 1 week so far — thin track record.",
-why_vol_ok:"Healthy volume — {n} units sold.",
-why_vol_low:"Low volume so far — only {n} units sold.",
-why_str_hi:"Sell-through {n}% — strong; most of what you stocked has sold.",
-why_str_mid:"Sell-through {n}% — middling; a good chunk is still on the shelf.",
-why_str_lo:"Sell-through {n}% — low; most of what you stocked hasn't sold.",
-why_margin:"Earns about {v}/week in margin ({n} sold × {m}).",
-
-keep_h:"No rescue needed",
-keep_p:"This one reads healthy — keep stocking it. (If a product's slipping, its rescue play shows up here.)",
-rescue_label:"Rescue play", prefix_rescue:"Rescue", prefix_retire:"Retire",
-play_cut:"Cut the price", play_light:"Try a light discount",
-disc_desc:"{cat} sells about <b>{lift}×</b> more units when discounted{mod} — a price cut is a real lever.",
-disc_mod_some:" (modestly)",
-disc_note:" At your margin, a ~15% cut still <b>adds about {v}/week</b> in profit — worth doing.",
-play_bundle:"Bundle it with {cat}",
-bundle_desc:"Shoppers who buy {a} grab {b} <b>{pct}%</b> of the time — a combo deal lets that habit pull it along.",
-play_retire:"Retire it", this_product:"This product",
-retire_1a:" responds to discounts, but not profitably at your margin,",
-retire_1b:" barely responds to discounts",
-retire_2:" and has no strong pairing partner",
-retire_3:". It earns only about {v}/week in margin",
-retire_4:", with about <b>{v}</b> of cash frozen in unsold stock",
-retire_5:". The honest move is to stop reordering — that cash could be buying a winner.",
-also_worth:"Also worth a shot:",
-warn_title:"⚠ Don't discount this.",
-warn_margin:"{cat} does respond to price cuts, but at your margin a 15% cut would {x} — the extra volume doesn't cover the margin you'd give up.",
-warn_below:"sell you <b>below cost</b>", warn_lose:"lose about <b>{v}/week</b>",
-warn_weak:"{cat} barely responds to price cuts (about {lift}×) — you'd give up margin for almost no extra sales.",
-pair_instead:" Pair it instead.",
-pick_cat_note:"Pick a category above to get discount vs bundle advice.",
-batch_summary:"Out of <b>{n}</b> products: <b>{cut}</b> read as likely to drop, <b>{keep}</b> worth keeping. For a keeper you still want to push, run it through <b>{tab}</b> to get its rescue play."
-},
-fil:{
-eyebrow:"Para sa may-tindahan &middot; suri ng mabagal na benta",
-title:"Suri ng Temperatura ng Istante",
-lead:"Alamin kung sulit pang itinda ang mabagal na produkto &mdash; at kung oo, ito ang hakbang na malamang makapagsalba nito. Base lahat sa sarili mong numero.",
-tab_check:"Suriin ang produkto", tab_batch:"Suriin ang mabagal magbenta",
-h_about:"Ikuwento mo ang produkto", sub_about:"Kung ano lang ang alam mo.",
-l_stale:"Linggo mula huling benta", hint_stale:"&mdash; 0 = nabenta ngayong linggo",
-l_weeks:"Linggong itinitinda",
-l_units:"Kabuuang piraso nabenta", hint_units:"&mdash; i-type ang bilang",
-l_cat:"Kategorya", hint_cat:"&mdash; gagamitin sa payo kung bumabagsak",
-l_stock:"Piraso na ni-stock mo", hint_stock:"&mdash; opsyonal, para sa sell-through at reorder",
-l_price:"Presyo mo ng benta (₱)", hint_price:"&mdash; opsyonal, para sa payo sa kita",
-l_cost:"Puhunan mo kada piraso (₱)", hint_cost:"&mdash; gastos mo kada piraso",
-chip_margin:"Tubo", chip_str:"Sell-through", chip_reorder:"Tatagal pa ang stock", chip_frozen:"Perang nakatengga",
-h_why:"Paano nabasa ang istante",
-h_batch:"Suriin lahat ng mabagal nang sabay-sabay",
-sub_batch:"Ilista ang mga produktong hindi ka sigurado. Lagyan ng kategorya at ilagay ang tatlong numero &mdash; babasahin nito kung sulit pang itago ang bawat isa. Ang kategorya ay para sa iyong reference; ang basa ay base sa numero ng benta.",
-th_product:"Produkto", th_cat:"Kategorya", th_stale:"Linggo mula benta", th_weeks:"Linggong itinitinda",
-th_units:"Piraso nabenta", th_reading:"Basa",
-btn_add:"+ Magdagdag ng produkto",
-footer:"<b>Dapat mong malaman.</b> Ang sell-through ay base sa stock na inilagay mo (piraso na nabenta &divide; piraso na ni-stock). Sinusuri nito ang mga produktong nasa tindahan mo na, base sa kung paano mabenta (hindi sa tubo) &mdash; gabay ito, hindi garantiya, tama sa humigit-kumulang 4 sa 5 beses. Ang payo sa pagpapares at diskwento ay galing sa totoong basket data; ituring itong matibay na ideyang subukan, dahil iba-iba ang ugali kada lugar. Ang payo sa tubo at margin ay base sa presyo at puhunan na inilagay mo. ₱ ay pang-halimbawa lamang.",
-
-reading:"Basa",
-band_thriving:"MALAKAS", band_stable:"MATATAG", band_watch:"BANTAYAN", band_critical:"DELIKADO",
-pct_chance:"{p}% tsansang magpatuloy ang benta",
-opt_pick:"— pumili —", ph_product:"pangalan ng produkto", remove:"alisin",
-sold_out:"ubos na", under_week:"wala pang isang linggo", wks:"{n} linggo",
-
-why_recent:"May benta pa kamakailan ({n} linggo ang nakalipas) — ito ang pinakamalakas na magandang senyales.",
-why_quiet:"Medyo tumahimik kamakailan ({n} linggo mula huling benta).",
-why_gone:"Tumahimik na — {n} linggong walang benta ang pinakamalaking red flag.",
-why_steady:"Tuloy-tuloy ang benta sa loob ng {n} linggo — may sariling ritmo.",
-why_thin:"{n} linggo pa lang ang benta — manipis pa ang record.",
-why_thin1:"1 linggo pa lang ang benta — manipis pa ang record.",
-why_vol_ok:"Malusog ang bilang — {n} piraso ang nabenta.",
-why_vol_low:"Mababa pa ang bilang — {n} piraso pa lang ang nabenta.",
-why_str_hi:"Sell-through {n}% — malakas; halos lahat ng ni-stock mo ay nabenta.",
-why_str_mid:"Sell-through {n}% — katamtaman; malaking bahagi ay nasa istante pa.",
-why_str_lo:"Sell-through {n}% — mababa; karamihan ng ni-stock mo ay hindi pa nabenta.",
-why_margin:"Kumikita ng humigit-kumulang {v}/linggo na tubo ({n} nabenta × {m}).",
-
-keep_h:"Hindi kailangan ng rescue",
-keep_p:"Malusog ang basa nito — ituloy mo lang ang pag-stock. (Kung may produktong bumabagsak, dito lalabas ang rescue play nito.)",
-rescue_label:"Rescue play", prefix_rescue:"Rescue", prefix_retire:"Itigil",
-play_cut:"Babaan ang presyo", play_light:"Subukan ang bahagyang diskwento",
-disc_desc:"Ang {cat} ay nakakabenta ng humigit-kumulang <b>{lift}×</b> na mas maraming piraso kapag naka-diskwento{mod} — totoong lever ang pagbaba ng presyo.",
-disc_mod_some:" (katamtaman lang)",
-disc_note:" Sa tubo mo, ang ~15% na bawas ay <b>nakakadagdag pa rin ng humigit-kumulang {v}/linggo</b> na kita — sulit gawin.",
-play_bundle:"Iparés sa {cat}",
-bundle_desc:"Ang bumibili ng {a} ay kumukuha rin ng {b} sa <b>{pct}%</b> ng pagkakataon — hahatakin ito ng combo deal.",
-play_retire:"Itigil na", this_product:"Ang produktong ito",
-retire_1a:" ay tumutugon sa diskwento, pero hindi kumikita sa tubo mo,",
-retire_1b:" ay halos hindi tumutugon sa diskwento",
-retire_2:" at walang malakas na kapares",
-retire_3:". Kumikita lang ito ng humigit-kumulang {v}/linggo na tubo",
-retire_4:", at may humigit-kumulang <b>{v}</b> na perang nakatengga sa hindi nabentang stock",
-retire_5:". Ang totoo, itigil na ang pag-reorder — puwedeng ipambili ng mas mabentang produkto ang perang iyon.",
-also_worth:"Sulit ding subukan:",
-warn_title:"⚠ Huwag itong bigyan ng diskwento.",
-warn_margin:"Ang {cat} ay tumutugon nga sa pagbaba ng presyo, pero sa tubo mo ang 15% na bawas ay {x} — hindi sasapat ang dagdag na benta para sa tubong isusuko mo.",
-warn_below:"magbebenta ka nang <b>below cost</b>", warn_lose:"malulugi ng humigit-kumulang <b>{v}/linggo</b>",
-warn_weak:"Ang {cat} ay halos hindi tumutugon sa pagbaba ng presyo (mga {lift}×) — isusuko mo ang tubo para sa halos walang dagdag na benta.",
-pair_instead:" Iparés na lang.",
-pick_cat_note:"Pumili ng kategorya sa itaas para makakuha ng payo sa diskwento vs. pagpapares.",
-batch_summary:"Sa <b>{n}</b> produkto: <b>{cut}</b> ang mukhang bababa, <b>{keep}</b> ang sulit itago. Para sa itatago mong gusto pang itulak, patakbuhin ito sa <b>{tab}</b> para makuha ang rescue play."
-}};
-
-let LANG = localStorage.getItem('lang')==='fil' ? 'fil' : 'en';
-function t(k,v){
-  let s=(I18N[LANG]&&I18N[LANG][k])!==undefined?I18N[LANG][k]:(I18N.en[k]!==undefined?I18N.en[k]:k);
-  if(v)for(const p in v)s=s.split('{'+p+'}').join(v[p]);
-  return s;
-}
-
 const TREE=DATA.tree, AFF=DATA.affinity, LIFT=DATA.lift;
 const peso=n=>"₱"+Math.round(n).toLocaleString();
 function predict(x){let n=TREE;while(!n.leaf){n=(x[n.f]<=n.thr)?n.l:n.r;}return n.prob;}
-function band(p){ if(p>=.75)return{key:"thriving",cls:"good",col:"var(--good)"};
-  if(p>=.55)return{key:"stable",cls:"good",col:"var(--good)"};
-  if(p>=.40)return{key:"watch",cls:"warm",col:"var(--warm)"};
-  return{key:"critical",cls:"bad",col:"var(--bad)"};}
-function badgeFor(p){const b=band(p);
-  return `<span class="badge b-${b.cls}">${t('band_'+b.key)} ${Math.round(p*100)}%</span>`;}
+function band(p){ if(p>=.75)return{label:"THRIVING",cls:"good",col:"var(--good)"};
+  if(p>=.55)return{label:"STABLE",cls:"good",col:"var(--good)"};
+  if(p>=.40)return{label:"WATCH",cls:"warm",col:"var(--warm)"};
+  return{label:"CRITICAL",cls:"bad",col:"var(--bad)"};}
+function badgeFor(p){const b=band(p);return `<span class="badge b-${b.cls}">${b.label} ${Math.round(p*100)}%</span>`;}
 function _(id){return document.getElementById(id);}
 function cap(s){return s?s.charAt(0).toUpperCase()+s.slice(1):s;}
 function low(s){return s?s.toLowerCase():s;}
 const CATS=Object.keys(AFF).sort();
-function catOpts(){return `<option value="">${t('opt_pick')}</option>`+CATS.map(c=>`<option>${c}</option>`).join('');}
+const CAT_OPTS='<option value="">— pick —</option>'+CATS.map(c=>`<option>${c}</option>`).join('');
 
 _('tabs').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
   document.querySelectorAll('.tabs button').forEach(x=>x.classList.toggle('on',x===b));
   document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('on',t.id===b.dataset.t));});
 
-_('cat').innerHTML=catOpts();
+_('cat').innerHTML=CAT_OPTS;
 _('cat').value = AFF['Baked Bread/buns/rolls']?'Baked Bread/buns/rolls':(CATS.filter(c=>LIFT[c]!==undefined).sort((a,b)=>LIFT[b]-LIFT[a])[0]||'');
 
 function rescueBlock(c,fin){
@@ -612,33 +514,24 @@ function rescueBlock(c,fin){
   const discountOK = dp ? (!dp.belowCost && dp.delta>0) : null;
   let plays=[];
   if(responsive&&discountOK!==false){
-    const note = discountOK===true ? t('disc_note',{v:peso(dp.delta)}) : '';
-    plays.push({k:'discount',t:(discClass==='strong'?t('play_cut'):t('play_light')),
-      d:t('disc_desc',{cat:cap(c),lift:lift.toFixed(1),mod:(discClass==='some'?t('disc_mod_some'):'')})+note});
+    const note = discountOK===true ? ` At your margin, a ~15% cut still <b>adds about ${peso(dp.delta)}/week</b> in profit — worth doing.` : '';
+    plays.push({k:'discount',t:(discClass==='strong'?'Cut the price':'Try a light discount'),
+      d:`${cap(c)} sells about <b>${lift.toFixed(1)}×</b> more units when discounted${discClass==='some'?' (modestly)':''} — a price cut is a real lever.${note}`});
   }
-  if(top&&top.pct>=8)plays.push({k:'bundle',t:t('play_bundle',{cat:low(top.cat)}),
-    d:t('bundle_desc',{a:low(c),b:low(top.cat),pct:top.pct})});
-  if(plays.length===0){
-    let d=(cap(c)||t('this_product'))
-      +((responsive&&discountOK===false)?t('retire_1a'):t('retire_1b'))
-      +t('retire_2')
-      +(fin?t('retire_3',{v:peso(fin.margin*fin.rate)})+(fin.frozen>0?t('retire_4',{v:peso(fin.frozen)}):''):'')
-      +t('retire_5');
-    plays.push({k:'retire',t:t('play_retire'),d:d});
-  }
+  if(top&&top.pct>=8)plays.push({k:'bundle',t:`Bundle it with ${low(top.cat)}`,
+    d:`Shoppers who buy ${low(c)} grab ${low(top.cat)} <b>${top.pct}%</b> of the time — a combo deal lets that habit pull it along.`});
+  if(plays.length===0)plays.push({k:'retire',t:'Retire it',
+    d:`${cap(c)||'This product'}${(responsive&&discountOK===false)?' responds to discounts, but not profitably at your margin,':' barely responds to discounts'} and has no strong pairing partner${fin?`. It earns only about ${peso(fin.margin*fin.rate)}/week in margin${fin.frozen>0?`, with about <b>${peso(fin.frozen)}</b> of cash frozen in unsold stock`:''}`:''}. The honest move is to stop reordering — that cash could be buying a winner.`});
   const primary=plays[0];
-  let h=`<div class="rescue-label">${t('rescue_label')}</div>`;
-  h+=`<div class="rp ${primary.k}"><div class="rp-h">${primary.k==='retire'?t('prefix_retire'):t('prefix_rescue')} — ${primary.t}</div><p>${primary.d}</p></div>`;
-  if(plays.length>1)h+=`<p class="sub" style="margin-top:12px">${t('also_worth')}</p>`+plays.slice(1).map(pl=>`<div class="rp2"><b>${pl.t}.</b> ${pl.d}</div>`).join('');
+  let h=`<div style="font-family:'Archivo';font-weight:700;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--brand);margin-bottom:8px">Rescue play</div>`;
+  h+=`<div class="rp ${primary.k}"><div class="rp-h">${primary.k==='retire'?'Retire':'Rescue'} — ${primary.t}</div><p>${primary.d}</p></div>`;
+  if(plays.length>1)h+=`<p class="sub" style="margin-top:12px">Also worth a shot:</p>`+plays.slice(1).map(pl=>`<div class="rp2"><b>${pl.t}.</b> ${pl.d}</div>`).join('');
   if(responsive&&discountOK===false){
-    const x = dp.belowCost ? t('warn_below') : t('warn_lose',{v:peso(-dp.delta)});
-    h+=`<div class="warn"><b>${t('warn_title')}</b> ${t('warn_margin',{cat:cap(c),x:x})}`
-      +((top&&top.pct>=8)?t('pair_instead'):'')+`</div>`;
+    h+=`<div class="warn"><b>⚠ Don't discount this.</b> ${cap(c)} does respond to price cuts, but at your margin a 15% cut would ${dp.belowCost?'sell you <b>below cost</b>':`lose about <b>${peso(-dp.delta)}/week</b>`} — the extra volume doesn't cover the margin you'd give up.`+((top&&top.pct>=8)?` Pair it instead.`:'')+`</div>`;
   } else if(discClass==='weak'){
-    h+=`<div class="warn"><b>${t('warn_title')}</b> ${t('warn_weak',{cat:cap(c),lift:lift.toFixed(1)})}`
-      +((top&&top.pct>=8)?t('pair_instead'):'')+`</div>`;
+    h+=`<div class="warn"><b>⚠ Don't discount this.</b> ${cap(c)} barely responds to price cuts (about ${lift.toFixed(1)}×) — you'd give up margin for almost no extra sales.`+((top&&top.pct>=8)?` Pair it instead.`:'')+`</div>`;
   }
-  if(discClass==='unknown')h+=`<p class="note">${t('pick_cat_note')}</p>`;
+  if(discClass==='unknown')h+=`<p class="note">Pick a category above to get discount vs bundle advice.</p>`;
   return h;
 }
 
@@ -650,8 +543,8 @@ function renderCheck(){
   const p=predict({weeks_since_last:stale,weeks,units}),b=band(p),pct=Math.round(p*100);
   const hh=150*p;_('merc').setAttribute('y',(10+150-hh).toFixed(1));_('merc').setAttribute('height',hh.toFixed(1));
   _('merc').setAttribute('fill',b.col);_('bulb').setAttribute('fill',b.col);
-  _('verdict').innerHTML=`<small>${t('reading')}</small>`+t('band_'+b.key);
-  _('pbig').textContent=t('pct_chance',{p:pct});
+  _('verdict').innerHTML='<small>Reading</small>'+b.label;
+  _('pbig').textContent=pct+'% chance it keeps selling';
   const received=stock, rate=weeks>0?units/weeks:0;
   let str=null;
   if(received>0){str=Math.round(units/received*100);
@@ -669,18 +562,17 @@ function renderCheck(){
   else _('frozen-chip').style.display='none';
   const fin=(margin!==null)?{price,cost,margin,rate,units,frozen:(cost>0?rem0*cost:0)}:null;
   const remaining=Math.max(0,received-units);
-  if(received>0&&remaining===0){_('reorder').textContent=t('sold_out');_('reorder-chip').style.display='';}
-  else if(remaining>0&&rate>0){const wk=remaining/rate;
-    _('reorder').textContent=wk<1?t('under_week'):t('wks',{n:Math.round(wk)});_('reorder-chip').style.display='';}
+  if(received>0&&remaining===0){_('reorder').textContent='sold out';_('reorder-chip').style.display='';}
+  else if(remaining>0&&rate>0){const wk=remaining/rate;_('reorder').textContent=wk<1?'under a week':Math.round(wk)+' wks';_('reorder-chip').style.display='';}
   else _('reorder-chip').style.display='none';
   const w=[];
-  w.push(stale<=6?t('why_recent',{n:stale}):stale<=15?t('why_quiet',{n:stale}):t('why_gone',{n:stale}));
-  w.push(weeks>=8?t('why_steady',{n:weeks}):(weeks===1?t('why_thin1'):t('why_thin',{n:weeks})));
-  w.push(units>=25?t('why_vol_ok',{n:units}):t('why_vol_low',{n:units}));
-  if(str!==null)w.push(str>=70?t('why_str_hi',{n:str}):str>=40?t('why_str_mid',{n:str}):t('why_str_lo',{n:str}));
-  if(margin!==null)w.push(t('why_margin',{v:peso(margin*rate),n:units,m:peso(margin)}));
-  _('why').innerHTML=w.map(x=>`<li>${x}</li>`).join('');
-  if(p>=0.55)_('check-rescue').innerHTML=`<div class="rp keep"><div class="rp-h">${t('keep_h')}</div><p>${t('keep_p')}</p></div>`;
+  w.push(stale<=6?`Still selling recently (${stale} wks ago) — the strongest good sign.`:stale<=15?`A little quiet lately (${stale} wks since a sale).`:`Gone quiet — ${stale} weeks with no sale is the biggest red flag.`);
+  w.push(weeks>=8?`Sold steadily across ${weeks} weeks — it has a rhythm.`:`Only sold in ${weeks} week${weeks>1?'s':''} so far — thin track record.`);
+  w.push(units>=25?`Healthy volume — ${units} units sold.`:`Low volume so far — only ${units} units sold.`);
+  if(str!==null)w.push(str>=70?`Sell-through ${str}% — strong; most of what you stocked has sold.`:str>=40?`Sell-through ${str}% — middling; a good chunk is still on the shelf.`:`Sell-through ${str}% — low; most of what you stocked hasn't sold.`);
+  if(margin!==null)w.push(`Earns about ${peso(margin*rate)}/week in margin (${units} sold × ${peso(margin)}).`);
+  _('why').innerHTML=w.map(t=>`<li>${t}</li>`).join('');
+  if(p>=0.55)_('check-rescue').innerHTML=`<div class="rp keep"><div class="rp-h">No rescue needed</div><p>This one reads healthy — keep stocking it. (If a product's slipping, its rescue play shows up here.)</p></div>`;
   else _('check-rescue').innerHTML=rescueBlock(IN.cat.value,fin);
 }
 Object.values(IN).forEach(el=>el.addEventListener('input',renderCheck));
@@ -689,16 +581,15 @@ Object.values(IN).forEach(el=>el.addEventListener('input',renderCheck));
 const seed=[["Canned mushrooms","Mushrooms",22,3,6],["Chili sauce","Condiments",6,14,40],["","",0,1,1]];
 function makeRow(name="",cat="",stale=8,weeks=8,units=15){
   const div=document.createElement('div');div.className='srow';
-  div.innerHTML=`<input type="text" placeholder="${t('ph_product')}" value="${name}">
-    <select class="rowcat">${catOpts()}</select>
+  div.innerHTML=`<input type="text" placeholder="product name" value="${name}">
+    <select class="rowcat">${CAT_OPTS}</select>
     <input type="number" min="0" value="${stale}"><input type="number" min="1" value="${weeks}">
     <input type="number" min="0" value="${units}"><span class="res"></span>
-    <button class="xbtn" title="${t('remove')}">×</button>`;
+    <button class="xbtn" title="remove">×</button>`;
   if(cat)div.querySelector('.rowcat').value=cat;
   const nums=div.querySelectorAll('input[type=number]');
   const score=()=>{const st=+nums[0].value||0,wk=+nums[1].value||1,un=+nums[2].value||0;
     div.querySelector('.res').innerHTML=badgeFor(predict({weeks_since_last:st,weeks:wk,units:un}));updateSummary();};
-  div._score=score;
   div.querySelectorAll('input').forEach(i=>i.addEventListener('input',score));
   div.querySelector('.xbtn').addEventListener('click',()=>{div.remove();updateSummary();});
   _('rows').appendChild(div);score();
@@ -708,53 +599,61 @@ function updateSummary(){
   rows.forEach(r=>{const ins=r.querySelectorAll('input[type=number]');
     const p=predict({weeks_since_last:+ins[0].value||0,weeks:+ins[1].value||1,units:+ins[2].value||0});
     if(p<0.5)cut++;else keep++;});
-  _('batch-summary').innerHTML=t('batch_summary',{n:rows.length,cut:cut,keep:keep,tab:t('tab_check')});
+  _('batch-summary').innerHTML=`Out of <b>${rows.length}</b> products: <b>${cut}</b> read as likely to drop, <b>${keep}</b> worth keeping. For a keeper you still want to push, run it through <b>Check a product</b> to get its rescue play.`;
 }
 _('addrow').addEventListener('click',()=>makeRow("","",4,8,15));
 seed.forEach(s=>makeRow(...s));
 
-/* ---- language switching ---- */
-function applyLang(){
-  document.documentElement.lang = (LANG==='fil') ? 'fil' : 'en';
-  document.querySelectorAll('[data-i18n]').forEach(el=>{el.innerHTML=t(el.dataset.i18n);});
-  document.title = (LANG==='fil') ? 'Suri ng Temperatura ng Istante' : 'Shelf Temperature Check';
-  _('langEn').classList.toggle('on',LANG==='en');
-  _('langFil').classList.toggle('on',LANG==='fil');
-  // rebuild the main category picker, keeping the current selection
-  const cv=_('cat').value; _('cat').innerHTML=catOpts(); _('cat').value=cv;
-  // refresh every batch row (placeholder, "pick", and the reading badge)
-  document.querySelectorAll('#rows .srow').forEach(r=>{
-    r.querySelector('input[type=text]').placeholder=t('ph_product');
-    r.querySelector('.xbtn').title=t('remove');
-    const sel=r.querySelector('.rowcat'), sv=sel.value;
-    sel.innerHTML=catOpts(); sel.value=sv;
-    if(r._score)r._score();
-  });
-  renderCheck();
-}
-function setLang(l){LANG=l;localStorage.setItem('lang',l);applyLang();}
-_('langEn').addEventListener('click',()=>setLang('en'));
-_('langFil').addEventListener('click',()=>setLang('fil'));
+renderCheck();
 
-applyLang();
-</script>
-<script>
+
+/* ---- CSV bulk upload for the batch tab ---- */
 (function(){
-  var root=document.documentElement, btn=document.getElementById('themeToggle');
-  var saved=localStorage.getItem('theme');
-  var mq=window.matchMedia('(prefers-color-scheme: dark)');
-  function isDarkNow(mode){return mode?mode==='dark':mq.matches;}
-  function apply(mode){
-    if(mode){root.setAttribute('data-theme',mode);}else{root.removeAttribute('data-theme');}
-    btn.textContent = isDarkNow(mode) ? '☀️' : '🌙';
-  }
-  apply(saved);
-  mq.addEventListener('change',function(){if(!localStorage.getItem('theme'))apply(null);});
-  btn.addEventListener('click',function(){
-    var next=isDarkNow(root.getAttribute('data-theme'))?'light':'dark';
-    localStorage.setItem('theme',next);
-    apply(next);
+  var HEAD=["Product","Category","Weeks since last sold","Weeks selling","Units sold"];
+  function msg(t,warn){var e=_('upload-msg');if(!e)return;e.innerHTML=t;e.className=warn?'upl-warn':'upl-ok';}
+  function setMode(up){_('mode-type').classList.toggle('on',!up);_('mode-upload').classList.toggle('on',up);_('upload-panel').style.display=up?'block':'none';}
+  var mt=_('mode-type'),mu=_('mode-upload');
+  if(mt&&mu){mt.addEventListener('click',function(){setMode(false);});mu.addEventListener('click',function(){setMode(true);});}
+  var dl=_('dl-template');
+  if(dl)dl.addEventListener('click',function(){
+    var csv=[HEAD.join(","),"Canned mushrooms,Mushrooms,22,3,6","Chili sauce,Condiments,6,14,40"].join("\n");
+    var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+    a.download='shelf-temp-check-template.csv';document.body.appendChild(a);a.click();a.remove();
   });
+  function parseLine(line){var o=[],c="",q=false;for(var i=0;i<line.length;i++){var ch=line[i];
+    if(q){if(ch=='"'){if(line[i+1]=='"'){c+='"';i++;}else q=false;}else c+=ch;}
+    else{if(ch=='"')q=true;else if(ch==','){o.push(c);c="";}else c+=ch;}}o.push(c);
+    return o.map(function(s){return s.trim();});}
+  function load(text){
+    var lines=text.replace(/\r/g,'').split('\n').filter(function(l){return l.trim().length;});
+    if(lines.length<2){msg('That file looks empty — download the template and add a couple of rows.',true);return;}
+    var head=parseLine(lines[0]).map(function(h){return h.toLowerCase();});
+    var idx={name:head.findIndex(function(h){return h.indexOf('product')>=0;}),
+      cat:head.findIndex(function(h){return h.indexOf('categ')>=0;}),
+      stale:head.findIndex(function(h){return h.indexOf('since')>=0;}),
+      weeks:head.findIndex(function(h){return h.indexOf('selling')>=0;}),
+      units:head.findIndex(function(h){return h.indexOf('unit')>=0;})};
+    var miss=['name','stale','weeks','units'].filter(function(k){return idx[k]<0;});
+    if(miss.length){msg('Could not find the right columns — please use the template. Missing: '+miss.join(', '),true);return;}
+    _('rows').innerHTML='';
+    var ok=0,bad=[];
+    lines.slice(1).forEach(function(ln,i){var r=parseLine(ln);
+      if(!r.some(function(x){return x;}))return;
+      var name=(idx.name>=0?r[idx.name]:'')||'';
+      var st=parseFloat(r[idx.stale]),wk=parseFloat(r[idx.weeks]),un=parseFloat(r[idx.units]);
+      if([st,wk,un].some(function(v){return isNaN(v);})){bad.push(i+2);return;}
+      makeRow(name,(idx.cat>=0?r[idx.cat]:''),Math.max(0,st),Math.max(1,wk),Math.max(0,un));ok++;});
+    var m='Loaded <b>'+ok+'</b> product'+(ok==1?'':'s')+' into the table below.';
+    if(bad.length)m+=' Skipped row'+(bad.length>1?'s':'')+' '+bad.join(', ')+' — the numbers there did not look right.';
+    msg(m,bad.length>0);updateSummary();
+  }
+  var fi=_('csv-file'),dz=_('dropzone');
+  function handle(f){if(!f)return;var r=new FileReader();r.onload=function(){load(r.result);};r.readAsText(f);}
+  if(fi)fi.addEventListener('change',function(e){handle(e.target.files[0]);});
+  if(dz){['dragover','dragenter'].forEach(function(ev){dz.addEventListener(ev,function(e){e.preventDefault();dz.classList.add('drag');});});
+    ['dragleave'].forEach(function(ev){dz.addEventListener(ev,function(e){e.preventDefault();dz.classList.remove('drag');});});
+    dz.addEventListener('drop',function(e){e.preventDefault();dz.classList.remove('drag');handle(e.dataTransfer.files[0]);});}
 })();
+
 </script>
 </body></html>
