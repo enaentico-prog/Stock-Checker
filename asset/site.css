@@ -40,8 +40,8 @@ h1,h2,h3{font-family:var(--f-head);font-weight:800;letter-spacing:-.02em;line-he
 section[id],div[id]{scroll-margin-top:var(--nav-h)}
 
 /* --- textures & motifs ------------------------------------- */
-.capiz{background-image:linear-gradient(rgba(198,187,166,.26) 1px,transparent 1px),linear-gradient(90deg,rgba(198,187,166,.26) 1px,transparent 1px);background-size:44px 44px}
-.banig{background-image:repeating-linear-gradient(45deg,rgba(198,187,166,.14) 0 6px,transparent 6px 12px),repeating-linear-gradient(-45deg,rgba(198,187,166,.14) 0 6px,transparent 6px 12px)}
+.gridpaper{background-image:linear-gradient(rgba(198,187,166,.26) 1px,transparent 1px),linear-gradient(90deg,rgba(198,187,166,.26) 1px,transparent 1px);background-size:44px 44px}
+.weave{background-image:repeating-linear-gradient(45deg,rgba(198,187,166,.14) 0 6px,transparent 6px 12px),repeating-linear-gradient(-45deg,rgba(198,187,166,.14) 0 6px,transparent 6px 12px)}
 /* a stocked shelf, read as a rule: goods lined up, no gaps */
 .shelfrule{position:relative;height:26px;overflow:hidden}
 .shelfrule::before{content:"";position:absolute;left:0;right:0;top:19px;height:3px;background:var(--ink);opacity:.22;border-radius:2px}
@@ -69,7 +69,7 @@ section[id],div[id]{scroll-margin-top:var(--nav-h)}
 .btn-sm.danger:hover{background:var(--tomato);border-color:var(--tomato);color:#fff}
 
 .eyebrow{font-family:var(--f-mono);font-size:11.5px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--tomato-deep);margin:0 0 14px}
-.fil{font-family:var(--f-mono);font-size:12px;letter-spacing:.06em;color:var(--muted)}
+.microlabel{font-family:var(--f-mono);font-size:12px;letter-spacing:.06em;color:var(--muted)}
 
 /* --- navbar ------------------------------------------------- */
 .navbar{background:var(--ink);position:sticky;top:0;z-index:50;box-shadow:0 1px 0 rgba(0,0,0,.16)}
@@ -150,7 +150,7 @@ section{padding:74px 0;position:relative}
 .cost .ic-cost{width:52px;height:52px;margin-bottom:13px}
 .cost .ic-cost svg{width:52px;height:52px;display:block}
 .cost h3{font-size:20px;margin:0 0 4px}
-.cost .tag-fil{font-family:var(--f-mono);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--tomato-deep);margin:0 0 9px}
+.cost .costtag{font-family:var(--f-mono);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--tomato-deep);margin:0 0 9px}
 .cost p{color:var(--ink-soft);font-size:14.5px;margin:0}
 
 /* --- numbers (subsection of the problem) -------------------- */
@@ -212,7 +212,7 @@ section{padding:74px 0;position:relative}
 .step .b{width:46px;height:46px;border-radius:11px;background:var(--mango);color:var(--ink);display:grid;place-items:center;
   font-family:var(--f-display);font-size:20px;margin-bottom:15px;box-shadow:0 4px 0 var(--mango-deep)}
 .step h3{font-size:19.5px;margin:0 0 4px}
-.step .tag-fil{font-family:var(--f-mono);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 8px}
+.step .costtag{font-family:var(--f-mono);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 8px}
 .step p{color:var(--ink-soft);font-size:14.5px;margin:0}
 
 /* --- triage cards (solution page) --------------------------- */
@@ -221,14 +221,14 @@ section{padding:74px 0;position:relative}
 .tcard{border-radius:14px;padding:24px;border:1.5px solid}
 .tcard .k{font-family:var(--f-display);font-size:12.5px;letter-spacing:.09em;padding:5px 11px;border-radius:6px;display:inline-block;margin-bottom:11px}
 .tcard h3{font-size:21px;margin:0 0 5px}
-.tcard .fil-sub{font-family:var(--f-mono);font-size:12px;letter-spacing:.06em;margin:0 0 9px}
+.tcard .panelsub{font-family:var(--f-mono);font-size:12px;letter-spacing:.06em;margin:0 0 9px}
 .tcard p{font-size:14.5px;margin:0}
 .tcard.push{background:var(--mango-soft);border-color:#EBD6B0}
 .tcard.push .k{background:var(--mango);color:var(--ink)}
-.tcard.push .fil-sub{color:var(--mango-deep)} .tcard.push p{color:#6E5836}
+.tcard.push .panelsub{color:var(--mango-deep)} .tcard.push p{color:#6E5836}
 .tcard.cut{background:var(--tomato-soft);border-color:#E6C4BB}
 .tcard.cut .k{background:var(--tomato);color:#fff}
-.tcard.cut .fil-sub{color:var(--tomato-deep)} .tcard.cut p{color:#7B3729}
+.tcard.cut .panelsub{color:var(--tomato-deep)} .tcard.cut p{color:#7B3729}
 .tsub{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
 @media(max-width:560px){.tsub{grid-template-columns:1fr}}
 .tsub .b{background:rgba(255,255,255,.55);border:1px dashed var(--line-2);border-radius:10px;padding:14px 16px}
@@ -309,7 +309,7 @@ section{padding:74px 0;position:relative}
 #app .tabs button.on{background:var(--ink);color:#fff}
 #app .tab{display:none}#app .tab.on{display:block}
 #app .card{background:var(--panel);border:1.5px solid var(--a-line);border-radius:13px;padding:20px}
-#app .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+#app .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
 @media(max-width:820px){#app .grid2{grid-template-columns:1fr}}
 #app h2{font-family:var(--f-head);font-weight:800;font-size:17.5px;margin:0 0 3px;color:var(--ink)}
 #app .sub{color:var(--muted);font-size:13px;margin:0 0 15px}
@@ -323,13 +323,23 @@ section{padding:74px 0;position:relative}
 #app input[type=range]::-moz-range-thumb{width:21px;height:21px;border-radius:7px;background:var(--tomato);border:3px solid #fff;cursor:pointer}
 #app input[type=number],#app select,#app input[type=text]{font-family:var(--f-body);font-size:14px;padding:9px 11px;border:1.5px solid var(--a-line);border-radius:8px;background:var(--soft);color:var(--ink)}
 #app input[type=number]:focus,#app select:focus,#app input[type=text]:focus{border-color:var(--ink);background:#fff}
-#app .temp-wrap{display:flex;gap:18px;align-items:center}
-#app .verdict{font-family:var(--f-display);font-size:clamp(23px,5.2vw,34px);line-height:1;margin:0;color:var(--ink);letter-spacing:-.01em}
+/* the reading: a compact left-to-right gauge, not a thermometer */
+#app .reading{padding:2px 0 4px}
+#app .gauge{margin:14px 0 10px}
+#app .gbar{position:relative;height:12px;border-radius:7px;
+  background:linear-gradient(90deg,var(--tomato) 0%,var(--mango) 38%,var(--sky) 68%,var(--leaf) 100%)}
+#app .gbar i{position:absolute;top:50%;width:22px;height:22px;border-radius:50%;background:#fff;
+  border:4px solid var(--ink);transform:translate(-50%,-50%);box-shadow:0 2px 6px rgba(46,64,52,.28);transition:left .18s,border-color .18s}
+#app .gscale{display:flex;justify-content:space-between;margin-top:7px;
+  font-family:var(--f-mono);font-size:10px;letter-spacing:.12em;color:var(--muted)}
+#app .verdict{font-family:var(--f-display);font-size:clamp(30px,5.6vw,44px);line-height:1;margin:0;color:var(--ink);letter-spacing:-.015em}
 #app .verdict small{display:block;font-family:var(--f-mono);font-size:10.5px;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
 #app .verdict em{display:block;font-style:normal;font-family:var(--f-body);font-weight:500;font-size:14px;color:var(--ink-soft);margin-top:7px;letter-spacing:0}
-#app .pbig{font-family:var(--f-head);font-weight:700;font-size:18px;margin:12px 0 0;color:var(--ink)}
-#app .chips{display:flex;gap:7px;flex-wrap:wrap;margin-top:14px}
-#app .chip{font-size:12px;background:var(--soft);border:1.5px solid var(--a-line);border-radius:7px;padding:5px 11px;color:var(--ink)}
+#app .pbig{font-family:var(--f-head);font-weight:700;font-size:17px;margin:2px 0 0;color:var(--ink-soft)}
+#app .chips{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:16px}
+@media(max-width:420px){#app .chips{grid-template-columns:1fr}}
+#app .chip{font-size:12.5px;background:var(--soft);border:1.5px solid var(--a-line);border-radius:8px;
+  padding:8px 11px;color:var(--ink);display:flex;justify-content:space-between;align-items:center;gap:8px}
 #app .chip b{font-family:var(--f-head);font-weight:700}
 #app .why{margin-top:15px;border-top:1.5px solid var(--a-line);padding-top:13px}
 #app .why h3{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:0 0 8px}
@@ -394,7 +404,7 @@ section{padding:74px 0;position:relative}
 .panel{background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:24px}
 @media(max-width:600px){.panel{padding:18px}}
 .panel h3{font-size:20px;margin:0 0 3px}
-.panel .fil-sub{font-family:var(--f-mono);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--tomato-deep);margin:0 0 12px}
+.panel .panelsub{font-family:var(--f-mono);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--tomato-deep);margin:0 0 12px}
 .panel .lede{color:var(--ink-soft);font-size:14.5px;margin:0 0 16px}
 .whereto{border-radius:9px;padding:12px 14px;font-size:13px;margin:0 0 18px;border:1.5px solid;display:flex;gap:9px;align-items:flex-start}
 .whereto .dot{width:9px;height:9px;border-radius:50%;flex:none;margin-top:5px}

@@ -64,8 +64,7 @@ function renderCheck(){
   const units=Math.max(0,parseInt(IN.units.value)||0),stock=Math.max(0,parseInt(IN.stock.value)||0);
   _('stale-v').textContent=stale;_('weeks-v').textContent=weeks;
   const p=predict({weeks_since_last:stale,weeks,units}),b=band(p),pct=Math.round(p*100);
-  const hh=150*p;_('merc').setAttribute('y',(10+150-hh).toFixed(1));_('merc').setAttribute('height',hh.toFixed(1));
-  _('merc').setAttribute('fill',b.col);_('bulb').setAttribute('fill',b.col);
+  const pin=_('gpin');pin.style.left=(4+p*92).toFixed(1)+'%';pin.style.borderColor=b.col;
   _('verdict').innerHTML='<small>Reading</small>'+b.label+'<em>'+b.en+'</em>';
   _('pbig').textContent=pct+'% chance it keeps selling';
   const received=stock, rate=weeks>0?units/weeks:0;
