@@ -1,8 +1,9 @@
 <!doctype html>
 <html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Shelf Temp Check — ang problema sa hindi nabebenta</title>
-<meta name="description" content="Slow-mover triage for sari-sari stores and small groceries. Start with the problem: what dead stock costs you, and why you're not the only one carrying it.">
+<title>LihukAI — the slow-mover checker</title>
+<meta name="description" content="Tell LihukAI three things about a product that isn't selling. It tells you whether to push it, bundle it, discount it, or drop it.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23C4553F'/%3E%3Crect x='3.5' y='10' width='4.5' height='2.6' rx='1.3' fill='%23FBF9F5' opacity='.38'/%3E%3Crect x='5.5' y='15' width='3' height='2.6' rx='1.3' fill='%23FBF9F5' opacity='.24'/%3E%3Crect x='11' y='7' width='14' height='14' rx='3' fill='%23FBF9F5'/%3E%3Crect x='11' y='12' width='14' height='3.6' fill='%23E0A052'/%3E%3Crect x='6' y='24' width='20' height='2.8' rx='1.4' fill='%23FBF9F5' opacity='.9'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -13,324 +14,211 @@
 
 <div class="navbar"><div class="wrap"><nav>
   <a class="brand" href="index.html">
-    <span class="mark" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="2.5" y="8" width="19" height="12.5" rx="1.8" fill="#fff"/><path d="M2.5 8 5 3.5h14L21.5 8Z" fill="#fff" opacity=".78"/><rect x="5.5" y="12" width="5" height="8.5" rx=".9" fill="#C4553F"/><rect x="13" y="11.5" width="5.5" height="4" rx=".9" fill="#C4553F"/></svg></span>
-    <span>Shelf Temp Check<small>Tindahan triage</small></span>
+    <span class="mark" aria-hidden="true"><svg viewBox="0 0 32 32"><rect width="32" height="32" rx="9" fill="#C4553F"/><rect x="3.5" y="10" width="4.5" height="2.6" rx="1.3" fill="#FBF9F5" opacity=".38"/><rect x="5.5" y="15" width="3" height="2.6" rx="1.3" fill="#FBF9F5" opacity=".24"/><rect x="11" y="7" width="14" height="14" rx="3" fill="#FBF9F5"/><rect x="11" y="12" width="14" height="3.6" fill="#E0A052"/><rect x="6" y="24" width="20" height="2.8" rx="1.4" fill="#FBF9F5" opacity=".9"/></svg></span>
+    <span>LihukAI<small>Slow-mover checker</small></span>
   </a>
   <div class="navlinks">
-    <a href="index.html">Ang problema</a>
-    <a href="solution.html">Ang solusyon</a>
-    <a href="method.html">Paano ito natuto</a>
-    <a href="solution.html#try" class="btn btn-primary" style="padding:11px 19px;font-size:14.5px"><span class="cta-long">Check a product</span><span class="cta-short">Try it →</span></a>
+    <a href="index.html">The Checker</a>
+    <a href="why.html">Why It Matters</a>
+    <a href="model.html">The AI Model</a>
+    <a href="#try" class="btn btn-primary" style="padding:11px 19px;font-size:14.5px"><span class="cta-long">Check a product</span><span class="cta-short">Start →</span></a>
   </div>
 </nav></div></div>
 
-<!-- ============================================================
-     1 · WHAT THIS IS
-     ============================================================ -->
-<div id="top" class="wrap">
-  <header class="hero">
-    <div>
-      <p class="eyebrow">Slow-mover triage · para sa tindahan</p>
-      <h1>Alin ang <span class="tint">itutulak</span>, alin ang <span class="hl">bibitawan</span>?</h1>
-      <p class="lead">Shelf Temp Check reads one fading product at a time and gives you a single honest call:
-        <b>push it</b> — by bundling or cutting the price — or <b>let it go</b> and free the cash for something
-        that actually sells. Three numbers you already know. No POS, no sign-up.</p>
-      <div class="cta">
-        <a href="solution.html#try" class="btn btn-primary">Try the checker →</a>
-        <a href="#problema" class="btn btn-ghost">Start with the problem</a>
-      </div>
-      <p class="trust">Walang app na ida-download · Runs on your own numbers<br>Built on two years of real store sales</p>
-    </div>
-
-    <div class="hero-art">
-      <svg viewBox="0 0 520 470" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="A sari-sari storefront with three shelves of goods; one dusty item on the middle shelf is circled and tagged for review">
-        <defs><linearGradient id="glow" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stop-color="#FBF3E4"/><stop offset="1" stop-color="#F0E8D8"/></linearGradient></defs>
-        <rect x="0" y="0" width="520" height="470" rx="16" fill="#E7E0D4"/>
-        <g opacity=".45" stroke="#C6BBA6" stroke-width="1"><path d="M0 60h520M0 120h520M0 180h520M0 240h520M0 300h520M0 360h520M0 420h520"/></g>
-
-        <rect x="18" y="26" width="484" height="62" rx="7" fill="#C4553F"/>
-        <rect x="18" y="80" width="484" height="8" rx="3" fill="#9E4231"/>
-        <text x="260" y="68" text-anchor="middle" font-family="Archivo Black, sans-serif" font-size="30" letter-spacing="7" fill="#FBF9F5">SARI-SARI</text>
-        <circle cx="44" cy="57" r="4" fill="#FAEEDA" opacity=".85"/><circle cx="476" cy="57" r="4" fill="#FAEEDA" opacity=".85"/>
-
-        <rect x="30" y="96" width="460" height="288" rx="8" fill="url(#glow)" stroke="#2E4034" stroke-width="3.5"/>
-
-        <g><line x1="72" y1="100" x2="72" y2="196" stroke="#2E4034" stroke-width="1.6"/>
-          <rect x="63" y="108" width="18" height="21" rx="3" fill="#E0A052"/><rect x="63" y="132" width="18" height="21" rx="3" fill="#6F91A6"/>
-          <rect x="63" y="156" width="18" height="21" rx="3" fill="#C4553F"/><rect x="63" y="180" width="18" height="21" rx="3" fill="#7C9A6B"/></g>
-        <g><line x1="448" y1="100" x2="448" y2="196" stroke="#2E4034" stroke-width="1.6"/>
-          <rect x="439" y="108" width="18" height="21" rx="3" fill="#6F91A6"/><rect x="439" y="132" width="18" height="21" rx="3" fill="#C4553F"/>
-          <rect x="439" y="156" width="18" height="21" rx="3" fill="#E0A052"/><rect x="439" y="180" width="18" height="21" rx="3" fill="#C6BBA6"/></g>
-
-        <rect x="96" y="150" width="316" height="7" rx="3" fill="#2E4034"/>
-        <g><rect x="106" y="116" width="26" height="34" rx="4" fill="#6F91A6"/><rect x="106" y="126" width="26" height="11" fill="#FBF9F5" opacity=".9"/>
-          <rect x="138" y="112" width="22" height="38" rx="4" fill="#C4553F"/><rect x="138" y="124" width="22" height="11" fill="#FBF9F5" opacity=".9"/>
-          <rect x="166" y="120" width="30" height="30" rx="4" fill="#E0A052"/><rect x="166" y="130" width="30" height="10" fill="#FBF9F5" opacity=".9"/>
-          <rect x="202" y="110" width="20" height="40" rx="9" fill="#C6BBA6"/>
-          <rect x="228" y="118" width="28" height="32" rx="4" fill="#7C9A6B"/><rect x="228" y="128" width="28" height="10" fill="#FBF9F5" opacity=".9"/>
-          <rect x="262" y="114" width="24" height="36" rx="4" fill="#C4553F"/><rect x="262" y="126" width="24" height="10" fill="#FBF9F5" opacity=".9"/>
-          <rect x="292" y="122" width="32" height="28" rx="4" fill="#6F91A6"/><rect x="292" y="131" width="32" height="9" fill="#FBF9F5" opacity=".9"/>
-          <rect x="330" y="112" width="22" height="38" rx="4" fill="#E0A052"/><rect x="330" y="124" width="22" height="11" fill="#FBF9F5" opacity=".9"/>
-          <rect x="358" y="118" width="26" height="32" rx="4" fill="#7C9A6B"/><rect x="358" y="128" width="26" height="10" fill="#FBF9F5" opacity=".9"/></g>
-
-        <rect x="96" y="228" width="316" height="7" rx="3" fill="#2E4034"/>
-        <g><rect x="106" y="192" width="28" height="36" rx="4" fill="#E0A052"/><rect x="106" y="203" width="28" height="11" fill="#FBF9F5" opacity=".9"/>
-          <rect x="140" y="196" width="24" height="32" rx="4" fill="#7C9A6B"/><rect x="140" y="206" width="24" height="10" fill="#FBF9F5" opacity=".9"/>
-          <g><rect x="176" y="184" width="42" height="44" rx="5" fill="#C6BBA6"/>
-            <rect x="176" y="198" width="42" height="14" fill="#F0EDE5" opacity=".85"/>
-            <rect x="184" y="203" width="18" height="3.5" rx="1.5" fill="#C6BBA6"/>
-            <rect x="172" y="180" width="50" height="52" rx="7" fill="none" stroke="#C4553F" stroke-width="2.6" stroke-dasharray="6 5"/></g>
-          <rect x="234" y="190" width="26" height="38" rx="4" fill="#6F91A6"/><rect x="234" y="202" width="26" height="11" fill="#FBF9F5" opacity=".9"/>
-          <rect x="266" y="196" width="30" height="32" rx="4" fill="#C4553F"/><rect x="266" y="206" width="30" height="10" fill="#FBF9F5" opacity=".9"/>
-          <rect x="302" y="188" width="22" height="40" rx="9" fill="#E0A052"/>
-          <rect x="330" y="194" width="28" height="34" rx="4" fill="#C6BBA6"/><rect x="330" y="205" width="28" height="10" fill="#FBF9F5" opacity=".9"/>
-          <rect x="364" y="198" width="20" height="30" rx="4" fill="#7C9A6B"/></g>
-
-        <rect x="96" y="306" width="316" height="7" rx="3" fill="#2E4034"/>
-        <g><rect x="104" y="268" width="34" height="38" rx="4" fill="#C4553F"/><rect x="104" y="280" width="34" height="12" fill="#FBF9F5" opacity=".9"/>
-          <rect x="144" y="274" width="26" height="32" rx="4" fill="#6F91A6"/><rect x="144" y="284" width="26" height="10" fill="#FBF9F5" opacity=".9"/>
-          <rect x="178" y="286" width="58" height="20" rx="4" fill="#F0EDE5" stroke="#C6BBA6" stroke-width="1.4"/>
-          <circle cx="190" cy="284" r="7" fill="#F5EDDD"/><circle cx="207" cy="284" r="7" fill="#F5EDDD"/><circle cx="224" cy="284" r="7" fill="#F5EDDD"/>
-          <rect x="244" y="270" width="28" height="36" rx="4" fill="#E0A052"/><rect x="244" y="281" width="28" height="11" fill="#FBF9F5" opacity=".9"/>
-          <rect x="278" y="276" width="24" height="30" rx="4" fill="#7C9A6B"/>
-          <rect x="308" y="266" width="22" height="40" rx="9" fill="#6F91A6"/>
-          <rect x="336" y="272" width="32" height="34" rx="4" fill="#C6BBA6"/><rect x="336" y="283" width="32" height="10" fill="#FBF9F5" opacity=".9"/>
-          <rect x="374" y="278" width="20" height="28" rx="4" fill="#C4553F"/></g>
-
-        <rect x="30" y="384" width="460" height="46" rx="7" fill="#2E4034"/>
-        <rect x="30" y="384" width="460" height="7" rx="3" fill="#456B52"/>
-        <rect x="392" y="352" width="44" height="34" rx="6" fill="#FBF9F5" opacity=".93" stroke="#C6BBA6" stroke-width="1.5"/>
-        <circle cx="403" cy="374" r="4" fill="#C4553F"/><circle cx="414" cy="371" r="4" fill="#E0A052"/>
-        <circle cx="425" cy="375" r="4" fill="#6F91A6"/><circle cx="409" cy="381" r="4" fill="#7C9A6B"/>
-        <rect x="396" y="346" width="36" height="7" rx="3" fill="#C4553F"/>
-        <ellipse cx="260" cy="440" rx="228" ry="11" fill="#2E4034" opacity=".12"/>
-        <line x1="197" y1="180" x2="197" y2="150" stroke="#C4553F" stroke-width="2"/>
-        <circle cx="197" cy="180" r="4" fill="#C4553F"/>
-      </svg>
-
-      <div class="floatcard">
-        <div class="st">Shelf reading</div>
-        <div class="nm">Canned mushrooms</div>
-        <div class="bar"><i></i></div>
-        <div class="sc"><span>NATIGIL</span><span>MABENTA</span></div>
-        <div class="verd"><span class="tag">ITULAK</span>
-          <p>22 weeks quiet — but it pairs. <b>Bundle it</b>, don't discount.</p></div>
+<div class="wrap">
+  <header class="pagehero tight">
+    <div class="lockup">
+      <span class="lmark" aria-hidden="true"><svg viewBox="0 0 32 32"><rect width="32" height="32" rx="9" fill="#C4553F"/><rect x="3.5" y="10" width="4.5" height="2.6" rx="1.3" fill="#FBF9F5" opacity=".38"/><rect x="5.5" y="15" width="3" height="2.6" rx="1.3" fill="#FBF9F5" opacity=".24"/><rect x="11" y="7" width="14" height="14" rx="3" fill="#FBF9F5"/><rect x="11" y="12" width="14" height="3.6" fill="#E0A052"/><rect x="6" y="24" width="20" height="2.8" rx="1.4" fill="#FBF9F5" opacity=".9"/></svg></span>
+      <div>
+        <div class="lname">Lihuk<i>AI</i></div>
+        <div class="ltag">Slow-mover checker for small stores</div>
       </div>
     </div>
+    <h1>Which slow sellers are worth saving?</h1>
+    <p class="lead">Every store has a few products that just sit there. Tell LihukAI three things you already know
+      about one, and it tells you what to do: keep it, push it, or drop it. Takes about ten seconds. No account,
+      no setup.</p>
   </header>
 </div>
 
-<div class="ticker" aria-hidden="true"><div class="in">
-  <span>1.3M sari-sari stores nationwide<b>·</b>94% of Filipinos buy from them<b>·</b>~70% of packaged food sales pass through them<b>·</b>131M tonnes of food wasted by retail worldwide<b>·</b>$562B lost to overstock<b>·</b>+46% sales when stores acted on slow-mover advice<b>·</b></span>
-  <span>1.3M sari-sari stores nationwide<b>·</b>94% of Filipinos buy from them<b>·</b>~70% of packaged food sales pass through them<b>·</b>131M tonnes of food wasted by retail worldwide<b>·</b>$562B lost to overstock<b>·</b>+46% sales when stores acted on slow-mover advice<b>·</b></span>
-</div></div>
-
 <!-- ============================================================
-     2 · THE PROBLEM — numbers live inside it
+     THE CHECKER
      ============================================================ -->
-<section id="problema" class="capiz"><div class="wrap">
-  <div class="sec-head">
-    <p class="eyebrow">Ang tahimik na lugi · the quiet loss</p>
-    <h2>You already know which one it is.</h2>
-    <p>The can at the back. The sachet strip nobody touches. It sold twice in March and it has been sitting there
-      since. You keep it because throwing it out feels like admitting the money is gone — but it already is, and
-      it is charging you rent three ways at the same time.</p>
+<section id="try" style="padding-top:8px"><div class="wrap">
+
+  <div class="howstrip">
+    <div class="hs"><span class="num">1</span><div><b>Enter what you know</b>
+      <span>Weeks since it last sold, how long you've stocked it, units sold. Add price and cost for money advice.</span></div></div>
+    <div class="hs"><span class="num">2</span><div><b>Read the gauge</b>
+      <span>Moving, steady, slowing, or stalled — plus the cash tied up in it and how fast it's turning over.</span></div></div>
+    <div class="hs"><span class="num">3</span><div><b>Take the move</b>
+      <span>One clear answer. Keep it, bundle it, cut the price, or stop reordering.</span></div></div>
   </div>
 
-  <div class="grid3">
-    <div class="cost">
-      <div class="ic-cost"><svg viewBox="0 0 52 52" fill="none">
-        <rect x="6" y="14" width="40" height="27" rx="5" fill="#F4E2DC" stroke="#C4553F" stroke-width="2.4"/>
-        <circle cx="26" cy="27.5" r="7.5" stroke="#C4553F" stroke-width="2.4"/>
-        <path d="M23.5 23.5h4a2.6 2.6 0 0 1 0 5.2h-4m0-2.6h6.5m-6.5-2.6v8.4" stroke="#C4553F" stroke-width="2" stroke-linecap="round"/>
-        <path d="M13 20v-4a3 3 0 0 1 3-3h20a3 3 0 0 1 3 3v4" stroke="#C6BBA6" stroke-width="2.4"/>
-        <path d="M15 44l3-3m16 3l-3-3" stroke="#6F91A6" stroke-width="2.2" stroke-linecap="round"/></svg></div>
-      <h3>Frozen cash</h3><p class="tag-fil">Nakatengga ang puhunan</p>
-      <p>Money tied up in stock that will not move is money you cannot spend on stock that will. The checker shows
-        the exact pesos frozen in each slow item.</p>
+  <div id="app">
+    <div class="appbar">
+      <div class="ttl"><span></span> LihukAI</div>
+      <div class="note">No sign-up · nothing leaves your phone</div>
     </div>
-    <div class="cost">
-      <div class="ic-cost"><svg viewBox="0 0 52 52" fill="none">
-        <rect x="5" y="33" width="42" height="4.5" rx="2.2" fill="#2E4034"/>
-        <rect x="9" y="17" width="10" height="16" rx="2.5" fill="#E0A052"/>
-        <rect x="21" y="21" width="9" height="12" rx="2.5" fill="#7C9A6B"/>
-        <rect x="33" y="15" width="10" height="18" rx="2.5" fill="#C6BBA6" stroke="#C4553F" stroke-width="2.2" stroke-dasharray="4 3"/>
-        <path d="M10 37.5v5m32-5v5" stroke="#2E4034" stroke-width="2.2" stroke-linecap="round"/>
-        <path d="M38 9v4M35 11h6" stroke="#C4553F" stroke-width="2" stroke-linecap="round"/></svg></div>
-      <h3>Dead shelf space</h3><p class="tag-fil">Sayang ang espasyo</p>
-      <p>Every slot a loser occupies is a slot a winner cannot have. In a tindahan, space is the scarcest thing you
-        own — and slow movers hoard it.</p>
-    </div>
-    <div class="cost">
-      <div class="ic-cost"><svg viewBox="0 0 52 52" fill="none">
-        <path d="M17 15h18l-2 26a3 3 0 0 1-3 2.8H22a3 3 0 0 1-3-2.8L17 15Z" fill="#FAEEDA" stroke="#E0A052" stroke-width="2.4"/>
-        <path d="M14 15h24" stroke="#E0A052" stroke-width="2.4" stroke-linecap="round"/>
-        <path d="M21 10h10v5H21z" fill="#C6BBA6"/>
-        <path d="M26 22v10m0 0l-3.5-3.5M26 32l3.5-3.5" stroke="#C4553F" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
-        <circle cx="38" cy="36" r="6" fill="#C4553F" opacity=".18"/></svg></div>
-      <h3>Spoiling value</h3><p class="tag-fil">Malapit nang mag-expire</p>
-      <p>Food, sachets and seasonal items lose value by the week. The longer they sit, the closer their worth
-        slides to zero — then to the bin.</p>
+    <div class="appbody">
+      <nav class="tabs" id="tabs">
+        <button class="on" data-t="check">Check a product</button>
+        <button data-t="batch">Check a whole list</button>
+      </nav>
+
+      <section class="tab on" id="check">
+        <div class="grid2">
+          <div class="card">
+            <h2>Tell me about the product</h2>
+            <p class="sub">Just what you already know off the top of your head.</p>
+            <div class="field"><div class="top"><div><label for="stale">Weeks since it last sold</label>
+              <span class="hint">— 0 = sold this week</span></div><span class="val" id="stale-v">20</span></div>
+              <input type="range" id="stale" min="0" max="52" value="20"></div>
+            <div class="field"><div class="top"><div><label for="weeks">Weeks you've been selling it</label></div>
+              <span class="val" id="weeks-v">3</span></div><input type="range" id="weeks" min="1" max="52" value="3"></div>
+            <div class="field"><label for="units">Total units sold so far</label>
+              <span class="hint">— type the number</span><br>
+              <input type="number" id="units" min="0" step="1" value="5" style="width:150px;margin-top:6px"></div>
+            <div class="field"><label for="cat">Category</label>
+              <span class="hint">— used for the bundle and discount advice</span><br>
+              <select id="cat" style="width:100%;margin-top:6px"></select></div>
+            <div class="field"><label for="stock">Units you originally stocked</label>
+              <span class="hint">— optional, for sell-through &amp; reorder</span><br>
+              <input type="number" id="stock" min="0" step="1" value="12" style="width:150px;margin-top:6px"></div>
+            <div class="field"><label for="price">Your selling price (₱)</label>
+              <span class="hint">— optional, unlocks the profit math</span><br>
+              <input type="number" id="price" min="0" step="0.01" value="25" style="width:150px;margin-top:6px"></div>
+            <div class="field"><label for="cost">What you pay for it (₱)</label>
+              <span class="hint">— your cost per unit</span><br>
+              <input type="number" id="cost" min="0" step="0.01" value="22" style="width:150px;margin-top:6px"></div>
+          </div>
+          <div class="card">
+            <div class="temp-wrap">
+              <svg width="66" height="196" viewBox="0 0 66 196" aria-hidden="true" style="flex:none">
+                <rect x="24" y="10" width="17" height="150" rx="8.5" fill="#F0EDE5" stroke="#DED6C8" stroke-width="1.5"/>
+                <rect id="merc" x="26.5" y="80" width="12" height="80" rx="6" fill="#7C9A6B"/>
+                <circle cx="32.5" cy="172" r="17" id="bulb" fill="#7C9A6B"/>
+                <text x="47" y="16" font-size="9" fill="#6F7C71" font-family="IBM Plex Mono, monospace">100</text>
+                <text x="47" y="90" font-size="9" fill="#6F7C71" font-family="IBM Plex Mono, monospace">50</text>
+                <text x="47" y="163" font-size="9" fill="#6F7C71" font-family="IBM Plex Mono, monospace">0</text>
+              </svg>
+              <div><p class="verdict" id="verdict"><small>Reading</small>STEADY</p>
+                <p class="pbig" id="pbig">— chance it keeps selling</p></div>
+            </div>
+            <div class="chips">
+              <span class="chip" id="margin-chip">Margin <b id="margin">–</b></span>
+              <span class="chip" id="str-chip">Sell-through <b id="str">–</b></span>
+              <span class="chip" id="reorder-chip">Stock left lasts <b id="reorder">–</b></span>
+              <span class="chip" id="frozen-chip">Cash tied up <b id="frozen">–</b></span>
+            </div>
+            <div class="why"><h3>Why it says that</h3><ul id="why"></ul></div>
+          </div>
+        </div>
+        <div id="check-rescue" style="margin-top:16px"></div>
+      </section>
+
+      <section class="tab" id="batch">
+        <div class="card">
+          <h2>Check a whole list at once</h2>
+          <p class="sub">Type them in or upload a filled-in file. Enter the three numbers for each and you'll see
+            which ones are worth keeping. The category is for your own reference — the reading runs on the sales numbers.</p>
+          <div class="mode-toggle"><button id="mode-type" class="on" type="button">Type it in</button><button id="mode-upload" type="button">Upload a list</button></div>
+          <div id="upload-panel" style="display:none">
+            <p>Download the template, fill it in (it opens in Excel), save it as CSV, then drop it back here. It only reads the numbers you type. It doesn't connect to your register.</p>
+            <button class="addbtn" id="dl-template" type="button">↓ Download CSV template</button>
+            <label class="dropzone" id="dropzone"><input type="file" id="csv-file" accept=".csv" style="display:none"><span>Drop your filled-in CSV here — or click to choose</span></label>
+            <div id="upload-msg"></div>
+          </div>
+          <div class="hscroll">
+            <div class="srow-head"><span>Product</span><span>Category</span><span>Wks since sold</span><span>Wks selling</span>
+              <span>Units sold</span><span>Reading</span><span></span></div>
+            <div id="rows"></div>
+          </div>
+          <button class="addbtn" id="addrow">+ Add product</button>
+          <div class="summary" id="batch-summary"></div>
+        </div>
+      </section>
     </div>
   </div>
 
-  <!-- ---------- the numbers, as a subsection of the problem ---------- -->
-  <div class="numbers-sub" id="bilang">
-    <div class="sub-head">
-      <p class="eyebrow">Hindi ka nag-iisa · you're not the only one</p>
-      <h3>It isn't just your shelf. It's the whole ecosystem.</h3>
-      <p>Slow stock feels like a personal failure when you are the one staring at it. It is not. Nearly every
-        business in this country is a micro-enterprise — <b>99.6%</b> of the Philippines' 1.24 million
-        establishments <sup>[8]</sup> — and unsold goods are the tax they all quietly pay. Here is the size of it,
-        in three parts.</p>
+  <div class="uvp" style="margin-top:26px">
+    <div>
+      <p class="eyebrow">The part most tools skip</p>
+      <h2>It'll tell you when <em>not</em> to discount.</h2>
+      <p>The first instinct with a slow seller is to knock the price down. But a lot of products barely sell any
+        faster when they're cheaper — and on a thin margin, a discount just hands away money. LihukAI checks that
+        against your own price and cost before it suggests anything.</p>
     </div>
-
-    <p class="notalone"><b>Read this as context, not as your numbers.</b> These figures come from national and
-      global studies. They are here to show the shape of the problem you are standing in — the checker itself
-      never uses them. It works only on the numbers you type in.</p>
-
-    <div class="statgroup">
-      <div class="grouphd">
-        <span class="gic" aria-hidden="true"><svg viewBox="0 0 38 38" fill="none">
-          <path d="M9 12h20l-1.6 19.5a2.6 2.6 0 0 1-2.6 2.4H13.2a2.6 2.6 0 0 1-2.6-2.4L9 12Z" fill="#F4E2DC" stroke="#C4553F" stroke-width="2.2"/>
-          <path d="M6.5 12h25" stroke="#C4553F" stroke-width="2.2" stroke-linecap="round"/>
-          <path d="M15 7.5h8v4.5h-8z" fill="#C4553F"/>
-          <path d="M16 19v9m6-9v9" stroke="#C4553F" stroke-width="1.9" stroke-linecap="round"/></svg></span>
-        <div><h4>1 · Ang natatapon</h4><p class="sub">Retail food waste — stock that ran out of time</p></div>
-      </div>
-      <div class="statgrid">
-        <div class="stat waste">
-          <div class="n">131M</div><div class="u">tonnes, retail worldwide</div>
-          <p>Food thrown out by <b>shops</b> every year — <b>12%</b> of all food waste. This starts on the shelf, not in the kitchen.</p>
-          <div class="src">UNEP, <a href="https://www.unep.org/resources/publication/food-waste-index-report-2024" target="_blank" rel="noopener">Food Waste Index 2024</a> <sup>[1]</sup></div>
-        </div>
-        <div class="stat waste">
-          <div class="n">2.95M</div><div class="u">tonnes / year, PH households</div>
-          <p>What Filipino homes throw away annually — about <b>26 kg per person</b>. Most of it crossed a store counter first.</p>
-          <div class="src">UNEP, <a href="https://www.unep.org/resources/publication/food-waste-index-report-2024" target="_blank" rel="noopener">Food Waste Index 2024</a> <sup>[1]</sup></div>
-        </div>
-        <div class="stat waste">
-          <div class="n">2,175</div><div class="u">tons every single day</div>
-          <p>Food waste generated nationwide, per day. Rice alone is <b>58%</b> of household plate waste.</p>
-          <div class="src">PIDS <a href="https://www.pids.gov.ph/details/news/in-the-news/food-wasted-by-the-tons-while-millions-of-filipinos-go-hungry" target="_blank" rel="noopener">estimate</a> <sup>[2]</sup></div>
-        </div>
-      </div>
-    </div>
-
-    <div class="statgroup">
-      <div class="grouphd">
-        <span class="gic" aria-hidden="true"><svg viewBox="0 0 38 38" fill="none">
-          <circle cx="19" cy="19" r="12" fill="#FAEEDA" stroke="#E0A052" stroke-width="2.2"/>
-          <path d="M15 14h5.2a3.1 3.1 0 0 1 0 6.2H15m0-3.1h8.5M15 14v11.5" stroke="#96622A" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/>
-          <path d="M30 8.5l3 3m0-3l-3 3" stroke="#C4553F" stroke-width="2.1" stroke-linecap="round"/></svg></span>
-        <div><h4>2 · Ang nalulugi</h4><p class="sub">What wrong stock costs the business</p></div>
-      </div>
-      <div class="statgrid">
-        <div class="stat cost">
-          <div class="n">$1.77T</div><div class="u">inventory distortion, 2023</div>
-          <p>The global cost of the wrong stock in the wrong place — larger than the entire retail GDP of Latin America.</p>
-          <div class="src">IHL Group, <a href="https://www.ihlservices.com/product/fixing-inventory-distortion-are-we-there-yet/" target="_blank" rel="noopener">Fixing Inventory Distortion</a> <sup>[3]</sup></div>
-        </div>
-        <div class="stat cost">
-          <div class="n">$562B</div><div class="u">of that is pure overstock</div>
-          <p>Goods bought in that were never bought out. Every peso of it started as somebody's working capital.</p>
-          <div class="src">IHL Group, 2023 <sup>[3]</sup></div>
-        </div>
-        <div class="stat cost">
-          <div class="n">7.2%</div><div class="u">of retail sales, gone</div>
-          <p>What distortion costs as a share of sales. On a store turning over <b>₱1,000,000</b> a year that is about <b>₱72,000</b> — close to a full month of revenue.</p>
-          <div class="src">IHL Group, 2023 <sup>[3]</sup></div>
-        </div>
-      </div>
-    </div>
-
-    <div class="statgroup">
-      <div class="grouphd">
-        <span class="gic" aria-hidden="true"><svg viewBox="0 0 38 38" fill="none">
-          <path d="M19 33V17" stroke="#54704A" stroke-width="2.4" stroke-linecap="round"/>
-          <path d="M19 21c-1-6-6-8-11.5-7 .6 6 5.4 9 11.5 7Z" fill="#7C9A6B"/>
-          <path d="M19 18c1-6.5 6-9 11.5-8-.6 6.5-5.4 9.6-11.5 8Z" fill="#A8C094"/>
-          <path d="M11 33h16" stroke="#54704A" stroke-width="2.4" stroke-linecap="round"/></svg></span>
-        <div><h4>3 · Ang pagkakataon</h4><p class="sub">What there is to win — already measured, on Filipino shelves</p></div>
-      </div>
-      <div class="statgrid">
-        <div class="stat opp">
-          <div class="n">1.3M</div><div class="u">sari-sari stores</div>
-          <p>Stores nationwide, with <b>94%</b> of Filipino consumers relying on them. The channel already turns over <b>₱1.12–1.46T</b> a year, with a ₱2.4T target by 2030.</p>
-          <div class="src"><a href="https://www.philstar.com/the-freeman/cebu-business/2024/03/05/2338187/sari-fund-benefit-13m-sari-sari-stores-nationwide" target="_blank" rel="noopener">Philstar</a> 2024 · <a href="https://bworldonline.com/economy/2025/06/16/679536/sari-sari-store-segment-targeted-for-growth-to-p2-4-trillion-by-2030/" target="_blank" rel="noopener">BusinessWorld</a> 2025 <sup>[4][5]</sup></div>
-        </div>
-        <div class="stat opp">
-          <div class="n">~70%</div><div class="u">of packaged food sales</div>
-          <p>The share of manufactured consumer-food sales that moves through sari-sari stores — which is why what sits unsold on those shelves matters nationally.</p>
-          <div class="src">Magna Kultura Foundation <sup>[6]</sup></div>
-        </div>
-        <div class="stat opp">
-          <div class="n">+46%</div><div class="u">daily sales, in two weeks</div>
-          <p>The lift 300+ sari-sari stores saw after acting on data-driven advice about their <b>underperforming products</b> — total sales up 17%, on 20% <i>fewer</i> selling days.</p>
-          <div class="src">Packworks <a href="https://packworks.io/sari-sari-stores-using-ai-see-double-digit-performance-gains-packworks-report/" target="_blank" rel="noopener">Store Insighting Project</a>, 2025 <sup>[7]</sup></div>
-        </div>
-      </div>
-    </div>
-
-    <div class="sources">
-      <h5>Sources</h5>
-      <ol>
-        <li>UNEP, <a href="https://www.unep.org/resources/publication/food-waste-index-report-2024" target="_blank" rel="noopener">Food Waste Index Report 2024</a> (2022 reference data) — global retail 131M tonnes / 12% of food waste; PH households 2.95M tonnes/yr, 26 kg per capita.</li>
-        <li>Philippine Institute for Development Studies, <a href="https://www.pids.gov.ph/details/news/in-the-news/food-wasted-by-the-tons-while-millions-of-filipinos-go-hungry" target="_blank" rel="noopener">"Food wasted by the tons while millions of Filipinos go hungry"</a> — ~2,175 tons/day; rice 58% of household plate waste.</li>
-        <li>IHL Group, <a href="https://www.ihlservices.com/product/fixing-inventory-distortion-are-we-there-yet/" target="_blank" rel="noopener">Fixing Inventory Distortion</a> (2023) — $1.77T global cost; $1.2T out-of-stocks, $562B overstocks; 7.2% of retail sales. Summary via <a href="https://www.retailtouchpoints.com/features/industry-insights/ihl-study-inventory-distortion-will-cost-retailers-1-77-trillion-in-2023" target="_blank" rel="noopener">Retail TouchPoints</a>.</li>
-        <li><a href="https://www.philstar.com/the-freeman/cebu-business/2024/03/05/2338187/sari-fund-benefit-13m-sari-sari-stores-nationwide" target="_blank" rel="noopener">Philstar / The Freeman</a> (2024) — 1.3M sari-sari stores; 94% of consumers depend on them.</li>
-        <li><a href="https://bworldonline.com/economy/2025/06/16/679536/sari-sari-store-segment-targeted-for-growth-to-p2-4-trillion-by-2030/" target="_blank" rel="noopener">BusinessWorld</a> (2025) — ₱1.12–1.46T annual contribution, 15–20% of retail; ₱2.4T target by 2030.</li>
-        <li>Magna Kultura Foundation, <a href="https://dickieaguado.wordpress.com/2011/09/29/empowering-sari-sari-stores-in-the-philippines/" target="_blank" rel="noopener">"Empowering Sari-Sari Stores in the Philippines"</a> — almost 70% of manufactured consumer-food sales. Foundation estimate, not official statistics.</li>
-        <li>Packworks, <a href="https://packworks.io/sari-sari-stores-using-ai-see-double-digit-performance-gains-packworks-report/" target="_blank" rel="noopener">Store Insighting Project report</a> (2025) — 300+ stores; +46% daily GMV, +17% total sales in two weeks, driven by recommendations on underperforming products.</li>
-        <li>Department of Trade and Industry, <a href="https://www.dti.gov.ph/dti-knowledge-hub/dti-statistics/dti-msme-statistics" target="_blank" rel="noopener">2024 Philippine MSME Statistics</a> — 1,236,908 MSMEs of 1,241,476 establishments (99.63%); 65.1% of total employment.</li>
-      </ol>
+    <div class="demo">
+      <div class="fil" style="text-transform:uppercase;letter-spacing:.12em;font-size:10.5px">Example · bacon</div>
+      <div style="font-family:var(--f-head);font-weight:800;font-size:19px;margin:6px 0 13px">Bundle it — don't discount</div>
+      <div class="warnbox"><b>Don't discount this one.</b> Bacon does move faster when it's cheaper, but at your ₱3 margin a 15% cut would put you <b>below cost</b>. Pair it with something instead.</div>
     </div>
   </div>
 </div></section>
 
 <div class="shelfrule" aria-hidden="true"></div>
 
-<section style="padding-top:56px"><div class="wrap"><div class="bridge">
-  <p class="eyebrow">May paraan · there's a way through</p>
-  <h2>Knowing it's expensive doesn't tell you what to do about it.</h2>
-  <p>That's the next page. One product, one decision — itulak o bitawan, and if you push it, how.</p>
-  <a href="solution.html" class="btn btn-mango">See the solution →</a>
-</div></div></section>
+<!-- ============================================================
+     SIGN-OFF
+     ============================================================ -->
+<section style="padding-top:58px"><div class="wrap">
+  <div class="signoff">
+    <h2>You were always going to make this call.</h2>
+    <p>Every shop owner already runs some version of this in their head — which product deserves another order,
+      and which one quietly turned into a loss months ago. LihukAI doesn't take that judgment away from you. It
+      just puts numbers behind it, so the decision gets made this week instead of next year, and the money stuck
+      on your shelf goes back to work.</p>
+    <p>Check one product. Then check the next one.</p>
+    <div class="nextup">
+      <a class="nextcard" href="why.html">
+        <span class="k">Next</span>
+        <b>Why It Matters</b>
+        <span>What dead stock costs a store, and why you're far from the only one carrying it.</span>
+      </a>
+      <a class="nextcard" href="model.html">
+        <span class="k">Then</span>
+        <b>The AI Model</b>
+        <span>What the model learned from, how it was tested, and where it can be wrong.</span>
+      </a>
+    </div>
+  </div>
+</div></section>
 
 <div class="disclaimer"><div class="wrap">
-  <h4>Mga paalala · notes on these figures</h4>
+  <h4>A few things to know</h4>
   <ul>
-    <li><b>Different studies, different scopes.</b> The food-waste totals are national and household-level, not retail-only. The inventory-distortion figures are global, not Philippine. They are shown together because they point the same way — not because they measure the same thing.</li>
-    <li><b>Different years.</b> Each figure carries the year of its source. The most recent is 2025; the UNEP data references 2022. Nothing has been adjusted for inflation or restated.</li>
-    <li><b>One source is weaker than the rest.</b> The ~70% packaged-food share is a foundation estimate that circulates widely in retail coverage. It is not official statistics, and it is labelled as such rather than dropped.</li>
-    <li><b>None of these numbers touch the tool.</b> The checker's verdicts come only from the sales figures you enter. Nothing on this page feeds the model.</li>
+    <li><b>It's a guide, not a guarantee.</b> Every reading is a probability based on patterns in past sales, not a prediction about your specific shop. A product marked STALLED can still sell. One marked MOVING can still stall.</li>
+    <li><b>The training data isn't Philippine.</b> The model learned from two years of a large foreign grocery chain's sales. The approach — how recently something sold, how steadily, how many people bought it — carries over fine. The specific category names, product pairings and discount responses may not.</li>
+    <li><b>The peso amounts are yours.</b> Margin, cash tied up, and the discount check all come straight from the price and cost you type in. Any ₱ figure in the examples is made up.</li>
+    <li><b>This isn't financial advice.</b> What you stock, discount or drop is your call. Factor in expiry dates, supplier terms and your own regulars — things this tool can't see.</li>
+    <li><b>Nothing you type gets sent anywhere.</b> The checker runs entirely in your browser. No account, no tracking of your inputs, no server on the other end.</li>
   </ul>
 </div></div>
 
 <footer class="sitefoot"><div class="wrap">
   <div class="cols">
     <div>
-      <div class="brand"><span class="mark" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="2.5" y="8" width="19" height="12.5" rx="1.8" fill="#fff"/><path d="M2.5 8 5 3.5h14L21.5 8Z" fill="#fff" opacity=".78"/><rect x="5.5" y="12" width="5" height="8.5" rx=".9" fill="#C4553F"/><rect x="13" y="11.5" width="5.5" height="4" rx=".9" fill="#C4553F"/></svg></span> <span>Shelf Temp Check</span></div>
-      <p style="margin:0;max-width:36ch">Slow-mover triage for sari-sari stores, mini-groceries, and anyone who has ever stared at a shelf and wondered kung itutuloy pa.</p>
+      <div class="brand"><span class="mark" aria-hidden="true"><svg viewBox="0 0 32 32"><rect width="32" height="32" rx="9" fill="#C4553F"/><rect x="3.5" y="10" width="4.5" height="2.6" rx="1.3" fill="#FBF9F5" opacity=".38"/><rect x="5.5" y="15" width="3" height="2.6" rx="1.3" fill="#FBF9F5" opacity=".24"/><rect x="11" y="7" width="14" height="14" rx="3" fill="#FBF9F5"/><rect x="11" y="12" width="14" height="3.6" fill="#E0A052"/><rect x="6" y="24" width="20" height="2.8" rx="1.4" fill="#FBF9F5" opacity=".9"/></svg></span> <span>LihukAI</span></div>
+      <p style="margin:0;max-width:36ch">A slow-mover checker for sari-sari stores, mini-groceries, and anyone who's ever looked at a shelf and wondered whether to reorder.</p>
     </div>
     <div><h5>The three pages</h5><ul>
-      <li><a href="index.html">1 · Ang problema</a></li>
-      <li><a href="solution.html">2 · Ang solusyon</a></li>
-      <li><a href="method.html">3 · Paano ito natuto</a></li>
+      <li><a href="index.html">1 · The Checker</a></li>
+      <li><a href="why.html">2 · Why It Matters</a></li>
+      <li><a href="model.html">3 · The AI Model</a></li>
     </ul></div>
     <div><h5>On this page</h5><ul>
-      <li><a href="#problema">The three costs</a></li>
-      <li><a href="#bilang">The numbers</a></li>
-      <li><a href="method.html#contribute">Contribute data</a></li>
-      <li><a href="method.html#feedback">Leave feedback</a></li>
+      <li><a href="#try">Check a product</a></li>
+      <li><a href="model.html#contribute">Send us your results</a></li>
+      <li><a href="model.html#feedback">Leave feedback</a></li>
     </ul></div>
   </div>
   <div class="fine">
-    <span>Built on real grocery transaction data. A guide, not a guarantee. ₱ figures illustrative.</span>
-    <span>Ginawa para sa mga tindera at tindero.</span>
+    <span>Built on real grocery sales data. A guide, not a guarantee. ₱ figures in examples are made up.</span>
+    <span>Made for shopkeepers.</span>
   </div>
 </div></footer>
 
 <script src="assets/model.js"></script>
+<script src="assets/checker.js"></script>
 </body></html>
