@@ -351,6 +351,93 @@ section[id],#top{scroll-margin-top:76px}
 #app .upl-warn{color:#7C2A20;background:var(--warm-s);border:1.5px solid #EAD2AE;border-radius:8px;padding:10px 12px}
 #app footer{display:none}
 
+/* --- contribute + feedback ---------------------------------- */
+#contribute{background-color:var(--paper-2);border-top:3px solid var(--forest);border-bottom:3px solid var(--forest)}
+.formwrap{display:grid;grid-template-columns:1.06fr .94fr;gap:20px;align-items:start}
+@media(max-width:900px){.formwrap{grid-template-columns:1fr}}
+.panel{background:var(--card);border:1.5px solid var(--line);border-radius:12px;padding:24px}
+@media(max-width:600px){.panel{padding:18px}}
+.panel h3{font-size:20px;margin:0 0 3px}
+.panel .fil-sub{font-family:var(--f-mono);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--red);margin:0 0 12px}
+.panel .lede{color:var(--ink-soft);font-size:14.5px;margin:0 0 16px}
+.whereto{border-radius:8px;padding:12px 14px;font-size:13px;margin:0 0 18px;border:1.5px solid;display:flex;gap:9px;align-items:flex-start}
+.whereto .dot{width:9px;height:9px;border-radius:50%;flex:none;margin-top:5px}
+.whereto.local{background:var(--blue-soft);border-color:#C3D2DA;color:var(--blue-deep)}
+.whereto.local .dot{background:var(--blue)}
+.whereto.live{background:var(--forest-soft);border-color:#C3D2C6;color:var(--forest)}
+.whereto.live .dot{background:var(--forest-2)}
+.whereto b{font-weight:700}
+
+.f{margin:14px 0}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.frow3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+@media(max-width:520px){.frow,.frow3{grid-template-columns:1fr}}
+.f>label,.flabel{display:block;font-family:var(--f-body);font-weight:600;font-size:13.5px;color:var(--ink);margin-bottom:6px}
+.f .hint{font-weight:400;font-size:11.5px;color:var(--muted)}
+.f input[type=text],.f input[type=number],.f input[type=email],.f select,.f textarea{
+  width:100%;font-family:var(--f-body);font-size:14px;padding:10px 12px;border:1.5px solid var(--line);
+  border-radius:7px;background:var(--paper-2);color:var(--ink)}
+.f textarea{min-height:118px;resize:vertical;line-height:1.5}
+.f input:focus,.f select:focus,.f textarea:focus{border-color:var(--forest);background:#fff;outline:none}
+.f input.bad,.f textarea.bad{border-color:var(--red);background:var(--red-soft)}
+
+.chipset{display:flex;flex-wrap:wrap;gap:7px}
+.chipset label{cursor:pointer}
+.chipset input{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap;border:0}
+.chipset span{display:inline-block;font-size:13px;padding:7px 13px;border-radius:100px;border:1.5px solid var(--line);
+  background:var(--paper-2);color:var(--ink-soft);transition:background .12s,color .12s,border-color .12s}
+.chipset label:hover span{border-color:var(--line-2)}
+.chipset input:checked+span{background:var(--forest);border-color:var(--forest);color:#fff;font-weight:600}
+.chipset input:focus-visible+span{outline:3px solid var(--orange);outline-offset:2px}
+.chipset.warmset input:checked+span{background:var(--orange);border-color:var(--orange-deep);color:var(--forest)}
+.chipset span em{font-style:normal;font-family:var(--f-mono);font-size:10.5px;letter-spacing:.05em;opacity:.7;margin-left:5px}
+
+.consent{display:flex;gap:10px;align-items:flex-start;background:var(--paper-2);border:1.5px solid var(--line);
+  border-radius:8px;padding:12px 14px;margin:18px 0 6px;font-size:13px;color:var(--ink-soft)}
+.consent input{margin-top:3px;width:17px;height:17px;accent-color:var(--forest);flex:none}
+.formactions{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:16px}
+.btn-sm{font-family:var(--f-head);font-weight:700;font-size:13.5px;cursor:pointer;border-radius:7px;padding:10px 16px;border:1.5px solid var(--line);background:var(--paper-2);color:var(--ink)}
+.btn-sm:hover{background:var(--forest);color:#fff;border-color:var(--forest)}
+.btn-sm.danger:hover{background:var(--red);border-color:var(--red);color:#fff}
+.status{font-size:13.5px;margin-top:14px;border-radius:8px;padding:11px 14px;border:1.5px solid;display:none}
+.status.show{display:block}
+.status.ok{background:var(--forest-soft);border-color:#C3D2C6;color:var(--forest)}
+.status.err{background:var(--red-soft);border-color:#E7C2BB;color:#7C2A20}
+.status.info{background:var(--orange-soft);border-color:#EAD2AE;color:#6D5636}
+
+/* the local ledger */
+.ledger .cnt{display:flex;align-items:baseline;gap:10px;margin-bottom:4px}
+.ledger .cnt b{font-family:var(--f-display);font-size:38px;line-height:1;color:var(--forest-2)}
+.ledger .cnt span{font-family:var(--f-mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.agree{background:var(--paper-2);border:1.5px solid var(--line);border-left:5px solid var(--blue);border-radius:8px;
+  padding:12px 14px;font-size:13.5px;color:var(--ink-soft);margin:14px 0}
+.agree b{color:var(--ink)}
+.entries{margin:14px 0 0;max-height:330px;overflow-y:auto;border:1.5px solid var(--line);border-radius:8px}
+.entries:empty{display:none}
+.entry{display:flex;gap:10px;align-items:flex-start;padding:11px 13px;border-bottom:1px solid var(--line);font-size:13px}
+.entry:last-child{border-bottom:none}
+.entry .meta{flex:1;min-width:0}
+.entry .nm{font-family:var(--f-head);font-weight:700;font-size:14px;color:var(--ink);word-break:break-word}
+.entry .dt{font-family:var(--f-mono);font-size:10.5px;color:var(--muted);margin-top:2px}
+.entry .tags{display:flex;gap:5px;flex-wrap:wrap;margin-top:6px}
+.entry .t{font-family:var(--f-mono);font-size:10px;letter-spacing:.04em;padding:2px 7px;border-radius:4px;background:var(--taupe-soft);color:var(--ink-soft)}
+.entry .t.did{background:var(--orange-soft);color:var(--orange-deep)}
+.entry .t.out-good{background:var(--forest-soft);color:var(--forest)}
+.entry .t.out-bad{background:var(--red-soft);color:var(--red)}
+.entry .del{background:transparent;border:none;color:var(--muted);cursor:pointer;font-size:17px;line-height:1;padding:0 2px}
+.entry .del:hover{color:var(--red)}
+.emptyledger{font-size:13.5px;color:var(--muted);background:var(--paper-2);border:1.5px dashed var(--line-2);
+  border-radius:8px;padding:16px;text-align:center;margin-top:14px}
+
+/* feedback */
+#feedback .formwrap{grid-template-columns:1fr .78fr}
+@media(max-width:900px){#feedback .formwrap{grid-template-columns:1fr}}
+.faq{list-style:none;padding:0;margin:0}
+.faq li{border-bottom:1px solid var(--line);padding:13px 0}
+.faq li:last-child{border-bottom:none}
+.faq b{display:block;font-family:var(--f-head);font-weight:700;font-size:14.5px;margin-bottom:3px}
+.faq span{font-size:13.5px;color:var(--ink-soft)}
+
 /* --- CTA + footer ------------------------------------------- */
 .cta-band{text-align:center;padding:78px 0}
 .cta-band h2{font-size:clamp(30px,4.8vw,52px);max-width:17ch;margin:0 auto 8px}
@@ -381,7 +468,7 @@ section[id],#top{scroll-margin-top:76px}
     <a href="#numbers">The numbers</a>
     <a href="#problem">The problem</a>
     <a href="#triage">The triage</a>
-    <a href="#method">The method</a>
+    <a href="#contribute">Contribute</a>
     <a href="#try" class="btn btn-red navcta" style="padding:11px 19px;font-size:14.5px"><span class="cta-long">Check a product</span><span class="cta-short">Try it →</span></a>
   </div>
 </nav></div></div>
@@ -617,8 +704,8 @@ section[id],#top{scroll-margin-top:76px}
         <div class="src">Reported by <a href="https://www.philstar.com/the-freeman/cebu-business/2024/03/05/2338187/sari-fund-benefit-13m-sari-sari-stores-nationwide" target="_blank" rel="noopener">Philstar</a>, 2024 <sup>[6]</sup></div>
       </div>
       <div class="stat opp">
-        <div class="n long">₱1.12–1.46T</div><div class="u">contributed each year</div>
-        <p>What the sari-sari channel adds to the economy annually — <b>15–20%</b> of the whole retail market, at ₱861k–₱1.12M average sales per store.</p>
+        <div class="n long">₱1.4T → ₱2.4T</div><div class="u">today, and the 2030 target</div>
+        <p>The channel already adds <b>₱1.12–1.46T</b> a year — <b>15–20%</b> of the whole retail market. Doubling that by 2030 means stores keeping more of what they already stock working, instead of dying on a shelf.</p>
         <div class="src">Sector estimates via <a href="https://bworldonline.com/economy/2025/06/16/679536/sari-sari-store-segment-targeted-for-growth-to-p2-4-trillion-by-2030/" target="_blank" rel="noopener">BusinessWorld</a>, 2025 <sup>[7]</sup></div>
       </div>
       <div class="stat opp">
@@ -627,9 +714,9 @@ section[id],#top{scroll-margin-top:76px}
         <div class="src">Packworks <a href="https://packworks.io/sari-sari-stores-using-ai-see-double-digit-performance-gains-packworks-report/" target="_blank" rel="noopener">Store Insighting Project</a>, 2025 <sup>[8]</sup></div>
       </div>
       <div class="stat opp">
-        <div class="n">₱2.4T</div><div class="u">sector target by 2030</div>
-        <p>Roughly double today's contribution. Getting there means stores keeping more of what they already stock working, instead of dying on a shelf.</p>
-        <div class="src"><a href="https://bworldonline.com/economy/2025/06/16/679536/sari-sari-store-segment-targeted-for-growth-to-p2-4-trillion-by-2030/" target="_blank" rel="noopener">BusinessWorld</a>, 2025 <sup>[7]</sup></div>
+        <div class="n">~70%</div><div class="u">of packaged food sales</div>
+        <p>The share of manufactured consumer-food sales that moves through sari-sari stores — which is why what sits unsold on those shelves matters nationally.</p>
+        <div class="src">Magna Kultura Foundation <sup>[9]</sup></div>
       </div>
     </div>
   </div>
@@ -650,6 +737,7 @@ section[id],#top{scroll-margin-top:76px}
       <li><a href="https://www.philstar.com/the-freeman/cebu-business/2024/03/05/2338187/sari-fund-benefit-13m-sari-sari-stores-nationwide" target="_blank" rel="noopener">Philstar / The Freeman</a> (2024) — 1.3M sari-sari stores; 94% of consumers depend on them.</li>
       <li><a href="https://bworldonline.com/economy/2025/06/16/679536/sari-sari-store-segment-targeted-for-growth-to-p2-4-trillion-by-2030/" target="_blank" rel="noopener">BusinessWorld</a> (2025) — ₱1.12–1.46T annual contribution; 15–20% of retail; ₱861k–₱1.123M average annual sales per store; ₱2.4T target by 2030.</li>
       <li>Packworks, <a href="https://packworks.io/sari-sari-stores-using-ai-see-double-digit-performance-gains-packworks-report/" target="_blank" rel="noopener">Store Insighting Project report</a> (2025) — 300+ stores; +46% daily GMV and +17% total sales in two weeks, driven by recommendations on underperforming products.</li>
+      <li>Magna Kultura Foundation, <a href="https://dickieaguado.wordpress.com/2011/09/29/empowering-sari-sari-stores-in-the-philippines/" target="_blank" rel="noopener">"Empowering Sari-Sari Stores in the Philippines"</a> — sari-sari stores account for almost 70% of sales of manufactured consumer food products. Foundation estimate, quoted widely in retail coverage; treat as indicative rather than official statistics.</li>
     </ol>
   </div>
 </div></section>
@@ -894,6 +982,191 @@ section[id],#top{scroll-margin-top:76px}
   </div>
 </div></section>
 
+<!-- ============================================================
+     CONTRIBUTE TO THE DATASET
+     ============================================================ -->
+<section id="contribute"><div class="wrap">
+  <div class="sec-head">
+    <p class="eyebrow">Ambag mo · add to the dataset</p>
+    <h2>Tell it what actually happened.</h2>
+    <p>The app learned from someone else's shelf. It gets sharper when it learns from yours. Log a slow mover, what
+      you decided to do about it, and how it turned out — that last part is the piece no dataset ever has. Every
+      entry is stamped with what the app <i>predicted</i>, so the gap between the call and the reality is the thing
+      that gets measured.</p>
+  </div>
+
+  <div class="formwrap">
+    <div class="panel">
+      <h3>Log a shelf outcome</h3>
+      <p class="fil-sub">Isang produkto, isang resulta</p>
+      <div class="whereto local" id="contrib-where">
+        <span class="dot"></span>
+        <span id="contrib-where-txt">Checking where this goes…</span>
+      </div>
+
+      <form id="contrib-form" novalidate>
+        <div class="f">
+          <label for="c-name">Product <span class="hint">— whatever you call it on the shelf</span></label>
+          <input type="text" id="c-name" placeholder="e.g. Canned mushrooms" maxlength="80">
+        </div>
+        <div class="f">
+          <label for="c-cat">Category <span class="hint">— optional, helps group the data</span></label>
+          <select id="c-cat"></select>
+        </div>
+        <div class="frow3">
+          <div class="f"><label for="c-stale">Weeks since last sold</label>
+            <input type="number" id="c-stale" min="0" max="520" step="1" placeholder="0"></div>
+          <div class="f"><label for="c-weeks">Weeks selling it</label>
+            <input type="number" id="c-weeks" min="1" max="520" step="1" placeholder="1"></div>
+          <div class="f"><label for="c-units">Units sold</label>
+            <input type="number" id="c-units" min="0" step="1" placeholder="0"></div>
+        </div>
+        <div class="frow3">
+          <div class="f"><label for="c-stock">Units stocked <span class="hint">— opt.</span></label>
+            <input type="number" id="c-stock" min="0" step="1" placeholder="—"></div>
+          <div class="f"><label for="c-price">Price ₱ <span class="hint">— opt.</span></label>
+            <input type="number" id="c-price" min="0" step="0.01" placeholder="—"></div>
+          <div class="f"><label for="c-cost">Cost ₱ <span class="hint">— opt.</span></label>
+            <input type="number" id="c-cost" min="0" step="0.01" placeholder="—"></div>
+        </div>
+
+        <div class="f">
+          <span class="flabel">Ano'ng ginawa mo? <span class="hint">— what you decided</span></span>
+          <div class="chipset warmset" id="c-did" role="radiogroup" aria-label="What you decided to do">
+            <label><input type="radio" name="c-did" value="kept"><span>Itinuloy <em>kept it</em></span></label>
+            <label><input type="radio" name="c-did" value="discounted"><span>Binawasan ang presyo <em>discounted</em></span></label>
+            <label><input type="radio" name="c-did" value="bundled"><span>Ipinares <em>bundled</em></span></label>
+            <label><input type="radio" name="c-did" value="stopped"><span>Hindi na inorder <em>stopped reordering</em></span></label>
+            <label><input type="radio" name="c-did" value="nothing"><span>Wala pa <em>nothing yet</em></span></label>
+          </div>
+        </div>
+
+        <div class="f">
+          <span class="flabel">Ano'ng nangyari? <span class="hint">— how it turned out</span></span>
+          <div class="chipset" id="c-out" role="radiogroup" aria-label="How it turned out">
+            <label><input type="radio" name="c-out" value="soldout"><span>Naubos <em>sold out</em></span></label>
+            <label><input type="radio" name="c-out" value="faster"><span>Bumilis <em>moved faster</em></span></label>
+            <label><input type="radio" name="c-out" value="same"><span>Ganoon pa rin <em>no change</em></span></label>
+            <label><input type="radio" name="c-out" value="wasted"><span>Nasayang <em>spoiled / written off</em></span></label>
+            <label><input type="radio" name="c-out" value="early"><span>Maaga pa <em>too early to tell</em></span></label>
+          </div>
+        </div>
+
+        <div class="frow">
+          <div class="f"><label for="c-region">Where's your store? <span class="hint">— optional</span></label>
+            <select id="c-region">
+              <option value="">— skip —</option>
+              <option>NCR / Metro Manila</option><option>Luzon (outside NCR)</option>
+              <option>Visayas</option><option>Mindanao</option><option>Outside PH</option>
+            </select></div>
+          <div class="f"><label for="c-type">Kind of store <span class="hint">— optional</span></label>
+            <select id="c-type">
+              <option value="">— skip —</option>
+              <option>Sari-sari store</option><option>Mini-grocery</option>
+              <option>Palengke / market stall</option><option>Convenience store</option><option>Iba pa / other</option>
+            </select></div>
+        </div>
+
+        <label class="consent"><input type="checkbox" id="c-consent">
+          <span>I'm happy for this entry to be used to improve the model. No store name, no address, no customer
+            details — only the numbers and the outcome above.</span></label>
+
+        <div class="formactions">
+          <button type="submit" class="btn btn-red" style="padding:12px 22px;font-size:15px">Log this outcome</button>
+          <button type="button" class="btn-sm" id="c-prefill">↑ Prefill from the checker</button>
+        </div>
+        <div class="status" id="c-status" role="status" aria-live="polite"></div>
+      </form>
+    </div>
+
+    <div class="panel ledger">
+      <h3>Your entries</h3>
+      <p class="fil-sub">Nasa telepono mo lang · kept on this device</p>
+      <div class="cnt"><b id="led-count">0</b><span id="led-count-lbl">outcomes logged</span></div>
+      <p class="lede" id="led-blurb">Nothing logged yet. Anything you add stays in this browser until you send it —
+        so you can build the list over weeks and export it in one go.</p>
+      <div class="agree" id="led-agree" style="display:none"></div>
+      <div class="entries" id="led-entries"></div>
+      <div class="emptyledger" id="led-empty">No entries yet. Log your first slow mover using the form.</div>
+      <div class="formactions">
+        <button type="button" class="btn-sm" id="led-csv">↓ Export CSV</button>
+        <button type="button" class="btn-sm" id="led-json">Copy as JSON</button>
+        <button type="button" class="btn-sm" id="led-send" style="display:none">Send all</button>
+        <button type="button" class="btn-sm danger" id="led-clear">Clear all</button>
+      </div>
+      <div class="status" id="led-status" role="status" aria-live="polite"></div>
+    </div>
+  </div>
+</div></section>
+
+<!-- ============================================================
+     FEEDBACK
+     ============================================================ -->
+<section id="feedback"><div class="wrap">
+  <div class="sec-head">
+    <p class="eyebrow">Sabihin mo sa amin · reach out</p>
+    <h2>Tell us where it gets it wrong.</h2>
+    <p>The verdicts are only as good as the shelves they've seen. If a call felt off, a word didn't translate, or
+      there's something a tindera needs that isn't here — that's the most useful thing you can send.</p>
+  </div>
+
+  <div class="formwrap">
+    <div class="panel">
+      <h3>Leave a message</h3>
+      <p class="fil-sub">Mag-iwan ng mensahe</p>
+      <div class="whereto local" id="fb-where">
+        <span class="dot"></span>
+        <span id="fb-where-txt">Checking where this goes…</span>
+      </div>
+
+      <form id="fb-form" novalidate>
+        <div class="f">
+          <span class="flabel">Anong klase? <span class="hint">— what's this about</span></span>
+          <div class="chipset" id="fb-topic" role="radiogroup" aria-label="Topic">
+            <label><input type="radio" name="fb-topic" value="wrong-call" checked><span>Mali ang hatol <em>a verdict felt wrong</em></span></label>
+            <label><input type="radio" name="fb-topic" value="bug"><span>May sira <em>something's broken</em></span></label>
+            <label><input type="radio" name="fb-topic" value="idea"><span>May ideya ako <em>feature idea</em></span></label>
+            <label><input type="radio" name="fb-topic" value="data"><span>Mali ang datos <em>data correction</em></span></label>
+            <label><input type="radio" name="fb-topic" value="other"><span>Iba pa <em>something else</em></span></label>
+          </div>
+        </div>
+        <div class="frow">
+          <div class="f"><label for="fb-name">Name <span class="hint">— optional</span></label>
+            <input type="text" id="fb-name" maxlength="80" placeholder="Aling Nena"></div>
+          <div class="f"><label for="fb-email">Email <span class="hint">— only if you want a reply</span></label>
+            <input type="email" id="fb-email" maxlength="120" placeholder="you@email.com"></div>
+        </div>
+        <div class="f">
+          <label for="fb-msg">Your message</label>
+          <textarea id="fb-msg" maxlength="4000" placeholder="Sabihin mo lang — Taglish is fine. If a verdict felt wrong, tell us the product and the three numbers you put in."></textarea>
+        </div>
+        <div class="formactions">
+          <button type="submit" class="btn btn-red" style="padding:12px 22px;font-size:15px">Send it</button>
+          <button type="button" class="btn-sm" id="fb-copy">Copy my message</button>
+        </div>
+        <div class="status" id="fb-status" role="status" aria-live="polite"></div>
+      </form>
+    </div>
+
+    <div class="panel">
+      <h3>Before you write</h3>
+      <p class="fil-sub">Baka nasagot na dito</p>
+      <ul class="faq">
+        <li><b>Does anything I type get uploaded?</b><span>No. The checker runs entirely in your browser — the
+          numbers you enter never leave the page. Contributions and messages are stored on this device until you
+          choose to send or export them.</span></li>
+        <li><b>Why did it say "don't discount"?</b><span>Because the category's measured response to a price cut
+          wasn't enough to cover the margin you'd give up, at <i>your</i> price and cost. Change either and it
+          recalculates.</span></li>
+        <li><b>My category isn't in the list.</b><span>Pick the closest one — the health reading doesn't use
+          category at all, only the bundle and discount advice does. Then tell us what's missing, above.</span></li>
+        <li><b>Can I get my data back out?</b><span>Yes. Export CSV in the section above gives you everything you
+          logged, in a file you can open in Excel.</span></li>
+      </ul>
+    </div>
+  </div>
+</div></section>
+
 <div class="sachets" aria-hidden="true"></div>
 
 <div class="cta-band banig"><div class="wrap">
@@ -901,6 +1174,7 @@ section[id],#top{scroll-margin-top:76px}
   <h2>Stop letting cash sit on the shelf.</h2>
   <p>Three numbers you already know. One clear answer, in seconds.</p>
   <a href="#try" class="btn btn-red">Check a product →</a>
+  <a href="#contribute" class="btn btn-ghost" style="margin-left:10px">Contribute an outcome</a>
 </div></div>
 
 <footer class="sitefoot"><div class="wrap">
@@ -917,6 +1191,8 @@ section[id],#top{scroll-margin-top:76px}
         <li><a href="#triage">The triage</a></li>
         <li><a href="#method">The method</a></li>
         <li><a href="#try">Try it</a></li>
+        <li><a href="#contribute">Contribute data</a></li>
+        <li><a href="#feedback">Leave feedback</a></li>
       </ul>
     </div>
     <div>
@@ -1134,6 +1410,283 @@ renderCheck();
     ['dragleave'].forEach(function(ev){dz.addEventListener(ev,function(e){e.preventDefault();dz.classList.remove('drag');});});
     dz.addEventListener('drop',function(e){e.preventDefault();dz.classList.remove('drag');handle(e.dataTransfer.files[0]);});}
 })();
+
+
+/* ============================================================
+   CONTRIBUTIONS + FEEDBACK
+
+   CONFIG below is the only thing you need to touch to turn on
+   real submission. Leave the strings empty and nothing breaks:
+   entries are kept in this browser and can be exported to CSV
+   or copied out by hand. The UI says which mode it is in — it
+   never claims to have sent something it hasn't.
+   ============================================================ */
+const CONFIG={
+  contactEmail:"",        /* e.g. "hello@yourdomain.ph" — turns on the email route for feedback */
+  contributeEndpoint:"",  /* e.g. a Formspree / Apps Script / your-own-API URL that accepts POST JSON */
+  feedbackEndpoint:""     /* optional; if blank, feedback falls back to contactEmail, then to local */
+};
+
+const K_CONTRIB='stc.contributions.v1', K_FEED='stc.feedback.v1';
+const STORE={
+  ok:(function(){try{localStorage.setItem('stc.t','1');localStorage.removeItem('stc.t');return true}catch(e){return false}})(),
+  get(k,d){try{const v=JSON.parse(localStorage.getItem(k));return v==null?d:v}catch(e){return d}},
+  set(k,v){try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){return false}}
+};
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function say(el,msg,kind){el.className='status show '+(kind||'info');el.innerHTML=msg;}
+function hide(el){el.className='status';}
+function hostOf(u){try{return new URL(u).host}catch(e){return 'the configured endpoint'}}
+
+const DID_LBL={kept:'Kept it',discounted:'Discounted',bundled:'Bundled',stopped:'Stopped reordering',nothing:'Nothing yet'};
+const OUT_LBL={soldout:'Sold out',faster:'Moved faster',same:'No change',wasted:'Spoiled / written off',early:'Too early to tell'};
+const OUT_GOOD={soldout:1,faster:1}, OUT_BAD={same:1,wasted:1};
+
+/* ---------- where does it go? honest banners ---------- */
+(function(){
+  const cw=_('contrib-where'), cwt=_('contrib-where-txt');
+  if(CONFIG.contributeEndpoint){
+    cw.className='whereto live';
+    cwt.innerHTML=`Entries are sent to <b>${esc(hostOf(CONFIG.contributeEndpoint))}</b> and also kept on this device so you keep your own copy.`;
+  }else{
+    cw.className='whereto local';
+    cwt.innerHTML=STORE.ok
+      ? `<b>Saved on this device only — nothing is uploaded.</b> Build your list over time, then export it as CSV and send it over when you're ready.`
+      : `<b>This browser is blocking local storage,</b> so entries can't be saved between visits. You can still fill the form and copy the entry out straight away.`;
+  }
+  const fw=_('fb-where'), fwt=_('fb-where-txt');
+  if(CONFIG.feedbackEndpoint){
+    fw.className='whereto live';
+    fwt.innerHTML=`Messages go to <b>${esc(hostOf(CONFIG.feedbackEndpoint))}</b>.`;
+  }else if(CONFIG.contactEmail){
+    fw.className='whereto live';
+    fwt.innerHTML=`Sending opens your email app with the message ready for <b>${esc(CONFIG.contactEmail)}</b> — you stay in control of what actually goes out.`;
+  }else{
+    fw.className='whereto local';
+    fwt.innerHTML=`<b>No inbox is wired up yet,</b> so messages are kept on this device. Use <i>Copy my message</i> and send it wherever you like — nothing is transmitted from this page.`;
+  }
+})();
+
+/* ---------- contribute ---------- */
+_('c-cat').innerHTML=CAT_OPTS;
+const CF={name:_('c-name'),cat:_('c-cat'),stale:_('c-stale'),weeks:_('c-weeks'),units:_('c-units'),
+  stock:_('c-stock'),price:_('c-price'),cost:_('c-cost'),region:_('c-region'),type:_('c-type'),consent:_('c-consent')};
+const cStatus=_('c-status');
+
+_('c-prefill').addEventListener('click',()=>{
+  CF.cat.value=IN.cat.value; CF.stale.value=IN.stale.value; CF.weeks.value=IN.weeks.value;
+  CF.units.value=IN.units.value; CF.stock.value=IN.stock.value; CF.price.value=IN.price.value; CF.cost.value=IN.cost.value;
+  say(cStatus,'Pulled the numbers from the checker above. Now tell it what you did and what happened.','info');
+  CF.name.focus();
+});
+
+function numOrNull(el){const v=el.value.trim();if(v==='')return null;const n=parseFloat(v);return isFinite(n)?n:null;}
+function pick(name){const el=document.querySelector(`input[name="${name}"]:checked`);return el?el.value:'';}
+
+_('contrib-form').addEventListener('submit',async e=>{
+  e.preventDefault();
+  const stale=numOrNull(CF.stale), weeks=numOrNull(CF.weeks), units=numOrNull(CF.units);
+  const did=pick('c-did'), out=pick('c-out');
+  [CF.stale,CF.weeks,CF.units].forEach(el=>el.classList.remove('bad'));
+  const missing=[];
+  if(stale===null||stale<0){missing.push('weeks since it last sold');CF.stale.classList.add('bad');}
+  if(weeks===null||weeks<1){missing.push('weeks you’ve been selling it');CF.weeks.classList.add('bad');}
+  if(units===null||units<0){missing.push('units sold');CF.units.classList.add('bad');}
+  if(!did)missing.push('what you decided');
+  if(!out)missing.push('how it turned out');
+  if(missing.length){say(cStatus,'Kulang pa — still need: '+missing.join(', ')+'.','err');return;}
+  if(!CF.consent.checked){say(cStatus,'Tick the box below so we know it’s alright to use this entry.','err');return;}
+
+  const p=predict({weeks_since_last:stale,weeks:weeks,units:units});
+  const rec={
+    id:'c_'+Date.now().toString(36)+Math.random().toString(36).slice(2,7),
+    ts:new Date().toISOString(),
+    name:CF.name.value.trim(), category:CF.cat.value,
+    weeks_since_last:stale, weeks:weeks, units:units,
+    stocked:numOrNull(CF.stock), price:numOrNull(CF.price), cost:numOrNull(CF.cost),
+    decision:did, outcome:out,
+    region:CF.region.value, store_type:CF.type.value,
+    model_prob:Math.round(p*1000)/1000, model_reading:band(p).label,
+    app_said:p>=0.55?'keep':'rescue-or-cut',
+    sent:false
+  };
+
+  const all=STORE.get(K_CONTRIB,[]);
+  all.unshift(rec);
+  const saved=STORE.set(K_CONTRIB,all);
+
+  if(CONFIG.contributeEndpoint){
+    say(cStatus,'Sending…','info');
+    try{
+      const r=await fetch(CONFIG.contributeEndpoint,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(rec)});
+      if(!r.ok)throw new Error('HTTP '+r.status);
+      rec.sent=true; STORE.set(K_CONTRIB,all);
+      say(cStatus,'<b>Salamat!</b> Entry sent and kept in your own list below.','ok');
+    }catch(err){
+      say(cStatus,'<b>Saved on this device,</b> but the upload failed ('+esc(err.message)+'). It stays in your list — hit <i>Send all</i> later, or export the CSV.','info');
+    }
+  }else if(saved){
+    say(cStatus,'<b>Salamat!</b> Logged on this device. Nothing was uploaded — export the CSV when you want to send it over.','ok');
+  }else{
+    say(cStatus,'<b>Couldn’t save it</b> — this browser is blocking local storage. Use <i>Copy as JSON</i> on the right to grab the entry before you leave the page.','err');
+  }
+  renderLedger();
+  _('contrib-form').reset();
+  document.querySelectorAll('#c-did input,#c-out input').forEach(i=>i.checked=false);
+  _('led-count').scrollIntoView({block:'nearest'});
+});
+
+/* ---------- the local ledger ---------- */
+function renderLedger(){
+  const all=STORE.get(K_CONTRIB,[]);
+  _('led-count').textContent=all.length;
+  _('led-count-lbl').textContent=all.length===1?'outcome logged':'outcomes logged';
+  _('led-empty').style.display=all.length?'none':'block';
+  _('led-send').style.display=(CONFIG.contributeEndpoint&&all.some(r=>!r.sent))?'':'none';
+  _('led-blurb').textContent=all.length
+    ? 'Your running list. Export it as CSV any time — it opens straight in Excel.'
+    : 'Nothing logged yet. Anything you add stays in this browser until you send it — so you can build the list over weeks and export it in one go.';
+
+  const judged=all.filter(r=>OUT_GOOD[r.outcome]||OUT_BAD[r.outcome]);
+  const ag=_('led-agree');
+  if(judged.length>=3){
+    const hits=judged.filter(r=>(r.app_said==='keep')===!!OUT_GOOD[r.outcome]).length;
+    const pct=Math.round(hits/judged.length*100);
+    ag.style.display='';
+    ag.innerHTML=`On the <b>${judged.length}</b> entries with a real outcome, the app’s call matched what happened <b>${hits}</b> times — <b>${pct}%</b>. ${pct>=70?'It’s reading your shelf well.':pct>=45?'Middling on your shelf — the gap is exactly what the dataset needs.':'It’s misreading your shelf, which is the most useful thing you can report.'}`;
+  }else ag.style.display='none';
+
+  _('led-entries').innerHTML=all.map(r=>{
+    const g=OUT_GOOD[r.outcome]?'out-good':OUT_BAD[r.outcome]?'out-bad':'';
+    const d=new Date(r.ts);
+    return `<div class="entry">
+      <div class="meta">
+        <div class="nm">${esc(r.name||'(unnamed product)')}</div>
+        <div class="dt">${d.toLocaleDateString()} · ${r.weeks_since_last}w quiet · ${r.units} sold in ${r.weeks}w · app read ${esc(r.model_reading)} ${Math.round(r.model_prob*100)}%${r.sent?' · sent':''}</div>
+        <div class="tags">
+          ${r.category?`<span class="t">${esc(r.category)}</span>`:''}
+          <span class="t did">${esc(DID_LBL[r.decision]||r.decision)}</span>
+          <span class="t ${g}">${esc(OUT_LBL[r.outcome]||r.outcome)}</span>
+        </div>
+      </div>
+      <button class="del" data-id="${r.id}" title="Remove this entry" aria-label="Remove entry">&times;</button>
+    </div>`;
+  }).join('');
+}
+
+_('led-entries').addEventListener('click',e=>{
+  const b=e.target.closest('.del');if(!b)return;
+  STORE.set(K_CONTRIB,STORE.get(K_CONTRIB,[]).filter(r=>r.id!==b.dataset.id));
+  renderLedger(); say(_('led-status'),'Entry removed.','info');
+});
+
+const CSV_COLS=['ts','name','category','weeks_since_last','weeks','units','stocked','price','cost',
+  'decision','outcome','region','store_type','model_prob','model_reading','app_said'];
+function csvCell(v){if(v==null)return'';const s=String(v);return /[",\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s;}
+_('led-csv').addEventListener('click',()=>{
+  const all=STORE.get(K_CONTRIB,[]);
+  if(!all.length){say(_('led-status'),'Nothing to export yet.','err');return;}
+  const csv=[CSV_COLS.join(',')].concat(all.map(r=>CSV_COLS.map(c=>csvCell(r[c])).join(','))).join('\n');
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+  a.download='shelf-temp-check-contributions.csv';
+  document.body.appendChild(a);a.click();a.remove();
+  say(_('led-status'),`Exported <b>${all.length}</b> entr${all.length===1?'y':'ies'}.`,'ok');
+});
+async function copyText(t){
+  try{await navigator.clipboard.writeText(t);return true}
+  catch(e){
+    const ta=document.createElement('textarea');ta.value=t;ta.style.position='fixed';ta.style.opacity='0';
+    document.body.appendChild(ta);ta.select();
+    let ok=false;try{ok=document.execCommand('copy')}catch(e2){}
+    ta.remove();return ok;
+  }
+}
+_('led-json').addEventListener('click',async()=>{
+  const all=STORE.get(K_CONTRIB,[]);
+  if(!all.length){say(_('led-status'),'Nothing to copy yet.','err');return;}
+  const ok=await copyText(JSON.stringify(all,null,2));
+  say(_('led-status'),ok?'Copied to your clipboard as JSON.':'Couldn’t reach the clipboard — try Export CSV instead.',ok?'ok':'err');
+});
+_('led-clear').addEventListener('click',()=>{
+  const all=STORE.get(K_CONTRIB,[]);
+  if(!all.length){say(_('led-status'),'Nothing to clear.','info');return;}
+  if(!confirm('Delete all '+all.length+' saved entries from this device? Export them first if you want a copy.'))return;
+  STORE.set(K_CONTRIB,[]);renderLedger();say(_('led-status'),'All entries deleted from this device.','info');
+});
+_('led-send').addEventListener('click',async()=>{
+  const all=STORE.get(K_CONTRIB,[]), pend=all.filter(r=>!r.sent);
+  if(!pend.length){say(_('led-status'),'Everything has been sent already.','info');return;}
+  say(_('led-status'),'Sending '+pend.length+'…','info');
+  let ok=0,fail=0;
+  for(const r of pend){
+    try{
+      const res=await fetch(CONFIG.contributeEndpoint,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(r)});
+      if(!res.ok)throw new Error('HTTP '+res.status);
+      r.sent=true;ok++;
+    }catch(e){fail++;}
+  }
+  STORE.set(K_CONTRIB,all);renderLedger();
+  say(_('led-status'),`Sent <b>${ok}</b>${fail?`, <b>${fail}</b> failed and stayed in your list`:''}.`,fail?'info':'ok');
+});
+renderLedger();
+
+/* ---------- feedback ---------- */
+const fbStatus=_('fb-status');
+function fbPayload(){
+  return{
+    id:'f_'+Date.now().toString(36)+Math.random().toString(36).slice(2,7),
+    ts:new Date().toISOString(),
+    topic:pick('fb-topic'),
+    name:_('fb-name').value.trim(),
+    email:_('fb-email').value.trim(),
+    message:_('fb-msg').value.trim(),
+    page:location.href
+  };
+}
+function fbText(p){
+  return `Topic: ${p.topic}\nName: ${p.name||'(not given)'}\nEmail: ${p.email||'(not given)'}\nWhen: ${p.ts}\n\n${p.message}`;
+}
+function fbValid(p){
+  const m=_('fb-msg');m.classList.remove('bad');
+  const e=_('fb-email');e.classList.remove('bad');
+  if(p.message.length<5){m.classList.add('bad');say(fbStatus,'Add a line or two about what happened first.','err');return false}
+  if(p.email&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(p.email)){e.classList.add('bad');say(fbStatus,'That email doesn’t look right — fix it, or leave it blank.','err');return false}
+  return true;
+}
+_('fb-form').addEventListener('submit',async e=>{
+  e.preventDefault();
+  const p=fbPayload();
+  if(!fbValid(p))return;
+  const log=STORE.get(K_FEED,[]);log.unshift(p);STORE.set(K_FEED,log);
+
+  if(CONFIG.feedbackEndpoint){
+    say(fbStatus,'Sending…','info');
+    try{
+      const r=await fetch(CONFIG.feedbackEndpoint,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(p)});
+      if(!r.ok)throw new Error('HTTP '+r.status);
+      say(fbStatus,'<b>Salamat!</b> Message sent. If you left an email we’ll get back to you.','ok');
+      _('fb-form').reset();
+    }catch(err){
+      say(fbStatus,'<b>That didn’t send</b> ('+esc(err.message)+'). Your message is saved on this device — hit <i>Copy my message</i> and send it another way.','err');
+    }
+  }else if(CONFIG.contactEmail){
+    const subj='Shelf Temp Check — '+p.topic;
+    location.href='mailto:'+encodeURIComponent(CONFIG.contactEmail)+'?subject='+encodeURIComponent(subj)+'&body='+encodeURIComponent(fbText(p));
+    say(fbStatus,'Your email app should be opening with the message ready. Nothing is sent until you hit send there.','ok');
+  }else{
+    const ok=await copyText(fbText(p));
+    say(fbStatus,ok
+      ? '<b>Saved on this device and copied to your clipboard.</b> No inbox is wired up to this page yet, so paste it wherever you’d like it to land.'
+      : '<b>Saved on this device.</b> No inbox is wired up to this page yet — use <i>Copy my message</i> to take it with you.','info');
+  }
+});
+_('fb-copy').addEventListener('click',async()=>{
+  const p=fbPayload();
+  if(!p.message){say(fbStatus,'Write the message first, then copy it.','err');return}
+  const ok=await copyText(fbText(p));
+  say(fbStatus,ok?'Copied to your clipboard.':'Couldn’t reach the clipboard — select the text and copy it manually.',ok?'ok':'err');
+});
 
 </script>
 </body></html>
