@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 56" width="200" height="56" role="img" aria-label="LihukAI">
+  <title>LihukAI</title>
+  <!-- mark: a product leaving the shelf, motion trailing behind it -->
+  <g>
+    <rect x="2" y="8" width="40" height="40" rx="10" fill="#C4553F"/>
+    <rect x="6.4" y="20.5" width="5.6" height="3.2" rx="1.6" fill="#FBF9F5" opacity=".38"/>
+    <rect x="8.9" y="26.8" width="3.8" height="3.2" rx="1.6" fill="#FBF9F5" opacity=".24"/>
+    <rect x="15.8" y="16.8" width="17.5" height="17.5" rx="3.8" fill="#FBF9F5"/>
+    <rect x="15.8" y="23" width="17.5" height="4.5" fill="#E0A052"/>
+    <rect x="9.5" y="38.5" width="25" height="3.5" rx="1.75" fill="#FBF9F5" opacity=".9"/>
+  </g>
+  <!-- wordmark -->
+  <text x="53" y="36.5" font-family="Archivo Black, Arial Black, sans-serif" font-size="25" letter-spacing="-0.4" fill="#2E4034">Lihuk<tspan fill="#C4553F">AI</tspan></text>
+</svg>
